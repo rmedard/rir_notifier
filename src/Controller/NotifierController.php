@@ -13,6 +13,7 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\OpenModalDialogCommand;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Form\FormBuilder;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\webform\Entity\Webform;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -30,14 +31,15 @@ class NotifierController extends ControllerBase {
     );
   }
 
-  public function openSubscriptionModal($js = 'nojs'){
+  public function openSubscriptionModal(){
 //    if ($js == 'ajax') {
       $options = array(
         'width' => '80%',
       );
+      $bedrooms = \Drupal::request()->query->get('field_advert_bedrooms_value');
       $response = new AjaxResponse();
       $webform = Webform::load('notification_subscription')->getSubmissionForm();
-      $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert'), $webform, $options));
+      $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert' . $bedrooms), $webform, $options));
       return $response;
 //    }
 //    else {
