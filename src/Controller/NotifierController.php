@@ -33,11 +33,13 @@ class NotifierController extends ControllerBase {
   }
 
   public function openSubscriptionModal(){
-      $districts = \Drupal::request()->query->get('districts');
-
+      $districts = explode("-", \Drupal::request()->query->get('districts'));
+      $data = array(
+        'notif_districts' => $districts
+      );
 
       $response = new AjaxResponse();
-      $webform = Webform::load('notification_subscription')->getSubmissionForm();
+      $webform = Webform::load('notification_subscription')->getSubmissionForm($data);
       $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert' . $districts), $webform, ['width'=> '80%']));
       return $response;
   }
