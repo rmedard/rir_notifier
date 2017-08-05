@@ -29,20 +29,3 @@ function rir_notifier_theme($existing, $type, $theme, $path) {
     ]
   ];
 }
-
-/**
- * Implements hook_form_alter().
- */
-function rir_notifier_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  if ($form_id == 'views-exposed-form'){
-
-  }
-}
-
-/**
- * Implements hook_views_plugins_exposed_form_alter().
- */
-function rir_notifier_views_plugins_exposed_form_alter(array &$plugins) {
-  kint($plugins);
-  die();
-}
