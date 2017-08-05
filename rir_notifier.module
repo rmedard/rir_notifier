@@ -24,7 +24,7 @@ function rir_notifier_theme($existing, $type, $theme, $path) {
   return [
     'rir_subscribe_search' => [
       'variables' => [
-        'bedrooms' => $path,
+        'bedrooms' => Drupal::request()->getRequestUri(),
         'property_type' => $propertyType
       ]
     ]
