@@ -6,6 +6,5 @@ rir_scripts:
     - core/jquery
     - core/drupal.ajax
     - core/drupal
-    - core/form
     - core/drupalSettings
     - core/jquery.once

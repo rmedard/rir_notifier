@@ -4,5 +4,5 @@ rir_notifier.open_subscription_modal:
     _title: 'Modal Form'
     _controller: '\Drupal\rir_notifier\Controller\NotifierController::openSubscriptionModal'
   requirements:
-    _permission: 'access content'
+    _access: TRUE
     js: 'nojs|ajax'
