@@ -31,16 +31,13 @@ class NotifierController extends ControllerBase {
   }
 
   public function openSubscriptionModal(){
-      $options = array(
-        'width' => '80%',
-      );
+      $url = \Drupal::request()->getRequestUri();
       $bedrooms = \Drupal::request()->query->get('field_advert_bedrooms_value');
       $propertyType = \Drupal::request()->query->get('field_advert_property_type_value');
-      $tee = "test";
 
       $response = new AjaxResponse();
       $webform = Webform::load('notification_subscription')->getSubmissionForm();
-      $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert' . $tee), $webform, ['width'=> '80%']));
+      $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert' . $url), $webform, ['width'=> '80%']));
       return $response;
   }
 }
