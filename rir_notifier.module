@@ -18,14 +18,11 @@ function rir_notifier_page_attachments(array &$attachments) {
  * Implements hook_theme().
  */
 function rir_notifier_theme($existing, $type, $theme, $path) {
-  $bedrooms = \Drupal::request()->query->get('field_advert_bedrooms_value');
-  $propertyType = \Drupal::request()->query->get('field_advert_property_type_value');
 
   return [
     'rir_subscribe_search' => [
       'variables' => [
-        'bedrooms' => Drupal::request()->request->get(field_advert_bedrooms_value),
-        'property_type' => $propertyType
+        'button' => t('Subscribe'),
       ]
     ]
   ];
