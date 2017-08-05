@@ -13,3 +13,20 @@ function rir_notifier_page_attachments(array &$attachments) {
     $attachments['#attached']['library'][] = 'core/drupal.dialog.ajax';
   }
 }
+
+/**
+ * Implements hook_theme().
+ */
+function rir_notifier_theme($existing, $type, $theme, $path) {
+  $bedrooms = \Drupal::request()->query->get('field_advert_bedrooms_value');
+  $propertyType = \Drupal::request()->query->get('field_advert_property_type_value');
+
+  return [
+    'rir_subscribe_search' => [
+      'variables' => [
+        'bedrooms' => $bedrooms,
+        'property_type' => $propertyType
+      ]
+    ]
+  ];
+}

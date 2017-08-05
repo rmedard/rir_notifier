@@ -34,9 +34,6 @@ class NotifierController extends ControllerBase {
 
   public function openSubscriptionModal(){
 
-      $bedrooms = \Drupal::request()->query->get('field_advert_bedrooms_value');
-      $propertyType = \Drupal::request()->query->get('field_advert_property_type_value');
-
       $response = new AjaxResponse();
       $webform = Webform::load('notification_subscription')->getSubmissionForm();
       $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert' . $this->url), $webform, ['width'=> '80%']));
