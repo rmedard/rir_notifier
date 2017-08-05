@@ -1,0 +1,5 @@
+name: RiR Notifier
+type: module
+description: 'This module handles RiR subscriptions to search notifications.'
+package: RIR Custom Modules
+core: 8.x
