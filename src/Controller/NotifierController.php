@@ -30,10 +30,18 @@ class NotifierController extends ControllerBase {
     );
   }
 
-  public function openSubscriptionModal(){
-    $response = new AjaxResponse();
-    $webform = Webform::load('notification_subscription');
-    $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert'), $webform, ['width' => '800']));
-    return $response;
+  public function openSubscriptionModal($js = 'nojs'){
+    if ($js == 'ajax') {
+      $options = array(
+        'width' => '80%',
+      );
+      $response = new AjaxResponse();
+      $webform = Webform::load('notification_subscription');
+      $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert'), $webform, $options));
+      return $response;
+    }
+    else {
+      return t('This is the page without Javascript.');
+    }
   }
 }
