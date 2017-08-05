@@ -33,7 +33,7 @@ class NotifierController extends ControllerBase {
   }
 
   public function openSubscriptionModal(){
-      $districts = \Drupal::request()->request->get('districts');
+      $districts = \Drupal::request()->query->get('districts');
 
 
       $response = new AjaxResponse();
