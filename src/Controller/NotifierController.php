@@ -33,11 +33,19 @@ class NotifierController extends ControllerBase {
   }
 
   public function openSubscriptionModal(){
-      $districts = explode("-", \Drupal::request()->query->get('districts'));
+      $query = \Drupal::request()->query;
+      $districts = explode("-", $query->get('districts'));
+      $rooms = $query->get('rooms');
+      $propertyType = $query->get('property_type');
+      $price = $query->get('price');
+
       $values = [
         'webform_id' => 'notification_subscription',
         'data' => [
-          'notif_districts' => $districts
+          'notif_districts' => $districts,
+          'notif_nbr_rooms' => $rooms,
+          'notif_property_type' => $propertyType,
+          'notif_price' => $price
         ]
       ];
 
