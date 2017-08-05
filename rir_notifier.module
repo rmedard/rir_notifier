@@ -3,3 +3,12 @@
 * @file
 * A description of what your module does.
 */
+
+/**
+ * Implements hook_page_attachments().
+ */
+function rir_notifier_page_attachments(array &$attachments) {
+  if (Drupal::currentUser()->isAnonymous()){
+    $attachments['#attached']['library'][] = 'rir_notifier/rir_scripts';
+  }
+}
