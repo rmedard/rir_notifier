@@ -38,3 +38,11 @@ function rir_notifier_form_alter(&$form, FormStateInterface $form_state, $form_i
 
   }
 }
+
+/**
+ * Implements hook_views_plugins_exposed_form_alter().
+ */
+function rir_notifier_views_plugins_exposed_form_alter(array &$plugins) {
+  kint($plugins);
+  die();
+}
