@@ -19,9 +19,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class NotifierController extends ControllerBase {
 
   protected $formBuilder;
+  protected $url;
 
   public function __construct(FormBuilder $formBuilder) {
     $this->formBuilder = $formBuilder;
+    $this->url = \Drupal::request()->getRequestUri();
   }
 
   public static function create(ContainerInterface $container) {
@@ -31,13 +33,13 @@ class NotifierController extends ControllerBase {
   }
 
   public function openSubscriptionModal(){
-      $url = \Drupal::request()->getRequestUri();
+
       $bedrooms = \Drupal::request()->query->get('field_advert_bedrooms_value');
       $propertyType = \Drupal::request()->query->get('field_advert_property_type_value');
 
       $response = new AjaxResponse();
       $webform = Webform::load('notification_subscription')->getSubmissionForm();
-      $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert' . $url), $webform, ['width'=> '80%']));
+      $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert' . $this->url), $webform, ['width'=> '80%']));
       return $response;
   }
 }
