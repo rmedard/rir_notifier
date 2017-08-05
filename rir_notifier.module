@@ -10,5 +10,6 @@
 function rir_notifier_page_attachments(array &$attachments) {
   if (Drupal::currentUser()->isAnonymous()){
     $attachments['#attached']['library'][] = 'rir_notifier/rir_scripts';
+    $attachments['#attached']['library'][] = 'core/drupal.dialog.ajax';
   }
 }
