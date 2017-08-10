@@ -4,8 +4,6 @@
 * A description of what your module does.
 */
 
-use Drupal\Core\Form\FormStateInterface;
-
 /**
  * Implements hook_page_attachments().
  */
