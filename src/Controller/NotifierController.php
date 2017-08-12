@@ -43,9 +43,9 @@ class NotifierController extends ControllerBase {
   }
 
   public function page(){
-    return array(
-      '#type' => 'markup',
-      '#markup' => '<p>This is a custom page</p>'
+    $element = array(
+      '#markup' => 'Hello, This is a test page'
     );
+    return $element;
   }
 }

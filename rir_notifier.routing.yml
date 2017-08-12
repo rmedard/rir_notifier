@@ -6,7 +6,7 @@ rir_notifier.open_subscription_modal:
   requirements:
     _access: 'TRUE'
     js: 'nojs|ajax'
-rir_notifier.page:
+rir_notifier.test_page:
   path: '/rir-notifier'
   dafaults:
     _title: 'Notifier Example'
