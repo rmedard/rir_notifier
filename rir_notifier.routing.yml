@@ -10,6 +10,6 @@ rir_notifier.test_page:
   path: '/testpage'
   dafaults:
     _title: 'Test Page Example'
-    _controller: '\Drupal\rir_notifier\Controller\NotifierController::testPage'
+    _controller: '\Drupal\rir_notifier\Controller\TestController::testPage'
   requirements:
     _permission: 'access content'
