@@ -1,3 +1,11 @@
+rir_notifier.test_page:
+  path: '/testpage'
+  dafaults:
+    _controller: '\Drupal\rir_notifier\Controller\TestController::testPage'
+    _title: 'Test Page Example'
+  requirements:
+    _permission: 'access content'
+
 rir_notifier.open_subscription_modal:
   path: '/search-subscribe'
   defaults:
@@ -6,10 +14,3 @@ rir_notifier.open_subscription_modal:
   requirements:
     _access: 'TRUE'
     js: 'nojs|ajax'
-rir_notifier.test_page:
-  path: '/testpage'
-  dafaults:
-    _controller: '\Drupal\rir_notifier\Controller\TestController::testPage'
-    _title: 'Test Page Example'
-  requirements:
-    _permission: 'access content'
