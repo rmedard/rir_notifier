@@ -9,7 +9,7 @@ rir_notifier.open_subscription_modal:
 rir_notifier.test_page:
   path: '/testpage'
   dafaults:
-    _title: 'Test Page Example'
     _controller: '\Drupal\rir_notifier\Controller\TestController::testPage'
+    _title: 'Test Page Example'
   requirements:
     _permission: 'access content'

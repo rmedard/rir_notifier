@@ -9,10 +9,13 @@
 namespace Drupal\rir_notifier\Controller;
 
 
-class TestController {
+use Drupal\Core\Controller\ControllerBase;
+
+class TestController extends ControllerBase {
+
   public function testPage(){
     $element = array(
-      '#markup' => 'Hello, This is a test page'
+      '#markup' => 'Hello, This is a test page',
     );
     return $element;
   }
