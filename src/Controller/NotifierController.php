@@ -21,16 +21,16 @@ class NotifierController extends ControllerBase {
   protected $formBuilder;
   protected $url;
 
-  public function __construct(FormBuilder $formBuilder) {
-    $this->formBuilder = $formBuilder;
-    $this->url = \Drupal::request()->getRequestUri();
-  }
-
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('form_builder')
-    );
-  }
+//  public function __construct(FormBuilder $formBuilder) {
+//    $this->formBuilder = $formBuilder;
+//    $this->url = \Drupal::request()->getRequestUri();
+//  }
+//
+//  public static function create(ContainerInterface $container) {
+//    return new static(
+//      $container->get('form_builder')
+//    );
+//  }
 
   public function openSubscriptionModal(){
       $query = \Drupal::request()->query;
@@ -56,5 +56,12 @@ class NotifierController extends ControllerBase {
       $webform = Webform::load($values['webform_id'])->getSubmissionForm($values);
       $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert'), $webform, ['width'=> '80%']));
       return $response;
+  }
+
+  public function page(){
+    return array(
+      '#type' => 'markup',
+      '#markup' => '<p>This is a custom page</p>'
+    );
   }
 }

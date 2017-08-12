@@ -6,3 +6,10 @@ rir_notifier.open_subscription_modal:
   requirements:
     _access: 'TRUE'
     js: 'nojs|ajax'
+rir_notifier.page:
+  path: '/rir-notifier'
+  dafaults:
+    _title: 'Notifier Example'
+    _controller: '\Drupal\rir_notifier\Controller\NotifierController::page'
+  requirements:
+    _permission: 'access content'
