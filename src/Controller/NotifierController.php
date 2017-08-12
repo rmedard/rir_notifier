@@ -42,7 +42,7 @@ class NotifierController extends ControllerBase {
       return $response;
   }
 
-  public function page(){
+  public function testPage(){
     $element = array(
       '#markup' => 'Hello, This is a test page'
     );
