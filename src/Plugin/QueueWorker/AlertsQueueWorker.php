@@ -17,6 +17,7 @@ use const CURLOPT_HTTPHEADER;
 use const CURLOPT_POST;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
+use const CURLOPT_URL;
 use Drupal;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\node\Entity\Node;
@@ -109,21 +110,22 @@ class AlertsQueueWorker extends QueueWorkerBase {
   private function authorize(){
     $clientID = '679132406599';
     $clientSecret = 'a4a75098d661c74574a825fcc0cd2758797934924362538593';
-    $url = 'https://login.mailchimp.com/oauth2/token';
+
+    $url = 'https://login.mailchimp.com/oauth2/authorize?response_type=code&client_id='.$clientID.'&client_secret='
+        .$clientSecret.'&redirect_uri='.urlencode('http://rirdev.tk/oauth/complete.php');
+
     $ch = curl_init($url);
     curl_setopt_array($ch, array(
-      CURLOPT_POST => TRUE,
-      CURLOPT_POSTFIELDS => 'grant_type=authorization_code&client_id='.$clientID.'&client_secret='
-        .$clientSecret.'&redirect_uri='.urlencode('http://rirdev.tk/oauth/complete.php').'&code={code}'
+      CURLOPT_RETURNTRANSFER => TRUE
     ));
     $response = curl_exec($ch);
     if ($response === FALSE){
       Drupal::logger('rir_notifier')->error(curl_error($ch));
       return NULL;
     } else {
-      $responseData = json_decode($response, TRUE);
-      Drupal::logger('rir_notifier')->notice($responseData['access_token']);
-      return $responseData['access_token'];
+//      $responseData = json_decode($response, TRUE);
+      Drupal::logger('rir_notifier')->notice($response);
+//      return $responseData['access_token'];
     }
   }
 }
