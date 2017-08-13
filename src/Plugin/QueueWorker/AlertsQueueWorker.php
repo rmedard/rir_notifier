@@ -13,6 +13,7 @@ use function curl_error;
 use function curl_exec;
 use function curl_init;
 use function curl_setopt_array;
+use const CURLOPT_HEADER;
 use const CURLOPT_HTTPHEADER;
 use const CURLOPT_POST;
 use const CURLOPT_POSTFIELDS;
@@ -116,7 +117,10 @@ class AlertsQueueWorker extends QueueWorkerBase {
 
     $ch = curl_init($url);
     curl_setopt_array($ch, array(
-      CURLOPT_RETURNTRANSFER => TRUE
+      CURLOPT_RETURNTRANSFER => TRUE,
+      CURLOPT_HTTPHEADER => array(
+        'Content-Type: application/json'
+      )
     ));
     $response = curl_exec($ch);
     if ($response === FALSE){
@@ -124,7 +128,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
       return NULL;
     } else {
 //      $responseData = json_decode($response, TRUE);
-      Drupal::logger('rir_notifier')->notice($response);
+      Drupal::logger('rir_notifier')->notice(json_decode($response));
 //      return $responseData['access_token'];
     }
   }
