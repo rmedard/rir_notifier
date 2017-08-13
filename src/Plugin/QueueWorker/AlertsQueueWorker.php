@@ -71,7 +71,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
 //    $client_secret =  'a4a75098d661c74574a825fcc0cd2758797934924362538593';
 //    $redirect_url =  'https://www.some-domain.com/callback_file.php';
 
-    $mailChimpAPIKey = '32e34053c5d17d18bf833e1c90af369e-us16';
+    $mailChimpAPIKey = 'e29c8cf2c4d114d83629a9aee4430992-us16';
     $mailchimp = new Mailchimp($mailChimpAPIKey);
 
     if (isset($mailchimp)){
