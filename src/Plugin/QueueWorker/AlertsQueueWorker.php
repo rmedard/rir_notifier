@@ -73,6 +73,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
         ->condition('field_dr_reference', $data->reference)
         ->execute();
 
+      $interestId = NULL;
       if (empty($requestCategories)){
 
         $responseData = $mailchimp->lists($mailChimpListId)->interestCategories($mailchimpCategoryID)->interests()->POST(array('name' => $data->reference));
@@ -89,7 +90,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
         $interestId = $responseData['id'];
       } else {
         $detailsRequestCategory = Node::load($requestCategories[0]);
-        $interestId = $detailsRequestCategory->get('field_mailchimp_category_id')->value;
+        $interestId = $detailsRequestCategory->get('field_mailchimp_interest_id')->value;
       }
       $member = ['email_address' => $data->email, 'status' => 'subscribed', 'email_type' => 'html', 'interests' => array($interestId)];
       $mailchimp->lists($mailChimpListId)->members()->POST($member);
