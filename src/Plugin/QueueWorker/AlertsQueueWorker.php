@@ -81,7 +81,8 @@ class AlertsQueueWorker extends QueueWorkerBase {
           'type' => 'details_request_category',
           'title' => $data->reference,
           'field_mailchimp_list_id' => $responseData['list_id'],
-          'field_mailchimp_category_id' => $responseData['id'],
+          'field_mailchimp_category_id' => $responseData['category_id'],
+          'field_mailchimp_interest_id' => $responseData['id'],
           'field_dr_reference' => $responseData['name']
         ]);
         $detailsRequestCategory->save();
