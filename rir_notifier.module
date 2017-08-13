@@ -36,6 +36,6 @@ function rir_notifier_theme($existing, $type, $theme, $path) {
  */
 function rir_notifier_entity_insert(EntityInterface $entity) {
   if ($entity instanceof WebformSubmissionInterface){
-    drupal_set_message($entity, 'warning');
+    drupal_set_message('Oyeeee', 'warning');
   }
 }
