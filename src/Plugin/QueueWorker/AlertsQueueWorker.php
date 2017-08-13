@@ -19,6 +19,8 @@ use const CURLOPT_RETURNTRANSFER;
 use Drupal;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\node\Entity\Node;
+use function json_decode;
+use function json_encode;
 use Mailchimp;
 use function urlencode;
 
@@ -81,7 +83,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
       if (empty($requestCategories)){
 
         $responseData = $mailchimp->lists($mailChimpListId)->interestCategories()->POST(array('title' => $data->reference, 'type' => 'dropdown'));
-
+        $responseData = json_decode(json_encode($responseData), TRUE);
         $detailsRequestCategory = Node::create([
           'type' => 'details_request_category',
           'title' => $data->reference,
