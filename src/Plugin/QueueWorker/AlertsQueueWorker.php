@@ -70,7 +70,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
       ->condition('field_dr_reference', $data->reference)
       ->execute();
     if (empty($requestCategories)){
-      $url = 'https://usX.api.mailchimp.com/3.0/lists/'.$mailChimpListId.'57afe96172/interest-categories';
+      $url = 'https://us16.api.mailchimp.com/3.0/lists/'.$mailChimpListId.'57afe96172/interest-categories';
       $ch = curl_init($url);
       curl_setopt_array($ch, array(
         CURLOPT_POST => TRUE,
