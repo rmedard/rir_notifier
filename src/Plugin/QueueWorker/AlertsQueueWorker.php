@@ -12,13 +12,11 @@ namespace Drupal\rir_notifier\Plugin\QueueWorker;
 use function curl_error;
 use function curl_exec;
 use function curl_init;
-use function curl_setopt;
 use function curl_setopt_array;
 use const CURLOPT_HTTPHEADER;
 use const CURLOPT_POST;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
-use const CURLOPT_USERNAME;
 use Drupal;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\node\Entity\Node;
@@ -90,6 +88,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
         $responseData = json_decode($response, TRUE);
         $detailsRequestCategory = Node::create([
           'type' => 'details_request_category',
+          'title' => $data->reference,
           'field_mailchimp_list_id' => $responseData->list_id,
           'field_mailchimp_category_id' => $responseData->id,
           'field_dr_reference' => $responseData->title
