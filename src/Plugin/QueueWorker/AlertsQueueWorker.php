@@ -92,9 +92,15 @@ class AlertsQueueWorker extends QueueWorkerBase {
           'field_dr_reference' => $responseData['title']
         ]);
         $detailsRequestCategory->save();
+        $categoryId = $responseData['id'];
       } else {
-
+        $detailsRequestCategory = Node::load($requestCategories[0]);
+        $categoryId = $detailsRequestCategory->get('field_mailchimp_category_id')->value;
       }
+      $member = ['email_address' => $data->email, 'status' => 'subscribed', 'email_type' => 'html'];
+      $mailchimp->lists($mailChimpListId)->members()->POST($member);
+    } else {
+      Drupal::logger('rir_notifier')->error('Mailchimp Instantiation Failed with Key: ' .$mailChimpAPIKey);
     }
 
   }
