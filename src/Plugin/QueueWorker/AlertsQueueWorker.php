@@ -132,7 +132,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
       return NULL;
     } else {
 //      $responseData = json_decode($response, TRUE);
-      Drupal::logger('rir_notifier')->notice(json_decode($response, TRUE));
+      Drupal::logger('rir_notifier')->notice($response);
 //      return $responseData['access_token'];
     }
   }
