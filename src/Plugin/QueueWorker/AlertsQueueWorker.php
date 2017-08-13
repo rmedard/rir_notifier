@@ -68,9 +68,9 @@ class AlertsQueueWorker extends QueueWorkerBase {
 
     $mailChimpAPIKey = 'e29c8cf2c4d114d83629a9aee4430992-us16';
     $mailchimp = new Mailchimp($mailChimpAPIKey);
+    $mailChimpListId = '6ec516829b';
 
     if (isset($mailchimp)){
-      $mailChimpListId = '6ec516829b';
 
       $requestCategories = Drupal::entityQuery('node')
         ->condition('status', 1)
@@ -80,7 +80,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
 
       if (empty($requestCategories)){
 
-        $responseData = $mailchimp->lists($mailChimpListId)->interest_categories->POST(array('title' => $data->reference, 'type' => 'dropdown'));
+        $responseData = $mailchimp->lists($mailChimpListId)->interest_categories()->POST(array('title' => $data->reference, 'type' => 'dropdown'));
 
         $detailsRequestCategory = Node::create([
           'type' => 'details_request_category',
