@@ -89,9 +89,9 @@ class AlertsQueueWorker extends QueueWorkerBase {
         $detailsRequestCategory = Node::create([
           'type' => 'details_request_category',
           'title' => $data->reference,
-          'field_mailchimp_list_id' => $responseData->list_id,
-          'field_mailchimp_category_id' => $responseData->id,
-          'field_dr_reference' => $responseData->title
+          'field_mailchimp_list_id' => $responseData['list_id'],
+          'field_mailchimp_category_id' => $responseData['id'],
+          'field_dr_reference' => $responseData['title']
         ]);
         $detailsRequestCategory->save();
       }
