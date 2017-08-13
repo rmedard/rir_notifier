@@ -4,9 +4,6 @@
 * A description of what your module does.
 */
 
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\webform\WebformSubmissionInterface;
-
 /**
  * Implements hook_page_attachments().
  */
@@ -29,13 +26,4 @@ function rir_notifier_theme($existing, $type, $theme, $path) {
       ]
     ]
   ];
-}
-
-/**
- * Implements hook_entity_insert().
- */
-function rir_notifier_entity_insert(EntityInterface $entity) {
-  if ($entity instanceof WebformSubmissionInterface){
-    drupal_set_message('Oyeeee', 'warning');
-  }
 }
