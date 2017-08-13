@@ -89,6 +89,8 @@ class AlertsQueueWorker extends QueueWorkerBase {
         $detailsRequestCategory = Node::load($requestCategories[0]);
         $categoryId = $detailsRequestCategory->get('field_mailchimp_category_id')->value;
       }
+      $categories = $mailchimp->lists($mailChimpListId)->interestCategories()->GET();
+      Drupal::logger('rir_notifier')->notice($categories);
       $member = ['email_address' => $data->email, 'status' => 'subscribed', 'email_type' => 'html'];
       $mailchimp->lists($mailChimpListId)->members()->POST($member);
     } else {
