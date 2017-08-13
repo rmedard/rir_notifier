@@ -13,17 +13,12 @@ use function curl_error;
 use function curl_exec;
 use function curl_init;
 use function curl_setopt_array;
-use const CURLOPT_HEADER;
-use const CURLOPT_HTTPHEADER;
 use const CURLOPT_POST;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
-use const CURLOPT_URL;
 use Drupal;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\node\Entity\Node;
-use function json_decode;
-use function json_encode;
 use Mailchimp;
 use function urlencode;
 
@@ -85,7 +80,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
 
       if (empty($requestCategories)){
 
-        $responseData = $mailchimp->lists($mailChimpListId)->interest_categories()->POST(array('title' => $data->reference, 'type' => 'dropdown'));
+        $responseData = $mailchimp->lists($mailChimpListId)->interest_categories->POST(array('title' => $data->reference, 'type' => 'dropdown'));
 
         $detailsRequestCategory = Node::create([
           'type' => 'details_request_category',
