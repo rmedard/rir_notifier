@@ -77,8 +77,8 @@ class AlertsQueueWorker extends QueueWorkerBase {
         CURLOPT_RETURNTRANSFER => TRUE,
         CURLOPT_HTTPHEADER => array(
           'Content-Type: application/json',
+          'Authorization: Basic ' . $mailChimpAPIKey
         ),
-        CURLOPT_USERNAME => 'rirmail:'.$mailChimpAPIKey,
         CURLOPT_POSTFIELDS => json_encode(array('title' => $data->reference, 'type' => 'dropdown'))
       ));
       $response = curl_exec($ch);
