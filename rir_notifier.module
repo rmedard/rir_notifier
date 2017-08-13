@@ -36,7 +36,6 @@ function rir_notifier_theme($existing, $type, $theme, $path) {
  */
 function rir_notifier_entity_insert(EntityInterface $entity) {
   if ($entity instanceof WebformSubmissionInterface){
-    kint($entity);
-    die();
+    dpm($entity);
   }
 }
