@@ -92,71 +92,10 @@ class AlertsQueueWorker extends QueueWorkerBase {
           'field_dr_reference' => $responseData['title']
         ]);
         $detailsRequestCategory->save();
-//
-//        $url = 'https://us16.api.mailchimp.com/3.0/lists/'.$mailChimpListId.'/interest-categories';
-//        $ch = curl_init($url);
-//        curl_setopt_array($ch, array(
-//          CURLOPT_POST => TRUE,
-//          CURLOPT_RETURNTRANSFER => TRUE,
-//          CURLOPT_HTTPHEADER => array(
-//            'Content-Type: application/json',
-//            'Authorization: OAuth ' . $token
-//          ),
-//          CURLOPT_POSTFIELDS => json_encode()
-//        ));
-//        $response = curl_exec($ch);
-//        if ($response === FALSE){
-//          Drupal::logger('rir_notifier')->error(curl_error($ch));
-//        } else {
-//          Drupal::logger('rir_notifier')->notice($response);
-//          $responseData = json_decode($response, TRUE);
-//          $detailsRequestCategory = Node::create([
-//            'type' => 'details_request_category',
-//            'title' => $data->reference,
-//            'field_mailchimp_list_id' => $responseData['list_id'],
-//            'field_mailchimp_category_id' => $responseData['id'],
-//            'field_dr_reference' => $responseData['title']
-//          ]);
-//          $detailsRequestCategory->save();
-//        }
       } else {
 
       }
     }
 
-  }
-
-  private function authorize(){
-    /**
-     * Mailchimp Lib doc: https://github.com/Jhut89/Mailchimp-API-3.0-PHP
-     */
-    $mailChimpAPIKey = '32e34053c5d17d18bf833e1c90af369e-us16';
-    $mailchimp = new Mailchimp($mailChimpAPIKey);
-    $clientID = '679132406599';
-    $clientSecret = 'a4a75098d661c74574a825fcc0cd2758797934924362538593';
-    /**
-     * To get csrf token: Use Postman: GET request
-     * https://login.mailchimp.com/oauth2/authorize?response_type=code&client_id=679132406599&redirect_uri=http%3A%2F%2Frirdev.tk%2Foauth%2Fcomplete.php
-     */
-    $csrf_token = '561b3b9406931a97ea2249f27ace5b88cd3f6daf';
-
-    $url = 'https://login.mailchimp.com/oauth2/token';
-
-    $ch = curl_init($url);
-    curl_setopt_array($ch, array(
-      CURLOPT_POST => TRUE,
-      CURLOPT_RETURNTRANSFER => TRUE,
-      CURLOPT_POSTFIELDS => 'grant_type=authorization_code&client_id='.$clientID.'&client_secret='
-        .$clientSecret.'&redirect_uri='.urlencode('http://rirdev.tk/oauth/complete.php').'&code='.$csrf_token,
-    ));
-    $response = curl_exec($ch);
-    if ($response === FALSE){
-      Drupal::logger('rir_notifier')->error(curl_error($ch));
-      return NULL;
-    } else {
-//      $responseData = json_decode($response, TRUE);
-      Drupal::logger('rir_notifier')->notice($response);
-//      return $responseData['access_token'];
-    }
   }
 }
