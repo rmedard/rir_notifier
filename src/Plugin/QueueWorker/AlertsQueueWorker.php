@@ -111,16 +111,20 @@ class AlertsQueueWorker extends QueueWorkerBase {
   private function authorize(){
     $clientID = '679132406599';
     $clientSecret = 'a4a75098d661c74574a825fcc0cd2758797934924362538593';
+    /**
+     * To get csrf token: Use Postman: GET request
+     * https://login.mailchimp.com/oauth2/authorize?response_type=code&client_id=679132406599&redirect_uri=http%3A%2F%2Frirdev.tk%2Foauth%2Fcomplete.php
+     */
+    $csrf_token = '561b3b9406931a97ea2249f27ace5b88cd3f6daf';
 
-    $url = 'https://login.mailchimp.com/oauth2/authorize?response_type=code&client_id='.$clientID.'&client_secret='
-        .$clientSecret.'&redirect_uri='.urlencode('http://rirdev.tk/oauth/complete.php');
+    $url = 'https://login.mailchimp.com/oauth2/token';
 
     $ch = curl_init($url);
     curl_setopt_array($ch, array(
+      CURLOPT_POST => TRUE,
       CURLOPT_RETURNTRANSFER => TRUE,
-      CURLOPT_HTTPHEADER => array(
-        'Content-Type: application/json'
-      )
+      CURLOPT_POSTFIELDS => 'grant_type=authorization_code&client_id='.$clientID.'&client_secret='
+        .$clientSecret.'&redirect_uri='.urlencode('http://rirdev.tk/oauth/complete.php').'&code='.$csrf_token,
     ));
     $response = curl_exec($ch);
     if ($response === FALSE){
@@ -128,7 +132,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
       return NULL;
     } else {
 //      $responseData = json_decode($response, TRUE);
-      Drupal::logger('rir_notifier')->notice(json_decode($response));
+      Drupal::logger('rir_notifier')->notice(json_decode($response, TRUE));
 //      return $responseData['access_token'];
     }
   }
