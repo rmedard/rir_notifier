@@ -63,6 +63,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
     $mailChimpAPIKey = 'e29c8cf2c4d114d83629a9aee4430992-us16';
     $mailchimp = new Mailchimp($mailChimpAPIKey);
     $mailChimpListId = '6ec516829b';
+    $mailchimpCategoryID = '970f627ce7';
 
     if (isset($mailchimp)){
 
@@ -74,24 +75,22 @@ class AlertsQueueWorker extends QueueWorkerBase {
 
       if (empty($requestCategories)){
 
-        $responseData = $mailchimp->lists($mailChimpListId)->interestCategories()->POST(array('title' => $data->reference, 'type' => 'dropdown'));
+        $responseData = $mailchimp->lists($mailChimpListId)->interestCategories($mailchimpCategoryID)->interests()->POST(array('name' => $data->reference));
         $responseData = json_decode(json_encode($responseData), TRUE);
         $detailsRequestCategory = Node::create([
           'type' => 'details_request_category',
           'title' => $data->reference,
           'field_mailchimp_list_id' => $responseData['list_id'],
           'field_mailchimp_category_id' => $responseData['id'],
-          'field_dr_reference' => $responseData['title']
+          'field_dr_reference' => $responseData['name']
         ]);
         $detailsRequestCategory->save();
-        $categoryId = $responseData['id'];
+        $interestId = $responseData['id'];
       } else {
         $detailsRequestCategory = Node::load($requestCategories[0]);
-        $categoryId = $detailsRequestCategory->get('field_mailchimp_category_id')->value;
+        $interestId = $detailsRequestCategory->get('field_mailchimp_category_id')->value;
       }
-      $categories = $mailchimp->lists($mailChimpListId)->interestCategories()->GET();
-      Drupal::logger('rir_notifier')->notice(json_encode($categories, TRUE));
-      $member = ['email_address' => $data->email, 'status' => 'subscribed', 'email_type' => 'html'];
+      $member = ['email_address' => $data->email, 'status' => 'subscribed', 'email_type' => 'html', 'interests' => array($interestId)];
       $mailchimp->lists($mailChimpListId)->members()->POST($member);
     } else {
       Drupal::logger('rir_notifier')->error('Mailchimp Instantiation Failed with Key: ' .$mailChimpAPIKey);
