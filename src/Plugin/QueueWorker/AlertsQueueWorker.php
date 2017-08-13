@@ -121,8 +121,8 @@ class AlertsQueueWorker extends QueueWorkerBase {
       Drupal::logger('rir_notifier')->error(curl_error($ch));
       return NULL;
     } else {
-      Drupal::logger('rir_notifier')->notice($response);
       $responseData = json_decode($response, TRUE);
+      Drupal::logger('rir_notifier')->notice($responseData['access_token']);
       return $responseData['access_token'];
     }
   }
