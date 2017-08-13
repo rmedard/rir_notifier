@@ -9,20 +9,12 @@
 namespace Drupal\rir_notifier\Plugin\QueueWorker;
 
 
-use function curl_error;
-use function curl_exec;
-use function curl_init;
-use function curl_setopt_array;
-use const CURLOPT_POST;
-use const CURLOPT_POSTFIELDS;
-use const CURLOPT_RETURNTRANSFER;
 use Drupal;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\node\Entity\Node;
 use function json_decode;
 use function json_encode;
 use Mailchimp;
-use function urlencode;
 
 /**
  * Class AlertsQueueWorker
