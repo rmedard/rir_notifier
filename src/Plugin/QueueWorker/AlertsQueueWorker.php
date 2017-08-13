@@ -80,7 +80,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
 
       if (empty($requestCategories)){
 
-        $responseData = $mailchimp->lists($mailChimpListId)->interest_categories()->POST(array('title' => $data->reference, 'type' => 'dropdown'));
+        $responseData = $mailchimp->lists($mailChimpListId)->interest_categories(NULL)->POST(array('title' => $data->reference, 'type' => 'dropdown'));
 
         $detailsRequestCategory = Node::create([
           'type' => 'details_request_category',
