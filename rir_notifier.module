@@ -4,7 +4,6 @@
 * A description of what your module does.
 */
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\webform\WebformSubmissionInterface;
 
 /**
@@ -36,18 +35,24 @@ function rir_notifier_theme($existing, $type, $theme, $path) {
  */
 function rir_notifier_webform_submission_insert(WebformSubmissionInterface $entity) {
   if ($entity->getWebform()->id() == 'notification_subscription'){
-    kint($entity->getData());
-    die();
     $districts = $entity->getData('notif_districts');
     $notifType = $entity->getData('notif_advert_type');
     $nbrRooms = $entity->getData('notif_nbr_rooms');
     $propertyType = $entity->getData('notif_property_type');
     $price = $entity->getData('notif_price');
+    $email = $entity->getData('notif_email');
+    $names = $entity->getData('notif_names');
     $referenceNbr = getRequestCategoryReference($districts, $notifType, $nbrRooms, $propertyType, $price);
-    $requestCategoryCount = Drupal::entityQuery('node')
-      ->condition('type', 'details_request_category')
-      ->condition('field_dr_reference', $referenceNbr)
-      ->count();
-    // TODO Continue here... Put logic in a queue worker
+
+    $alertsQueueWorker = Drupal::queue('alerts_processor');
+    $data = (object)['email' => $email, 'names' => $names, 'reference' => $referenceNbr];
+    $alertsQueueWorker->createItem($data);
+
   }
+}
+
+function getRequestCategoryReference($districts, $notificationType, $nbrRooms, $propertyType, $price ){
+  $districtValues = implode('_', $districts);
+  $advertTypeValue = $notificationType == 'buy' ? 'SALE' : 'RENT';
+  return $districtValues . '-' . $advertTypeValue . '-' . $nbrRooms . '-' . $propertyType . '-' .$price;
 }

@@ -9,8 +9,31 @@
 namespace Drupal\rir_notifier\Plugin\QueueWorker;
 
 
+use function curl_error;
+use function curl_exec;
+use function curl_init;
+use function curl_setopt;
+use function curl_setopt_array;
+use const CURLOPT_HTTPHEADER;
+use const CURLOPT_POST;
+use const CURLOPT_POSTFIELDS;
+use const CURLOPT_RETURNTRANSFER;
+use const CURLOPT_USERNAME;
+use Drupal;
 use Drupal\Core\Queue\QueueWorkerBase;
+use function json_decode;
+use function json_encode;
 
+/**
+ * Class AlertsQueueWorker
+ *
+ * @package Drupal\rir_notifier\Plugin\QueueWorker
+ * @QueueWorker(
+ *  id = "alerts_processor",
+ *  title = "Alerts custom Queue Worker",
+ *  cron = {"time" = 60}
+ * )
+ */
 class AlertsQueueWorker extends QueueWorkerBase {
 
   /**
@@ -39,6 +62,33 @@ class AlertsQueueWorker extends QueueWorkerBase {
    * @see \Drupal\Core\Cron::processQueues()
    */
   public function processItem($data) {
-    // TODO: Implement processItem() method.
+    $mailChimpListId = '6ec516829b';
+    $mailChimpAPIKey = '32e34053c5d17d18bf833e1c90af369e-us16';
+    $requestCategories = Drupal::entityQuery('node')
+      ->condition('status', 1)
+      ->condition('type', 'details_request_category')
+      ->condition('field_dr_reference', $data->reference)
+      ->execute();
+    if (empty($requestCategories)){
+      $url = 'https://usX.api.mailchimp.com/3.0/lists/'.$mailChimpListId.'57afe96172/interest-categories';
+      $ch = curl_init($url);
+      curl_setopt_array($ch, array(
+        CURLOPT_POST => TRUE,
+        CURLOPT_RETURNTRANSFER => TRUE,
+        CURLOPT_HTTPHEADER => array(
+          'Content-Type: application/json',
+        ),
+        CURLOPT_USERNAME => 'rirmail:'.$mailChimpAPIKey,
+        CURLOPT_POSTFIELDS => json_encode(array('title' => $data->reference, 'type' => 'dropdown'))
+      ));
+      $response = curl_exec($ch);
+      if ($response === FALSE){
+        Drupal::logger('rir_notifier')->error(curl_error($ch));
+      } else {
+        $responseData = json_decode($response, TRUE);
+        Drupal::logger('rir_notifier')->notice($responseData);
+      }
+    }
+
   }
 }
