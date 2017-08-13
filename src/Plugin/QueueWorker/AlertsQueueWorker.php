@@ -92,6 +92,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
       }
       $member = ['email_address' => $data->email, 'status' => 'subscribed', 'email_type' => 'html', 'interests' => array($interestId)];
       $mailchimp->lists($mailChimpListId)->members()->POST($member);
+      Drupal::logger('rir_notifier')->notice('Member suscribed search: ' . $data->email);
     } else {
       Drupal::logger('rir_notifier')->error('Mailchimp Instantiation Failed with Key: ' .$mailChimpAPIKey);
     }
