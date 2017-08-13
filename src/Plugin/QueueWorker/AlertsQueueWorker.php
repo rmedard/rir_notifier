@@ -24,6 +24,7 @@ use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\node\Entity\Node;
 use function json_decode;
 use function json_encode;
+use Mailchimp;
 use function urlencode;
 
 /**
@@ -64,10 +65,18 @@ class AlertsQueueWorker extends QueueWorkerBase {
    * @see \Drupal\Core\Cron::processQueues()
    */
   public function processItem($data) {
-    $token = $this->authorize();
-    if (isset($token)){
+
+//    $code = 'abc123abc123abc123abc123';
+//    $client_id =   '679132406599';
+//    $client_secret =  'a4a75098d661c74574a825fcc0cd2758797934924362538593';
+//    $redirect_url =  'https://www.some-domain.com/callback_file.php';
+
+    $mailChimpAPIKey = '32e34053c5d17d18bf833e1c90af369e-us16';
+    $mailchimp = new Mailchimp($mailChimpAPIKey);
+
+    if (isset($mailchimp)){
       $mailChimpListId = '6ec516829b';
-      $mailChimpAPIKey = '32e34053c5d17d18bf833e1c90af369e-us16';
+
       $requestCategories = Drupal::entityQuery('node')
         ->condition('status', 1)
         ->condition('type', 'details_request_category')
@@ -75,32 +84,44 @@ class AlertsQueueWorker extends QueueWorkerBase {
         ->execute();
 
       if (empty($requestCategories)){
-        $url = 'https://us16.api.mailchimp.com/3.0/lists/'.$mailChimpListId.'/interest-categories';
-        $ch = curl_init($url);
-        curl_setopt_array($ch, array(
-          CURLOPT_POST => TRUE,
-          CURLOPT_RETURNTRANSFER => TRUE,
-          CURLOPT_HTTPHEADER => array(
-            'Content-Type: application/json',
-            'Authorization: OAuth ' . $token
-          ),
-          CURLOPT_POSTFIELDS => json_encode(array('title' => $data->reference, 'type' => 'dropdown'))
-        ));
-        $response = curl_exec($ch);
-        if ($response === FALSE){
-          Drupal::logger('rir_notifier')->error(curl_error($ch));
-        } else {
-          Drupal::logger('rir_notifier')->notice($response);
-          $responseData = json_decode($response, TRUE);
-          $detailsRequestCategory = Node::create([
-            'type' => 'details_request_category',
-            'title' => $data->reference,
-            'field_mailchimp_list_id' => $responseData['list_id'],
-            'field_mailchimp_category_id' => $responseData['id'],
-            'field_dr_reference' => $responseData['title']
-          ]);
-          $detailsRequestCategory->save();
-        }
+
+        $responseData = $mailchimp->lists($mailChimpListId)->interest_categories()->POST(array('title' => $data->reference, 'type' => 'dropdown'));
+
+        $detailsRequestCategory = Node::create([
+          'type' => 'details_request_category',
+          'title' => $data->reference,
+          'field_mailchimp_list_id' => $responseData['list_id'],
+          'field_mailchimp_category_id' => $responseData['id'],
+          'field_dr_reference' => $responseData['title']
+        ]);
+        $detailsRequestCategory->save();
+//
+//        $url = 'https://us16.api.mailchimp.com/3.0/lists/'.$mailChimpListId.'/interest-categories';
+//        $ch = curl_init($url);
+//        curl_setopt_array($ch, array(
+//          CURLOPT_POST => TRUE,
+//          CURLOPT_RETURNTRANSFER => TRUE,
+//          CURLOPT_HTTPHEADER => array(
+//            'Content-Type: application/json',
+//            'Authorization: OAuth ' . $token
+//          ),
+//          CURLOPT_POSTFIELDS => json_encode()
+//        ));
+//        $response = curl_exec($ch);
+//        if ($response === FALSE){
+//          Drupal::logger('rir_notifier')->error(curl_error($ch));
+//        } else {
+//          Drupal::logger('rir_notifier')->notice($response);
+//          $responseData = json_decode($response, TRUE);
+//          $detailsRequestCategory = Node::create([
+//            'type' => 'details_request_category',
+//            'title' => $data->reference,
+//            'field_mailchimp_list_id' => $responseData['list_id'],
+//            'field_mailchimp_category_id' => $responseData['id'],
+//            'field_dr_reference' => $responseData['title']
+//          ]);
+//          $detailsRequestCategory->save();
+//        }
       } else {
 
       }
@@ -109,6 +130,11 @@ class AlertsQueueWorker extends QueueWorkerBase {
   }
 
   private function authorize(){
+    /**
+     * Mailchimp Lib doc: https://github.com/Jhut89/Mailchimp-API-3.0-PHP
+     */
+    $mailChimpAPIKey = '32e34053c5d17d18bf833e1c90af369e-us16';
+    $mailchimp = new Mailchimp($mailChimpAPIKey);
     $clientID = '679132406599';
     $clientSecret = 'a4a75098d661c74574a825fcc0cd2758797934924362538593';
     /**
