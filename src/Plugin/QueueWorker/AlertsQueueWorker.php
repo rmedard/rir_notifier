@@ -67,14 +67,14 @@ class AlertsQueueWorker extends QueueWorkerBase {
 
     if (isset($mailchimp)){
 
-      $requestCategories = Drupal::entityQuery('node')
+      $requestInterests = Drupal::entityQuery('node')
         ->condition('status', 1)
         ->condition('type', 'details_request_category')
         ->condition('field_dr_reference', $data->reference)
         ->execute();
 
       $interestId = NULL;
-      if (empty($requestCategories)){
+      if (empty($requestInterests)){
 
         $responseData = $mailchimp->lists($mailChimpListId)->interestCategories($mailchimpCategoryID)->interests()->POST(array('name' => $data->reference));
         $responseData = json_decode(json_encode($responseData), TRUE);
@@ -89,7 +89,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
         $detailsRequestCategory->save();
         $interestId = $responseData['id'];
       } else {
-        $detailsRequestCategory = Node::load($requestCategories[0]);
+        $detailsRequestCategory = Node::load($requestInterests[0]);
         $interestId = $detailsRequestCategory->get('field_mailchimp_interest_id')->value;
       }
       $member = ['email_address' => $data->email, 'status' => 'subscribed', 'email_type' => 'html', 'interests' => array($interestId)];
