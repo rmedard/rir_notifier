@@ -21,6 +21,7 @@ use const CURLOPT_RETURNTRANSFER;
 use const CURLOPT_USERNAME;
 use Drupal;
 use Drupal\Core\Queue\QueueWorkerBase;
+use Drupal\node\Entity\Node;
 use function json_decode;
 use function json_encode;
 
@@ -85,8 +86,15 @@ class AlertsQueueWorker extends QueueWorkerBase {
       if ($response === FALSE){
         Drupal::logger('rir_notifier')->error(curl_error($ch));
       } else {
-        $responseData = json_decode($response, TRUE);
         Drupal::logger('rir_notifier')->notice($response);
+        $responseData = json_decode($response, TRUE);
+        $detailsRequestCategory = Node::create([
+          'type' => 'details_request_category',
+          'field_mailchimp_list_id' => $responseData->list_id,
+          'field_mailchimp_category_id' => $responseData->id,
+          'field_dr_reference' => $responseData->title
+        ]);
+        $detailsRequestCategory->save();
       }
     }
 
