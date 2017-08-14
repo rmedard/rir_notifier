@@ -76,7 +76,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
       $interestId = NULL;
       if (empty($requestInterests)){
 
-        $responseData = $mailchimp->request('POST', $createInterestPath, array('list-id' => $mailChimpListId, 'interest_category_id' => $mailchimpCategoryID), array('name' => $data->reference), FALSE, TRUE);
+        $responseData = $mailchimp->request('POST', $createInterestPath, array('list_id' => $mailChimpListId, 'interest_category_id' => $mailchimpCategoryID), array('name' => $data->reference), FALSE, TRUE);
 
 //        $responseData = $mailchimp->lists($mailChimpListId)->interestCategories($mailchimpCategoryID)->interests()->POST(array('name' => $data->reference));
 //        $responseData = json_decode(json_encode($responseData), TRUE);
