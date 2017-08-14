@@ -12,9 +12,9 @@ namespace Drupal\rir_notifier\Plugin\QueueWorker;
 use Drupal;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\node\Entity\Node;
-use function json_decode;
-use function json_encode;
-use Mailchimp;
+use Mailchimp\Mailchimp;
+use Mailchimp\MailchimpLists;
+
 
 /**
  * Class AlertsQueueWorker
@@ -55,13 +55,13 @@ class AlertsQueueWorker extends QueueWorkerBase {
    */
   public function processItem($data) {
 
-//    $code = 'abc123abc123abc123abc123';
-//    $client_id =   '679132406599';
-//    $client_secret =  'a4a75098d661c74574a825fcc0cd2758797934924362538593';
-//    $redirect_url =  'https://www.some-domain.com/callback_file.php';
+    $createInterestPath = '/lists/{list_id}/interest-categories/{interest_category_id}/interests';
+    $createMemberPath = '/lists/{list_id}/members';
 
     $mailChimpAPIKey = 'e29c8cf2c4d114d83629a9aee4430992-us16';
     $mailchimp = new Mailchimp($mailChimpAPIKey);
+    $mailchimpLists = new MailchimpLists($mailChimpAPIKey);
+
     $mailChimpListId = '6ec516829b';
     $mailchimpCategoryID = '970f627ce7';
 
@@ -76,8 +76,10 @@ class AlertsQueueWorker extends QueueWorkerBase {
       $interestId = NULL;
       if (empty($requestInterests)){
 
-        $responseData = $mailchimp->lists($mailChimpListId)->interestCategories($mailchimpCategoryID)->interests()->POST(array('name' => $data->reference));
-        $responseData = json_decode(json_encode($responseData), TRUE);
+        $responseData = $mailchimp->request('POST', $createInterestPath, array('list-id' => $mailChimpListId, 'interest_category_id' => $mailchimpCategoryID), array('name' => $data->reference), FALSE, TRUE);
+
+//        $responseData = $mailchimp->lists($mailChimpListId)->interestCategories($mailchimpCategoryID)->interests()->POST(array('name' => $data->reference));
+//        $responseData = json_decode(json_encode($responseData), TRUE);
         $detailsRequestCategory = Node::create([
           'type' => 'details_request_category',
           'title' => $data->reference,
@@ -92,8 +94,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
         $detailsRequestCategory = Node::load($requestInterests[0]);
         $interestId = $detailsRequestCategory->get('field_mailchimp_interest_id')->value;
       }
-      $member = ['email_address' => $data->email, 'status' => 'subscribed', 'email_type' => 'html', 'interests' => array($interestId)];
-      $mailchimp->lists($mailChimpListId)->members()->POST($member);
+      $mailchimpLists->addMember($mailChimpListId, $data->email, array('status' => 'subscribed' , 'email_type' => 'html','interests' => array($interestId)), FALSE);
       Drupal::logger('rir_notifier')->notice('Member suscribed search: ' . $data->email);
     } else {
       Drupal::logger('rir_notifier')->error('Mailchimp Instantiation Failed with Key: ' .$mailChimpAPIKey);
