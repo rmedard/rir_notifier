@@ -87,8 +87,6 @@ class AlertsQueueWorker extends QueueWorkerBase {
         $detailsRequestCategory->save();
         $interestId = $responseData['id'];
       } else {
-        kint($detailsRequestInterests);
-        die();
         $detailsRequestCategory = Node::load($detailsRequestInterests[0]);
         $interestId = $detailsRequestCategory->get('field_mailchimp_interest_id')->value;
       }
