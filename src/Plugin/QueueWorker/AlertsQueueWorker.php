@@ -56,7 +56,6 @@ class AlertsQueueWorker extends QueueWorkerBase {
   public function processItem($data) {
 
     $createInterestPath = '/lists/{list_id}/interest-categories/{interest_category_id}/interests';
-    $createMemberPath = '/lists/{list_id}/members';
 
     $mailChimpAPIKey = 'e29c8cf2c4d114d83629a9aee4430992-us16';
     $mailchimp = new Mailchimp($mailChimpAPIKey);
@@ -77,9 +76,6 @@ class AlertsQueueWorker extends QueueWorkerBase {
       if (empty($requestInterests)){
 
         $responseData = $mailchimp->request('POST', $createInterestPath, array('list_id' => $mailChimpListId, 'interest_category_id' => $mailchimpCategoryID), array('name' => $data->reference), FALSE, TRUE);
-
-//        $responseData = $mailchimp->lists($mailChimpListId)->interestCategories($mailchimpCategoryID)->interests()->POST(array('name' => $data->reference));
-//        $responseData = json_decode(json_encode($responseData), TRUE);
         $detailsRequestCategory = Node::create([
           'type' => 'details_request_category',
           'title' => $data->reference,
@@ -94,7 +90,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
         $detailsRequestCategory = Node::load($requestInterests[0]);
         $interestId = $detailsRequestCategory->get('field_mailchimp_interest_id')->value;
       }
-      $mailchimpLists->addMember($mailChimpListId, $data->email, array('status' => 'subscribed' , 'email_type' => 'html','interests' => array($interestId)), FALSE);
+      $mailchimpLists->addMember($mailChimpListId, $data->email, array('status' => 'subscribed' , 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
       Drupal::logger('rir_notifier')->notice('Member suscribed search: ' . $data->email);
     } else {
       Drupal::logger('rir_notifier')->error('Mailchimp Instantiation Failed with Key: ' .$mailChimpAPIKey);
