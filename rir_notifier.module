@@ -39,11 +39,12 @@ function rir_notifier_webform_submission_insert(WebformSubmissionInterface $enti
     $advertType = $entity->getData('notif_advert_type');
     $propertyType = $entity->getData('notif_property_type');
     $email = $entity->getData('notif_email');
-    $names = $entity->getData('notif_names');
+    $firstName = $entity->getData('notif_firstname');
+    $lastName = $entity->getData('notif_lastname');
     $referenceNbr = getRequestCategoryReference($location, $advertType, $propertyType);
 
     $alertsQueueWorker = Drupal::queue('alerts_processor');
-    $data = (object)['email' => $email, 'names' => $names, 'reference' => $referenceNbr];
+    $data = (object)['email' => $email, 'first_name' => $firstName, 'last_name' => $lastName,'reference' => $referenceNbr];
     $alertsQueueWorker->createItem($data);
 
   }
