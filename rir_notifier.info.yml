@@ -4,3 +4,6 @@ package: RIR Custom Modules
 
 type: module
 core: 8.x
+
+dependencies:
+  - mailchimp:mailchimp
