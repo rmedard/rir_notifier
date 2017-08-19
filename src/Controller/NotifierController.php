@@ -20,19 +20,15 @@ class NotifierController extends ControllerBase {
       $query = \Drupal::request()->query;
 
       $advertType = $query->get('advert');
-      $districts = explode("-", $query->get('districts'));
-      $rooms = $query->get('rooms');
+      $propertyLocation = $query->get('property_location');
       $propertyType = $query->get('property_type');
-      $price = $query->get('price');
 
       $values = [
         'webform_id' => 'notification_subscription',
         'data' => [
           'notif_advert_type' => $advertType,
-          'notif_districts' => $districts,
-          'notif_nbr_rooms' => $rooms,
-          'notif_property_type' => $propertyType,
-          'notif_price' => $price
+          'notif_property_location' => $propertyLocation,
+          'notif_property_type' => $propertyType
         ]
       ];
 
