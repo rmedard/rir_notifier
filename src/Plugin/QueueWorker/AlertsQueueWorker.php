@@ -90,10 +90,10 @@ class AlertsQueueWorker extends QueueWorkerBase {
         $detailsRequestCategory->save();
         $interestId = $responseData['id'];
         try{
-          $response = $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED , 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
-          Drupal::logger('rir_notifier')->notice('New member subscribed: ' . $data->email . ' Response:' . json_encode($response));
+          $response1 = $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED , 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
+          Drupal::logger('rir_notifier')->notice('New member subscribed: ' . $data->email . ' Response:' . json_encode($response1));
         }catch (MailchimpAPIException $ex){
-          Drupal::logger('rir_notifier')->error('MailChimp error: Code: ' . $response->status . ' Title: ' . $response->title);
+          Drupal::logger('rir_notifier')->error('MailChimp error: Code: ' . $response1->status . ' Title: ' . $response1->title);
         }
 
       } else {
@@ -104,10 +104,10 @@ class AlertsQueueWorker extends QueueWorkerBase {
             $interestId = $detailsRequestCategory->get('field_mailchimp_interest_id')->value;
           }
           try{
-            $response = $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED , 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
-            Drupal::logger('rir_notifier')->notice('Member subscription updated: ' . $data->email . ' Response:' . json_encode($response));
+            $response2 = $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED , 'merge_fields' => $data->names, 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
+            Drupal::logger('rir_notifier')->notice('Member subscription updated: ' . $data->email . ' Response:' . json_encode($response2));
           }catch (MailchimpAPIException $ex){
-            Drupal::logger('rir_notifier')->error('MailChimp Code: ' . $response->status . ' Title: ' . $response->title);
+            Drupal::logger('rir_notifier')->error('MailChimp Code: ' . $response2->status . ' Title: ' . $response2->title);
           }
 
         }
