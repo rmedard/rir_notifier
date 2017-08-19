@@ -35,14 +35,12 @@ function rir_notifier_theme($existing, $type, $theme, $path) {
  */
 function rir_notifier_webform_submission_insert(WebformSubmissionInterface $entity) {
   if ($entity->getWebform()->id() == 'notification_subscription'){
-    $districts = $entity->getData('notif_districts');
+    $location = $entity->getData('notif_property_location');
     $advertType = $entity->getData('notif_advert_type');
-    $nbrRooms = $entity->getData('notif_nbr_rooms');
     $propertyType = $entity->getData('notif_property_type');
-    $price = $entity->getData('notif_price');
     $email = $entity->getData('notif_email');
     $names = $entity->getData('notif_names');
-    $referenceNbr = getRequestCategoryReference($districts, $advertType, $nbrRooms, $propertyType, $price);
+    $referenceNbr = getRequestCategoryReference($location, $advertType, $propertyType);
 
     $alertsQueueWorker = Drupal::queue('alerts_processor');
     $data = (object)['email' => $email, 'names' => $names, 'reference' => $referenceNbr];
@@ -51,11 +49,9 @@ function rir_notifier_webform_submission_insert(WebformSubmissionInterface $enti
   }
 }
 
-function getRequestCategoryReference($districts, $advertType, $nbrRooms, $propertyType, $price ){
-  if (empty($districts)){
-    $districtValues = 'ANY';
-  } else {
-    $districtValues = implode('_', $districts);
+function getRequestCategoryReference($location, $advertType, $propertyType){
+  if (empty($location)){
+    $location = 'ANY';
   }
-  return $districtValues . '-' . $advertType . '-' . $nbrRooms . '-' . $propertyType . '-' .$price;
+  return $location . '-' . $advertType . '-' . $propertyType;
 }
