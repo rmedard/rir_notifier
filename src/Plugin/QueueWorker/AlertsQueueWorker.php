@@ -12,6 +12,7 @@ namespace Drupal\rir_notifier\Plugin\QueueWorker;
 use Drupal;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\node\Entity\Node;
+use function drupal_flush_all_caches;
 use Mailchimp\Mailchimp;
 use Mailchimp\MailchimpLists;
 
@@ -93,11 +94,11 @@ class AlertsQueueWorker extends QueueWorkerBase {
           $interestId = $detailsRequestCategory->get('field_mailchimp_interest_id')->value;
         }
       }
-      $mailchimpLists->addMember($mailChimpListId, $data->email, array('status' => 'subscribed' , 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
+      $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED , 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
       Drupal::logger('rir_notifier')->notice('Member suscribed search: ' . $data->email);
     } else {
       Drupal::logger('rir_notifier')->error('Mailchimp Instantiation Failed with Key: ' .$mailChimpAPIKey);
     }
-
+    drupal_flush_all_caches();
   }
 }
