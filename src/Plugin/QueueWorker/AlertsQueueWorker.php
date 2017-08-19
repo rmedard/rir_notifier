@@ -92,7 +92,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
           $response = $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED , 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
           Drupal::logger('rir_notifier')->notice('New member subscribed: ' . $data->email . ' Response:' . $response);
         }catch (MailchimpAPIException $ex){
-          Drupal::logger('rir_notifier')->error('MailChimp error: ' .$ex);
+          Drupal::logger('rir_notifier')->error('MailChimp error: Code: ' . $response->status . ' Title: ' . $response->title);
         }
 
       } else {
@@ -106,7 +106,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
             $response = $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED , 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
             Drupal::logger('rir_notifier')->notice('Member subscription updated: ' . $data->email . ' Response:' . $response);
           }catch (MailchimpAPIException $ex){
-            Drupal::logger('rir_notifier')->error('MailChimp error: ' .$ex);
+            Drupal::logger('rir_notifier')->error('MailChimp Code: ' . $response->status . ' Title: ' . $response->title);
           }
 
         }
