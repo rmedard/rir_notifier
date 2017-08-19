@@ -115,6 +115,5 @@ class AlertsQueueWorker extends QueueWorkerBase {
     } else {
       Drupal::logger('rir_notifier')->error('Mailchimp Instantiation Failed with Key: ' . $mailChimpAPIKey);
     }
-    drupal_flush_all_caches();
   }
 }
