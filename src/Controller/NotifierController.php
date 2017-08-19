@@ -20,7 +20,7 @@ class NotifierController extends ControllerBase {
       $query = \Drupal::request()->query;
 
       $advertType = $query->get('advert');
-      $propertyLocation = $query->get('combine');
+      $propertyLocation = $query->get('location');
       $propertyType = $query->get('property_type');
 
       $values = [
