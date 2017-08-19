@@ -51,8 +51,5 @@ function rir_notifier_webform_submission_insert(WebformSubmissionInterface $enti
 }
 
 function getRequestCategoryReference($location, $advertType, $propertyType){
-  if (empty($location)){
-    $location = 'ANY';
-  }
   return $location . '-' . $advertType . '-' . $propertyType;
 }
