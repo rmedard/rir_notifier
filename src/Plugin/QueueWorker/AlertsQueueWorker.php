@@ -89,7 +89,9 @@ class AlertsQueueWorker extends QueueWorkerBase {
       } else {
         Drupal::logger('rir_notifier')->alert('Dore: ' . json_encode($detailsRequestInterests));
         $detailsRequestCategory = Node::load($detailsRequestInterests[0]);
-        $interestId = $detailsRequestCategory->get('field_mailchimp_interest_id')->value;
+        if (isset($detailsRequestCategory)){
+          $interestId = $detailsRequestCategory->get('field_mailchimp_interest_id')->value;
+        }
       }
       $mailchimpLists->addMember($mailChimpListId, $data->email, array('status' => 'subscribed' , 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
       Drupal::logger('rir_notifier')->notice('Member suscribed search: ' . $data->email);
