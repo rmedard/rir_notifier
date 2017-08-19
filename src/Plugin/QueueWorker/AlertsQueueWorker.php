@@ -12,7 +12,6 @@ namespace Drupal\rir_notifier\Plugin\QueueWorker;
 use Drupal;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\node\Entity\Node;
-use function drupal_flush_all_caches;
 use function json_encode;
 use Mailchimp\Mailchimp;
 use Mailchimp\MailchimpAPIException;
