@@ -87,15 +87,19 @@ class AlertsQueueWorker extends QueueWorkerBase {
         ]);
         $detailsRequestCategory->save();
         $interestId = $responseData['id'];
+        $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED , 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
+        Drupal::logger('rir_notifier')->notice('New member subscribed: ' . $data->email);
       } else {
-        Drupal::logger('rir_notifier')->alert('Dore: ' . json_encode($detailsRequestInterests));
-        $detailsRequestCategory = Node::load($detailsRequestInterests[0]);
-        if (isset($detailsRequestCategory)){
-          $interestId = $detailsRequestCategory->get('field_mailchimp_interest_id')->value;
+        foreach ($detailsRequestInterests as $interestRequest){
+          Drupal::logger('rir_notifier')->alert('Dore: ' . json_encode($interestRequest));
+          $detailsRequestCategory = Node::load($interestRequest);
+          if (isset($detailsRequestCategory)){
+            $interestId = $detailsRequestCategory->get('field_mailchimp_interest_id')->value;
+          }
+          $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED , 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
+          Drupal::logger('rir_notifier')->notice('Member subscription updated: ' . $data->email);
         }
       }
-      $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED , 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
-      Drupal::logger('rir_notifier')->notice('Member suscribed search: ' . $data->email);
     } else {
       Drupal::logger('rir_notifier')->error('Mailchimp Instantiation Failed with Key: ' .$mailChimpAPIKey);
     }
