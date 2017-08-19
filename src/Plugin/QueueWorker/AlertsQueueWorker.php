@@ -14,6 +14,7 @@ use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\node\Entity\Node;
 use function drupal_flush_all_caches;
 use Mailchimp\Mailchimp;
+use Mailchimp\MailchimpAPIException;
 use Mailchimp\MailchimpLists;
 
 
@@ -87,8 +88,13 @@ class AlertsQueueWorker extends QueueWorkerBase {
         ]);
         $detailsRequestCategory->save();
         $interestId = $responseData['id'];
-        $response = $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED , 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
-        Drupal::logger('rir_notifier')->notice('New member subscribed: ' . $data->email . ' Response:' . $response);
+        try{
+          $response = $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED , 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
+          Drupal::logger('rir_notifier')->notice('New member subscribed: ' . $data->email . ' Response:' . $response);
+        }catch (MailchimpAPIException $ex){
+          Drupal::logger('rir_notifier')->error('MailChimp error: ' .$ex);
+        }
+
       } else {
         foreach ($detailsRequestInterests as $interestRequest){
           Drupal::logger('rir_notifier')->debug('Dore: ' . json_encode($interestRequest));
@@ -96,8 +102,13 @@ class AlertsQueueWorker extends QueueWorkerBase {
           if (isset($detailsRequestCategory)){
             $interestId = $detailsRequestCategory->get('field_mailchimp_interest_id')->value;
           }
-          $response = $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED , 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
-          Drupal::logger('rir_notifier')->notice('Member subscription updated: ' . $data->email . ' Response:' . $response);
+          try{
+            $response = $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED , 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
+            Drupal::logger('rir_notifier')->notice('Member subscription updated: ' . $data->email . ' Response:' . $response);
+          }catch (MailchimpAPIException $ex){
+            Drupal::logger('rir_notifier')->error('MailChimp error: ' .$ex);
+          }
+
         }
       }
     } else {
