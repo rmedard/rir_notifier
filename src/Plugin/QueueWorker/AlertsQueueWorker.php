@@ -97,7 +97,6 @@ class AlertsQueueWorker extends QueueWorkerBase {
 
       } else {
         foreach ($detailsRequestInterests as $interestRequest){
-          Drupal::logger('rir_notifier')->debug('Dore: ' . json_encode($interestRequest));
           $detailsRequestCategory = Node::load($interestRequest);
           if (isset($detailsRequestCategory)){
             $interestId = $detailsRequestCategory->get('field_mailchimp_interest_id')->value;
