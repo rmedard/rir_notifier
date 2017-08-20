@@ -58,7 +58,7 @@ function getRequestCategoryReference($location, $advertType, $propertyType){
     $advertType = 'ad';
   }
   if (empty($propertyType) or $propertyType == 'All'){
-    $advertType = 'pro';
+    $propertyType = 'pro';
   }
   return $location . '-' . $advertType . '-' . $propertyType;
 }
