@@ -4,6 +4,7 @@
 * A description of what your module does.
 */
 
+use Drupal\node\NodeInterface;
 use Drupal\webform\WebformSubmissionInterface;
 
 /**
@@ -46,7 +47,14 @@ function rir_notifier_webform_submission_insert(WebformSubmissionInterface $enti
     $alertsQueueWorker = Drupal::queue('alerts_processor');
     $data = (object)['email' => $email, 'first_name' => $firstName, 'last_name' => $lastName,'reference' => $referenceNbr];
     $alertsQueueWorker->createItem($data);
-
+  } elseif ($entity->getWebform()->id() == 'interest_form'){
+    $advert = Drupal::routeMatch()->getParameter('node');
+    if ($advert instanceof NodeInterface and $entity->bundle() == 'advert'){
+      $contactEmail = $advert->get('field_advert_contact_email')->value;
+      $visitEmail1 = $advert->get('field_visit_email_address1')->value;
+      $visitEmail2 = $advert->get('field_visit_email_address1')->value;
+      // TODO Send notification email to these...
+    }
   }
 }
 
