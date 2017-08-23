@@ -62,10 +62,10 @@ function rir_notifier_webform_submission_insert(WebformSubmissionInterface $enti
       $send = TRUE;
       $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
       if ($result['result'] !== true) {
-        drupal_set_message(t('There was a problem sending your message and it was not sent.'), 'error');
+        Drupal::logger('rir_notifier')->error('Sending mail failed: ' + $to);
       }
       else {
-        drupal_set_message(t('Your message has been sent.'));
+        Drupal::logger('rir_notifier')->notice('Email sent successfully to ' + $to);
       }
     }
   }
