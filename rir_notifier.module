@@ -49,7 +49,9 @@ function rir_notifier_webform_submission_insert(WebformSubmissionInterface $enti
     $alertsQueueWorker->createItem($data);
   } elseif ($entity->getWebform()->id() == 'interest_form'){
     $advert = Drupal::routeMatch()->getParameter('node');
+    Drupal::logger('rir_notifier')->debug('Request creation triggered... ');
     if ($advert instanceof NodeInterface and $entity->bundle() == 'advert'){
+      Drupal::logger('rir_notifier')->debug('Node detected...: ');
       $contactEmail = $advert->get('field_advert_contact_email')->value;
       $visitEmail1 = $advert->get('field_visit_email_address1')->value;
       $visitEmail2 = $advert->get('field_visit_email_address1')->value;
