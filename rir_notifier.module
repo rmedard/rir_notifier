@@ -53,7 +53,20 @@ function rir_notifier_webform_submission_insert(WebformSubmissionInterface $enti
       $contactEmail = $advert->get('field_advert_contact_email')->value;
       $visitEmail1 = $advert->get('field_visit_email_address1')->value;
       $visitEmail2 = $advert->get('field_visit_email_address1')->value;
-      // TODO Send notification email to these...
+      $mailManager = Drupal::service('plugin.manager.mail');
+      $module = 'rir_notifier';
+      $key = 'details_request_sent';
+      $to = $contactEmail;
+      $params['message'] = 'A new request for details has been sent...';
+      $langcode = Drupal::currentUser()->getPreferredLangcode();
+      $send = TRUE;
+      $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
+      if ($result['result'] !== true) {
+        drupal_set_message(t('There was a problem sending your message and it was not sent.'), 'error');
+      }
+      else {
+        drupal_set_message(t('Your message has been sent.'));
+      }
     }
   }
 }
@@ -69,4 +82,20 @@ function getRequestCategoryReference($location, $advertType, $propertyType){
     $propertyType = 'pro';
   }
   return $location . '-' . $advertType . '-' . $propertyType;
+}
+
+/**
+ * Implements hook_mail().
+ */
+function rir_notifier_mail($key, &$message, $params) {
+  $options = array(
+    'langcode' => $message['langcode']
+  );
+  switch ($key){
+    case 'details_request_sent':
+      $message['from'] = Drupal::config('system.site')->get('mail');
+      $message['subject'] = t('Request sent for more details', $options);
+      $message['body'][] = $params['message'];
+      break;
+  }
 }
