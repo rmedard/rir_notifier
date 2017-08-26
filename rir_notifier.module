@@ -4,7 +4,6 @@
 * A description of what your module does.
 */
 
-use Drupal\node\NodeInterface;
 use Drupal\webform\WebformSubmissionInterface;
 
 /**
