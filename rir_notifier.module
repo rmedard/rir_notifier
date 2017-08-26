@@ -61,19 +61,3 @@ function getRequestCategoryReference($location, $advertType, $propertyType){
   }
   return $location . '-' . $advertType . '-' . $propertyType;
 }
-
-/**
- * Implements hook_mail().
- */
-function rir_notifier_mail($key, &$message, $params) {
-  $options = array(
-    'langcode' => $message['langcode']
-  );
-  switch ($key){
-    case 'details_request_sent':
-      $message['from'] = Drupal::config('system.site')->get('mail');
-      $message['subject'] = t('Request sent for more details', $options);
-      $message['body'][] = $params['message'];
-      break;
-  }
-}
