@@ -4,7 +4,11 @@
 * A description of what your module does.
 */
 
+use Drupal\Core\Entity\Entity;
+use Drupal\node\NodeInterface;
 use Drupal\webform\WebformSubmissionInterface;
+use Mailchimp\MailchimpCampaigns;
+use Mailchimp\MailchimpLists;
 
 /**
  * Implements hook_page_attachments().
@@ -67,4 +71,16 @@ function getRequestCategoryReference($location, $advertType, $propertyType){
  */
 function rir_notifier_cron() {
   Drupal::logger('rir_notifier')->debug('Cron is executed...');
+  $mailChimpAPIKey = 'e29c8cf2c4d114d83629a9aee4430992-us16';
+  $mailchimpCampaings = new MailchimpCampaigns($mailChimpAPIKey);
+  $mailchimpLists = new MailchimpLists($mailChimpAPIKey);
+  $interestObj = Entity::load(88);
+  if ($interestObj instanceof NodeInterface and $interestObj->bundle() == 'details_request_category'){
+    $campaignSettings = array('subject_line' => 'Interesting adverts', 'title' => 'Adverts that may interest you', 'from_name' => Drupal::config('system.site')->get('name'), 'reply_to' => Drupal::config('system.site')->get('mail'));
+    $mailchimpCampaings->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR,
+      $mailchimpLists->getMembers($interestObj->get('field_mailchimp_list_id')->value,
+        array('interest_category_id' => $interestObj->get('field_mailchimp_category_id')->value, 'interest_ids' => $interestObj->get('field_mailchimp_interest_id'), 'interest_match' => 'all')), $campaignSettings);
+  } else {
+    Drupal::logger('rir_notifier')->debug('Interest Object not found');
+  }
 }
