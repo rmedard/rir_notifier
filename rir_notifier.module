@@ -61,3 +61,10 @@ function getRequestCategoryReference($location, $advertType, $propertyType){
   }
   return $location . '-' . $advertType . '-' . $propertyType;
 }
+
+/**
+ * Implements hook_cron().
+ */
+function rir_notifier_cron() {
+  Drupal::logger('rir_notifier')->debug('Cron is executed...');
+}
