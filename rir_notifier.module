@@ -98,6 +98,6 @@ function getDailyAdverts($reference){
     ->condition('field_advert_property_type', $propertyType)
     ->condition('field_advert_type', $advertType);
 
-  $group = $query->orConditionGroup()->condition('field_advert_sector', $location)->condition('field_advert_village', $location);
+  $group = $query->orConditionGroup()->condition('field_advert_district.entity.name', $location)->condition('field_advert_sector', $location)->condition('field_advert_village', $location);
   return $query->condition($group)->count()->execute();
 }
