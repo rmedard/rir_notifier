@@ -80,7 +80,7 @@ function rir_notifier_cron() {
     $campaignSettings = array('subject_line' => 'Interesting adverts', 'title' => 'Adverts that may interest you', 'from_name' => Drupal::config('system.site')->get('name'), 'reply_to' => Drupal::config('system.site')->get('mail'));
     $mailchimpCampaings->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR,
       $mailchimpLists->getMembers($interestObj->get('field_mailchimp_list_id')->value,
-        array('interest_category_id' => $interestObj->get('field_mailchimp_category_id')->value, 'interest_ids' => $interestObj->get('field_mailchimp_interest_id'), 'interest_match' => 'all')), $campaignSettings);
+        array('interest_category_id' => $interestObj->get('field_mailchimp_category_id')->value, 'interest_ids' => $interestObj->get('field_mailchimp_interest_id')->value, 'interest_match' => 'all')), $campaignSettings);
   } else {
     Drupal::logger('rir_notifier')->debug('Interest Object not found');
   }
