@@ -5,6 +5,7 @@
 */
 
 use Drupal\Core\Entity\Entity;
+use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use Drupal\webform\WebformSubmissionInterface;
 use Mailchimp\MailchimpCampaigns;
@@ -74,7 +75,7 @@ function rir_notifier_cron() {
   $mailChimpAPIKey = 'e29c8cf2c4d114d83629a9aee4430992-us16';
   $mailchimpCampaings = new MailchimpCampaigns($mailChimpAPIKey);
   $mailchimpLists = new MailchimpLists($mailChimpAPIKey);
-  $interestObj = Entity::load(88);
+  $interestObj =  Node::load(88);
   if ($interestObj instanceof NodeInterface and $interestObj->bundle() == 'details_request_category'){
     $campaignSettings = array('subject_line' => 'Interesting adverts', 'title' => 'Adverts that may interest you', 'from_name' => Drupal::config('system.site')->get('name'), 'reply_to' => Drupal::config('system.site')->get('mail'));
     $mailchimpCampaings->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR,
