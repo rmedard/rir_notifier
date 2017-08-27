@@ -72,16 +72,32 @@ function getRequestCategoryReference($location, $advertType, $propertyType){
  */
 function rir_notifier_cron() {
   Drupal::logger('rir_notifier')->debug('Cron is executed...');
-  $mailChimpAPIKey = 'e29c8cf2c4d114d83629a9aee4430992-us16';
-  $mailchimpCampaings = new MailchimpCampaigns($mailChimpAPIKey);
-  $mailchimpLists = new MailchimpLists($mailChimpAPIKey);
-  $interestObj =  Node::load(88);
+  $APIKey = 'e29c8cf2c4d114d83629a9aee4430992-us16';
+  $campaigns = new MailchimpCampaigns($APIKey);
+  $lists = new MailchimpLists($APIKey);
+  $interestObj =  Node::load(96);
   if ($interestObj instanceof NodeInterface and $interestObj->bundle() == 'details_request_category'){
-    $campaignSettings = array('subject_line' => 'Interesting adverts', 'title' => 'Adverts that may interest you', 'from_name' => Drupal::config('system.site')->get('name'), 'reply_to' => Drupal::config('system.site')->get('mail'));
-    $mailchimpCampaings->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR,
-      $mailchimpLists->getMembers($interestObj->get('field_mailchimp_list_id')->value,
-        array('interest_category_id' => $interestObj->get('field_mailchimp_category_id')->value, 'interest_ids' => $interestObj->get('field_mailchimp_interest_id')->value, 'interest_match' => 'all')), $campaignSettings);
+    Drupal::logger('rir_notifier')->debug('Adverts found: ' . getDailyAdverts($interestObj->get('field_dr_reference')->value));
+    $settings = array('subject_line' => 'Interesting adverts', 'title' => 'Adverts that may interest you', 'from_name' => Drupal::config('system.site')->get('name'), 'reply_to' => Drupal::config('system.site')->get('mail'));
+    $campaigns->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR, $lists->getMembers($interestObj->get('field_mailchimp_list_id')->value,
+        array('interest_category_id' => $interestObj->get('field_mailchimp_category_id')->value, 'interest_ids' => $interestObj->get('field_mailchimp_interest_id')->value, 'interest_match' => 'all')), $settings);
   } else {
     Drupal::logger('rir_notifier')->debug('Interest Object not found');
   }
+}
+
+function getDailyAdverts($reference){
+  $keys = explode('-', $reference);
+  $location = $keys[0];
+  $advertType = $keys[1];
+  $propertyType = $keys[2];
+
+  $query = Drupal::entityQuery('node')
+    ->condition('status', 1)
+    ->condition('type', 'advert')
+    ->condition('field_advert_property_type', $propertyType)
+    ->condition('field_advert_type', $advertType);
+
+  $group = $query->orConditionGroup()->condition('field_advert_sector', $location)->condition('field_advert_village', $location);
+  return $query->condition($group)->count()->execute();
 }
