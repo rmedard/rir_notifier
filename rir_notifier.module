@@ -36,7 +36,7 @@ function rir_notifier_theme($existing, $type, $theme, $path) {
       ],
       'rir_campaign' => [
         'variables' => [
-          'adverts' => Drupal::entityTypeManager()->getViewBuilder('node')->viewMultiple($nodes, 'teaser')
+          'adverts' => render(Drupal::entityTypeManager()->getViewBuilder('node')->viewMultiple($nodes, 'teaser'))
         ]
       ],
     ];
