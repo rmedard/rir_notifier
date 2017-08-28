@@ -150,7 +150,7 @@ function getDailyAdverts($reference) {
 }
 
 function getHtmlContent($reference) {
-    $html = file_get_contents('../html/campaign-template.php', TRUE);
+    $html = file_get_contents(drupal_get_path('module', 'rir_notifier') . '/html/campaign-template.php', TRUE);
     $ids = getDailyAdverts($reference);
     if ($html !== FALSE) {
         return vsprintf($html, Node::loadMultiple($ids));
