@@ -32,6 +32,11 @@ function rir_notifier_theme($existing, $type, $theme, $path) {
           'button' => t('Subscribe'),
         ],
       ],
+      'rir_campaign' => [
+        'variables' => [
+          'adverts' => Node::loadMultiple(getDailyAdverts('Kimihurura-rent-house'))
+        ]
+      ],
     ];
 }
 
@@ -82,7 +87,7 @@ function rir_notifier_cron() {
     $interestObj = Node::load(96);
     if ($interestObj instanceof NodeInterface and $interestObj->bundle() == 'details_request_category') {
         $reference = $interestObj->get('field_dr_reference')->value;
-        if (count(countAvailableAdverts($reference)) > 0){
+        if (count(countAvailableAdverts($reference)) > 0) {
             $settings = [
               'subject_line' => 'Interesting adverts',
               'title' => 'Adverts that may interest you',
@@ -94,16 +99,20 @@ function rir_notifier_cron() {
                 'interest_category_id' => $interestObj->get('field_mailchimp_category_id')->value,
                 'interest_ids' => $interestObj->get('field_mailchimp_interest_id')->value,
                 'interest_match' => 'all',
-              ]), (object)$settings);
-            $campaign = json_decode(json_encode($campaign, true));
-            Drupal::logger('rir_notifier')->debug('Created campaign: ' . $campaign->id);
-            try{
+              ]), (object) $settings);
+            $campaign = json_decode(json_encode($campaign, TRUE));
+            Drupal::logger('rir_notifier')
+              ->debug('Created campaign: ' . $campaign->id);
+            try {
                 $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
-            }catch (MailchimpAPIException $exp){
-                Drupal::logger('rir_notifier')->error('Setting Campaign content failed: ' . $exp->getTraceAsString());
+            } catch (MailchimpAPIException $exp) {
+                Drupal::logger('rir_notifier')
+                  ->error('Setting Campaign content failed: ' . $exp->getTraceAsString());
             }
-        } else {
-            Drupal::logger('rir_notifier')->debug('No adverts found for reference: ' . $reference);
+        }
+        else {
+            Drupal::logger('rir_notifier')
+              ->debug('No adverts found for reference: ' . $reference);
         }
     }
     else {
@@ -111,7 +120,7 @@ function rir_notifier_cron() {
     }
 }
 
-function countAvailableAdverts($reference){
+function countAvailableAdverts($reference) {
     $keys = explode('-', $reference);
     $location = $keys[0];
     $advertType = $keys[1];
@@ -150,13 +159,14 @@ function getDailyAdverts($reference) {
 }
 
 function getHtmlContent($reference) {
-    $html = file_get_contents(drupal_get_path('module', 'rir_notifier') . '/html/campaign-template.php', TRUE);
-    $ids = getDailyAdverts($reference);
-    if ($html !== FALSE) {
-        return vsprintf($html, ['adverts' => Node::loadMultiple($ids)]);
-    }
-    else {
-        Drupal::logger('rir_notifier')
-          ->error('Campaign template file not found!');
-    }
+    $html = file_get_contents(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.twig', TRUE);
+//    $ids = getDailyAdverts($reference);
+//    if ($html !== FALSE) {
+//        return vsprintf($html, ['adverts' => Node::loadMultiple($ids)]);
+//    }
+//    else {
+//        Drupal::logger('rir_notifier')
+//          ->error('Campaign template file not found!');
+//    }
+    return $html;
 }

@@ -6,3 +6,11 @@ rir_notifier.open_subscription_modal:
   requirements:
     _access: 'TRUE'
     js: 'nojs|ajax'
+
+rir_notifier.newsletter:
+  path: '/newsletter'
+  defaults:
+    _title: 'Our latest adverts'
+    _controller: '\Drupal\rir_notifier\Controller\NotifierController::newsletterPage'
+  requirements:
+    _permission: 'access content'

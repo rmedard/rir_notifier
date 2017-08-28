@@ -37,4 +37,10 @@ class NotifierController extends ControllerBase {
       $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert'), $webform, ['width'=> '80%']));
       return $response;
   }
+
+  public function newsletterPage(){
+        return [
+          '#theme' => 'rir_campaign',
+        ];
+  }
 }
