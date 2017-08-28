@@ -27,6 +27,7 @@ function rir_notifier_page_attachments(array &$attachments) {
 function rir_notifier_theme($existing, $type, $theme, $path) {
 
     $nodes = Node::loadMultiple(getDailyAdverts('Kimihurura-rent-house'));
+    $serializer = Drupal::service('serializer');
 
     return [
       'rir_subscribe_search' => [
@@ -36,7 +37,7 @@ function rir_notifier_theme($existing, $type, $theme, $path) {
       ],
       'rir_campaign' => [
         'variables' => [
-          'adverts' => $nodes
+          'adverts' => $serializer->serialize($nodes, 'json', ['plugin_id' => 'entity'])
         ]
       ],
     ];
