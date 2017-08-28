@@ -7,6 +7,7 @@
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use Drupal\webform\WebformSubmissionInterface;
+use Mailchimp\MailchimpAPIException;
 use Mailchimp\MailchimpCampaigns;
 use Mailchimp\MailchimpLists;
 
@@ -96,7 +97,11 @@ function rir_notifier_cron() {
               ]), (object)$settings);
             $campaign = json_decode(json_encode($campaign, true));
             Drupal::logger('rir_notifier')->debug('Created campaign: ' . $campaign->id);
-            $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
+            try{
+                $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
+            }catch (MailchimpAPIException $exp){
+                Drupal::logger('rir_notifier')->error('Setting Campaign content failed: ' . $exp->getTraceAsString());
+            }
         } else {
             Drupal::logger('rir_notifier')->debug('No adverts found for reference: ' . $reference);
         }
