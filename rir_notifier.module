@@ -161,8 +161,9 @@ function getDailyAdverts($reference) {
 }
 
 function getHtmlContent($reference) {
-    $html = file_get_contents(DRUPAL_ROOT . '/newsletter');
-    Drupal::logger('rir_notifier')->debug('Template location: ' . $html);
+    $template_location = DRUPAL_ROOT . '/newsletter';
+    Drupal::logger('rir_notifier')->debug('Template location: ' . $template_location);
+    $html = file_get_contents($template_location);
     if ($html !== FALSE) {
 
         return $html;
