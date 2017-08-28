@@ -162,6 +162,7 @@ function getDailyAdverts($reference) {
 
 function getHtmlContent($reference) {
     $html = file_get_contents(Drupal::request()->getHost() . '/newsletter');
+    Drupal::logger('rir_notifier')->debug('Template location: ' . $html);
     if ($html !== FALSE) {
 
         return $html;
