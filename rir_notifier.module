@@ -161,7 +161,7 @@ function getDailyAdverts($reference) {
 }
 
 function getHtmlContent($reference) {
-    $html = file_get_contents('/newsletter', TRUE);
+    $html = file_get_contents('http://rirdev.ml/newsletter');
 //    $ids = getDailyAdverts($reference);
     if ($html !== FALSE) {
         return $html;
