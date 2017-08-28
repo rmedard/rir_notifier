@@ -605,10 +605,10 @@
                                         <td id="imageBlockId"><img src="https://s3.eu-central-1.amazonaws.com/rirbucket/images/teal-house-md.png" style="max-width:90px;" class="templateImage" alt="teal-house-md.png">
                                         </td>
                                         <td id="detailsBlockId">
-                                            <p id="titleId"><a href="#">Dore title: {{ advert.title.value }}</a> - Ref: <span>reference</span> - <span>Price</span>
+                                            <p id="titleId"><a href="#">{{ advert.title.value }}</a> - Ref: <span>{{ advert.field_advert_reference.value }}</span> - <span>{{ advert.field_advert_price.value }}</span>
                                             </p>
                                             <p>Gasabo, Kimironko</p>
-                                            <p>House for rent</p>
+                                            <p>{{ advert.field_advert_property_type.value }} for {{ advert.field_advert_type.value }}</p>
                                         </td>
                                     </tr>
                                     {% endfor %}
