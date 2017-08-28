@@ -13,7 +13,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="x-ua-compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>*|MC:SUBJECT|*</title>
+  <title>Newsletter</title>
 
   <style type="text/css">
     p{
@@ -560,7 +560,7 @@
                       <tr>
                         <td valign="top">
                           <div class="preheader_rightcol_content">
-                            <p><a href="*|ARCHIVE|*" target="_blank">View email in your browser</a>
+                            <p><a href="#" target="_blank">View email in your browser</a>
                             </p>
                           </div>
                         </td>
@@ -605,7 +605,7 @@
                     <td id="imageBlockId"><img src="https://s3.eu-central-1.amazonaws.com/rirbucket/images/teal-house-md.png" style="max-width:90px;" class="templateImage" alt="teal-house-md.png">
                     </td>
                     <td id="detailsBlockId">
-                      <p id="titleId"><a href="#">Dore title: <?php echo $advert->title ?></a> - Ref: <span>reference</span> - <span>Price</span>
+                      <p id="titleId"><a href="#">Dore title: <?php echo json_encode($advert, true) ?></a> - Ref: <span>reference</span> - <span>Price</span>
                       </p>
                       <p>Gasabo, Kimironko</p>
                       <p>House for rent</p>
