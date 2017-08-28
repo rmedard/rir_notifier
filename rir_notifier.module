@@ -94,8 +94,8 @@ function rir_notifier_cron() {
                 'interest_ids' => $interestObj->get('field_mailchimp_interest_id')->value,
                 'interest_match' => 'all',
               ]), (object)$settings);
+            Drupal::logger('rir_notifier')->debug('Created campaign: ' . json_encode($campaign, true));
             $campaign = json_decode(json_encode($campaign, true));
-            Drupal::logger('rir_notifier')->debug('Created campaign: ' . $campaign);
             $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
         } else {
             Drupal::logger('rir_notifier')->debug('No adverts found for reference: ' . $reference);
