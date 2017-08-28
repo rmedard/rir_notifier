@@ -161,7 +161,7 @@ function getDailyAdverts($reference) {
 }
 
 function getHtmlContent($reference) {
-    $html = file_get_contents('http://rirdev.ml/newsletter');
+    $html = file_get_contents(Drupal::request()->getHost() . '/newsletter');
     if ($html !== FALSE) {
 
         return $html;
