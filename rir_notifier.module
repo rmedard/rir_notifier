@@ -26,6 +26,8 @@ function rir_notifier_page_attachments(array &$attachments) {
  */
 function rir_notifier_theme($existing, $type, $theme, $path) {
 
+    $nodes = Node::loadMultiple(getDailyAdverts('Kimihurura-rent-house'));
+
     return [
       'rir_subscribe_search' => [
         'variables' => [
@@ -34,7 +36,7 @@ function rir_notifier_theme($existing, $type, $theme, $path) {
       ],
       'rir_campaign' => [
         'variables' => [
-          'adverts' => Node::loadMultiple(getDailyAdverts('Kimihurura-rent-house'))
+          'adverts' => Drupal::entityTypeManager()->getViewBuilder('node')->viewMultiple($nodes, 'teaser')
         ]
       ],
     ];
