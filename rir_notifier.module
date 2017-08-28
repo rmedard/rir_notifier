@@ -161,14 +161,13 @@ function getDailyAdverts($reference) {
 }
 
 function getHtmlContent($reference) {
-    $html = file_get_contents(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.html.twig', TRUE);
+    $html = file_get_contents('/newsletter', TRUE);
 //    $ids = getDailyAdverts($reference);
-//    if ($html !== FALSE) {
-//        return vsprintf($html, ['adverts' => Node::loadMultiple($ids)]);
-//    }
-//    else {
-//        Drupal::logger('rir_notifier')
-//          ->error('Campaign template file not found!');
-//    }
-    return $html;
+    if ($html !== FALSE) {
+        return $html;
+    }
+    else {
+        Drupal::logger('rir_notifier')
+          ->error('Campaign template file not found!');
+    }
 }
