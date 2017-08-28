@@ -164,8 +164,8 @@ function getHtmlContent($reference) {
     $template_location = 'http://' . Drupal::request()->getHost() . '/newsletter';
     $html = file_get_contents($template_location);
     if ($html !== FALSE) {
-
-        return $html;
+        $html = explode('<!-- RIR_CAMPAIGN_TEMPLATE -->', $html);
+        return $html[1];
     }
     else {
         Drupal::logger('rir_notifier')
