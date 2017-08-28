@@ -4,7 +4,6 @@
  * A description of what your module does.
  */
 
-use Drupal\Core\Entity\Entity;
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use Drupal\webform\WebformSubmissionInterface;
@@ -96,12 +95,7 @@ function rir_notifier_cron() {
                 'interest_match' => 'all',
               ]), $settings);
             $campaign = json_encode($campaign);
-            $campaigns->setCampaignContent($campaign->id, [
-              'template' => [
-                'id' => '32543',
-                'sections' => ['body' => getHtmlContent($reference)],
-              ],
-            ]);
+            $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
         } else {
             Drupal::logger('rir_notifier')->debug('No adverts found for reference: ' . $reference);
         }
