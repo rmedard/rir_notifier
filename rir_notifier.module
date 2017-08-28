@@ -159,7 +159,7 @@ function getDailyAdverts($reference) {
 }
 
 function getHtmlContent($reference) {
-    $html = file_get_contents(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.twig', TRUE);
+    $html = file_get_contents(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.html.twig', TRUE);
 //    $ids = getDailyAdverts($reference);
 //    if ($html !== FALSE) {
 //        return vsprintf($html, ['adverts' => Node::loadMultiple($ids)]);
