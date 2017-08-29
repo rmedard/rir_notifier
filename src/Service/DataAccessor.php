@@ -9,6 +9,8 @@
 namespace Drupal\rir_notifier\Service;
 
 
+use Drupal;
+
 class DataAccessor {
 
     /**
