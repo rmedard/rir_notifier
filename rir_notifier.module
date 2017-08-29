@@ -92,16 +92,17 @@ function rir_notifier_cron() {
         if (count(countAvailableAdverts($reference)) > 0) {
             $settings = [
               'subject_line' => 'Interesting adverts',
-              'title' => 'Adverts that may interest you',
+              'title' => 'Campaign - ' . $reference,
               'from_name' => Drupal::config('system.site')->get('name'),
               'reply_to' => Drupal::config('system.site')->get('mail'),
             ];
-            $campaign = $campaigns->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR, $lists->getMembers($interestObj->get('field_mailchimp_list_id')->value,
-              [
+            $members = $lists->getMembers($interestObj->get('field_mailchimp_list_id')->value,
+              array(
                 'interest_category_id' => $interestObj->get('field_mailchimp_category_id')->value,
                 'interest_ids' => $interestObj->get('field_mailchimp_interest_id')->value,
-                'interest_match' => 'all',
-              ]), (object) $settings);
+                'interest_match' => 'all'
+              ));
+            $campaign = $campaigns->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR, $members, (object) $settings);
             $campaign = json_decode(json_encode($campaign, TRUE));
             Drupal::logger('rir_notifier')
               ->debug('Created campaign: ' . $campaign->id);
