@@ -39,9 +39,9 @@ function rir_notifier_theme($existing, $type, $theme, $path) {
         ],
       ],
       'rir_campaign' => [
-        'variables' => [
-          'adverts' => $nodes
-        ]
+//        'variables' => [
+//          'adverts' => $nodes
+//        ]
       ],
     ];
 }
