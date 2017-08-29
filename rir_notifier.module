@@ -26,19 +26,17 @@ function rir_notifier_page_attachments(array &$attachments) {
  */
 function rir_notifier_theme($existing, $type, $theme, $path) {
 
-    $nodes = Node::loadMultiple(getDailyAdverts(NULL, NULL, NULL));
-
     return [
       'rir_subscribe_search' => [
         'variables' => [
           'button' => t('Subscribe'),
         ],
       ],
-//      'rir_campaign' => [
-//        'variables' => [
+      'rir_campaign' => [
+        'variables' => [
 //          'adverts' => $nodes
-//        ]
-//      ],
+        ]
+      ],
     ];
 }
 
