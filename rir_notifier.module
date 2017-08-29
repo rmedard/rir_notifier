@@ -26,7 +26,11 @@ function rir_notifier_page_attachments(array &$attachments) {
  */
 function rir_notifier_theme($existing, $type, $theme, $path) {
 
-    $nodes = Node::loadMultiple(getDailyAdverts('Kimihurura-rent-house'));
+    $location = Drupal::request()->get('location');
+    $advertType = Drupal::request()->get('advert');
+    $propertyType = Drupal::request()->get('property');
+
+    $nodes = Node::loadMultiple(getDailyAdverts($location, $advertType, $propertyType));
 
     return [
       'rir_subscribe_search' => [
@@ -89,16 +93,15 @@ function rir_notifier_cron() {
     $interestObj = Node::load(96);
     if ($interestObj instanceof NodeInterface and $interestObj->bundle() == 'details_request_category') {
         $reference = $interestObj->get('field_dr_reference')->value;
-        $members = $lists->getMembers($interestObj->get('field_mailchimp_list_id')->value,
-          array(
-            'interest_category_id' => $interestObj->get('field_mailchimp_category_id')->value,
-            'interest_ids' => $interestObj->get('field_mailchimp_interest_id')->value,
-            'interest_match' => 'all'
-          ));
-        $members_array = json_decode(json_encode($members, true));
-        Drupal::logger('rir_notifier')->debug('Nbr of members: ' . $members_array->total_items);
-        if ($members_array->total_items > 0){
-            if (count(countAvailableAdverts($reference)) > 0) {
+        if (countAvailableAdverts($reference) > 0) {
+            $members = $lists->getMembers($interestObj->get('field_mailchimp_list_id')->value,
+              array(
+                'interest_category_id' => $interestObj->get('field_mailchimp_category_id')->value,
+                'interest_ids' => $interestObj->get('field_mailchimp_interest_id')->value,
+                'interest_match' => 'all'
+              ));
+            $members_array = json_decode(json_encode($members, true));
+            if ($members_array->total_items > 0) {
                 $settings = [
                   'subject_line' => 'Interesting adverts',
                   'title' => 'Campaign - ' . $reference,
@@ -108,17 +111,18 @@ function rir_notifier_cron() {
 
                 $campaign = $campaigns->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR, $members, (object) $settings);
                 $campaign = json_decode(json_encode($campaign, TRUE));
-                Drupal::logger('rir_notifier')->debug('Created campaign: ' . $campaign->id);
+                Drupal::logger('rir_notifier')
+                  ->debug('Created campaign: ' . $campaign->id);
                 try {
                     $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
                 } catch (MailchimpAPIException $exp) {
-                    Drupal::logger('rir_notifier')->error('Setting Campaign content failed: ' . $exp->getTraceAsString());
+                    Drupal::logger('rir_notifier')
+                      ->error('Setting Campaign content failed: ' . $exp->getTraceAsString());
                 }
             }
-            else {
-                Drupal::logger('rir_notifier')
-                  ->debug('No adverts found for reference: ' . $reference);
-            }
+        } else {
+            Drupal::logger('rir_notifier')
+              ->debug('No adverts found for reference: ' . $reference);
         }
     }
     else {
@@ -131,41 +135,42 @@ function countAvailableAdverts($reference) {
     $location = $keys[0];
     $advertType = $keys[1];
     $propertyType = $keys[2];
-
-    $query = Drupal::entityQuery('node')
-      ->condition('status', 1)
-      ->condition('type', 'advert')
-      ->condition('field_advert_property_type', $propertyType)
-      ->condition('field_advert_type', $advertType);
-
-    $group = $query->orConditionGroup()
-      ->condition('field_advert_district.entity.name', $location)
-      ->condition('field_advert_sector', $location)
-      ->condition('field_advert_village', $location);
-    return $query->condition($group)->count()->execute();
+    return getQuery($location, $advertType, $propertyType)->count()->execute();
 }
 
-function getDailyAdverts($reference) {
+function getDailyAdverts($location, $advert, $property) {
+    return getQuery($location, $advert, $property)->execute();
+}
+
+function getQuery($location, $advert, $property){
+    $query = Drupal::entityQuery('node');
+
+    $group = $query->condition('type', 'advert')
+      ->condition('status', 1);
+
+    if (isset($location) and !empty($location) and $location !== 'loc'){
+        $group->orConditionGroup()
+          ->condition('field_advert_district.entity.name', $location)
+          ->condition('field_advert_sector', $location)
+          ->condition('field_advert_village', $location);
+    }
+
+    if (isset($advert) and !empty($advert) and $advert !== 'ad'){
+        $query->condition('field_advert_type', $advert);
+    }
+
+    if (isset($property) and !empty($property) and $property !== 'pro'){
+        $query->condition('field_advert_property_type', $property);
+    }
+    return $query->condition($group);
+}
+
+function getHtmlContent($reference) {
     $keys = explode('-', $reference);
     $location = $keys[0];
     $advertType = $keys[1];
     $propertyType = $keys[2];
-
-    $query = Drupal::entityQuery('node')
-      ->condition('status', 1)
-      ->condition('type', 'advert')
-      ->condition('field_advert_property_type', $propertyType)
-      ->condition('field_advert_type', $advertType);
-
-    $group = $query->orConditionGroup()
-      ->condition('field_advert_district.entity.name', $location)
-      ->condition('field_advert_sector', $location)
-      ->condition('field_advert_village', $location);
-    return $query->condition($group)->execute();
-}
-
-function getHtmlContent($reference) {
-    $template_location = 'http://' . Drupal::request()->getHost() . '/newsletter';
+    $template_location = 'http://' . Drupal::request()->getHost() . '/newsletter?location=' . $location . '&advert=' . $advertType . '&property=' . $propertyType;
     $html = file_get_contents($template_location);
     if ($html !== FALSE) {
         $html = explode('<!-- RIR_CAMPAIGN_TEMPLATE -->', $html);
