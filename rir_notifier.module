@@ -156,11 +156,11 @@ function getQuery($location, $advert, $property){
     }
 
     if (isset($advert) and !empty($advert) and $advert !== 'ad'){
-        $query->condition('field_advert_type', $advert);
+        $group->condition('field_advert_type', $advert);
     }
 
     if (isset($property) and !empty($property) and $property !== 'pro'){
-        $query->condition('field_advert_property_type', $property);
+        $group->condition('field_advert_property_type', $property);
     }
     return $query->condition($group);
 }
