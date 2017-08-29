@@ -9,6 +9,7 @@
 namespace Drupal\rir_notifier\Controller;
 
 
+use Drupal;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\OpenModalDialogCommand;
 use Drupal\Core\Controller\ControllerBase;
@@ -45,7 +46,7 @@ class NotifierController extends ControllerBase {
         $propertyType = Drupal::request()->query->get('property_type');
         return [
           '#theme' => 'rir_campaign',
-            '#adverts' => $this->getDailyAdverts($propertyLocation, $advertType, $propertyType)
+          '#adverts' => $this->getDailyAdverts($propertyLocation, $advertType, $propertyType),
         ];
     }
 
@@ -53,12 +54,12 @@ class NotifierController extends ControllerBase {
         return getQuery($location, $advert, $property)->execute();
     }
 
-    function getQuery($location, $advert, $property){
+    function getQuery($location, $advert, $property) {
         $query = Drupal::entityQuery('node')
           ->condition('type', 'advert')
           ->condition('status', 1);
 
-        if (isset($location) and !empty($location) and $location !== 'loc'){
+        if (isset($location) and !empty($location) and $location !== 'loc') {
             $group = $query->orConditionGroup()
               ->condition('field_advert_district.entity.name', $location)
               ->condition('field_advert_sector', $location)
@@ -66,11 +67,11 @@ class NotifierController extends ControllerBase {
             $query->condition($group);
         }
 
-        if (isset($advert) and !empty($advert) and $advert !== 'ad'){
+        if (isset($advert) and !empty($advert) and $advert !== 'ad') {
             $query->condition('field_advert_type', $advert);
         }
 
-        if (isset($property) and !empty($property) and $property !== 'pro'){
+        if (isset($property) and !empty($property) and $property !== 'pro') {
             $query->condition('field_advert_property_type', $property);
         }
         return $query;
