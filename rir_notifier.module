@@ -26,10 +26,6 @@ function rir_notifier_page_attachments(array &$attachments) {
  */
 function rir_notifier_theme($existing, $type, $theme, $path) {
 
-//    $location = Drupal::request()->query->get('location');
-//    $advertType = Drupal::request()->query->get('advert');
-//    $propertyType = Drupal::request()->query->get('property');
-
     $nodes = Node::loadMultiple(getDailyAdverts(NULL, NULL, NULL));
 
     return [
@@ -38,11 +34,11 @@ function rir_notifier_theme($existing, $type, $theme, $path) {
           'button' => t('Subscribe'),
         ],
       ],
-      'rir_campaign' => [
-        'variables' => [
-          'adverts' => $nodes
-        ]
-      ],
+//      'rir_campaign' => [
+//        'variables' => [
+//          'adverts' => $nodes
+//        ]
+//      ],
     ];
 }
 
