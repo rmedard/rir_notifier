@@ -1,0 +1,54 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: reberme
+ * Date: 29/08/2017
+ * Time: 19:56
+ */
+
+namespace Drupal\rir_notifier\Service;
+
+
+class DataAccessor {
+
+    /**
+     * @param $reference Interest reference
+     *
+     * @return mixed
+     */
+    function countAdvertsByReference($reference) {
+        $keys = explode('-', $reference);
+        $location = $keys[0];
+        $advertType = $keys[1];
+        $propertyType = $keys[2];
+        return $this->getQuery($location, $advertType, $propertyType)->count()->execute();
+    }
+
+    function getDailyAdverts($location, $advert, $property) {
+        return $this->getQuery($location, $advert, $property)->execute();
+    }
+
+    private function getQuery($location, $advert, $property){
+        $query = Drupal::entityQuery('node')
+          ->condition('type', 'advert')
+          ->condition('status', 1);
+
+        if (isset($location) and !empty($location) and $location !== 'loc'){
+            $group = $query->orConditionGroup()
+              ->condition('field_advert_district.entity.name', $location)
+              ->condition('field_advert_sector', $location)
+              ->condition('field_advert_village', $location);
+            $query->condition($group);
+        }
+
+        if (isset($advert) and !empty($advert) and $advert !== 'ad'){
+            $query->condition('field_advert_type', $advert);
+        }
+
+        if (isset($property) and !empty($property) and $property !== 'pro'){
+            $query->condition('field_advert_property_type', $property);
+        }
+        return $query;
+    }
+
+}

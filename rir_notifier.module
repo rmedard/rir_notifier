@@ -87,9 +87,10 @@ function rir_notifier_cron() {
     $campaigns = new MailchimpCampaigns($APIKey);
     $lists = new MailchimpLists($APIKey);
     $interestObj = Node::load(96);
+    $dataAccessor = Drupal::service('rir_notifier.data_accessor');
     if ($interestObj instanceof NodeInterface and $interestObj->bundle() == 'details_request_category') {
         $reference = $interestObj->get('field_dr_reference')->value;
-        if (countAvailableAdverts($reference) > 0) {
+        if ($dataAccessor->countAdvertsByReference($reference) > 0) {
             $members = $lists->getMembers($interestObj->get('field_mailchimp_list_id')->value,
               array(
                 'interest_category_id' => $interestObj->get('field_mailchimp_category_id')->value,
@@ -124,41 +125,6 @@ function rir_notifier_cron() {
     else {
         Drupal::logger('rir_notifier')->error('Interest Object not found');
     }
-}
-
-function countAvailableAdverts($reference) {
-    $keys = explode('-', $reference);
-    $location = $keys[0];
-    $advertType = $keys[1];
-    $propertyType = $keys[2];
-    return getQuery($location, $advertType, $propertyType)->count()->execute();
-}
-
-function getDailyAdverts($location, $advert, $property) {
-    return getQuery($location, $advert, $property)->execute();
-}
-
-function getQuery($location, $advert, $property){
-    $query = Drupal::entityQuery('node')
-      ->condition('type', 'advert')
-      ->condition('status', 1);
-
-    if (isset($location) and !empty($location) and $location !== 'loc'){
-        $group = $query->orConditionGroup()
-          ->condition('field_advert_district.entity.name', $location)
-          ->condition('field_advert_sector', $location)
-          ->condition('field_advert_village', $location);
-        $query->condition($group);
-    }
-
-    if (isset($advert) and !empty($advert) and $advert !== 'ad'){
-        $query->condition('field_advert_type', $advert);
-    }
-
-    if (isset($property) and !empty($property) and $property !== 'pro'){
-        $query->condition('field_advert_property_type', $property);
-    }
-    return $query;
 }
 
 function getHtmlContent($reference) {
