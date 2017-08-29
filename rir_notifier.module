@@ -26,9 +26,9 @@ function rir_notifier_page_attachments(array &$attachments) {
  */
 function rir_notifier_theme($existing, $type, $theme, $path) {
 
-    $location = Drupal::request()->get('location');
-    $advertType = Drupal::request()->get('advert');
-    $propertyType = Drupal::request()->get('property');
+    $location = Drupal::request()->query->get('location');
+    $advertType = Drupal::request()->query->get('advert');
+    $propertyType = Drupal::request()->query->get('property');
 
     $nodes = Node::loadMultiple(getDailyAdverts($location, $advertType, $propertyType));
 
