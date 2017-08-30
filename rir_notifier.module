@@ -27,6 +27,7 @@ function rir_notifier_page_attachments(array &$attachments) {
  */
 function rir_notifier_theme($existing, $type, $theme, $path) {
     $dataAccessor = Drupal::service('rir_notifier.data_accessor');
+    Drupal::logger('rir_notifier')->debug('Available adverts - module: ' . $dataAccessor->countAdvertsByReference());
     return [
       'rir_subscribe_search' => [
         'variables' => [

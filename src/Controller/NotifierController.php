@@ -45,6 +45,7 @@ class NotifierController extends ControllerBase {
         $advert = Drupal::request()->query->get('advert');
         $property = Drupal::request()->query->get('property');
         $dataAccessor = Drupal::service('rir_notifier.data_accessor');
+        Drupal::logger('rir_notifier')->debug('Available adverts - controller: ' . $dataAccessor->countAdvertsByReference());
         return [
           '#theme' => 'rir_campaign',
           '#adverts' => $dataAccessor->getDailyAdverts($location, $advert, $property),
