@@ -10,6 +10,7 @@ namespace Drupal\rir_notifier\Service;
 
 
 use Drupal;
+use Drupal\node\Entity\Node;
 
 class DataAccessor {
 
@@ -35,8 +36,7 @@ class DataAccessor {
 
     function getDailyAdverts($location = NULL, $advert = NULL, $property = NULL) {
         $adverts = $this->getQuery($location, $advert, $property)->execute();
-        Drupal::logger('rir_notifier')->debug('adverts data: ' . json_encode($adverts, TRUE));
-        return $adverts;
+        return Node::loadMultiple($adverts);
     }
 
     private function getQuery($location, $advert, $property){
