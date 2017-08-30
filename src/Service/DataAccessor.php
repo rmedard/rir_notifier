@@ -21,6 +21,9 @@ class DataAccessor {
      * @return mixed
      */
     function countAdvertsByReference($reference = NULL) {
+        $location = NULL;
+        $advertType = NULL;
+        $propertyType = NULL;
         if (isset($reference)){
             $keys = explode('-', $reference);
             $location = $keys[0];
@@ -31,7 +34,9 @@ class DataAccessor {
     }
 
     function getDailyAdverts($location = NULL, $advert = NULL, $property = NULL) {
-        return $this->getQuery($location, $advert, $property)->execute();
+        $adverts = $this->getQuery($location, $advert, $property)->execute();
+        Drupal::logger('rir_notifier')->debug('adverts data: ' . json_encode($adverts, TRUE));
+        return $adverts;
     }
 
     private function getQuery($location, $advert, $property){
