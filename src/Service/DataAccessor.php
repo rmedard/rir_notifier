@@ -13,6 +13,8 @@ use Drupal;
 
 class DataAccessor {
 
+    const MAILCHIMP_API_KEY = 'e29c8cf2c4d114d83629a9aee4430992-us16';
+
     /**
      * @param $reference Interest reference
      *
@@ -26,7 +28,7 @@ class DataAccessor {
         return $this->getQuery($location, $advertType, $propertyType)->count()->execute();
     }
 
-    function getDailyAdverts($location, $advert, $property) {
+    function getDailyAdverts($location = NULL, $advert = NULL, $property = NULL) {
         return $this->getQuery($location, $advert, $property)->execute();
     }
 

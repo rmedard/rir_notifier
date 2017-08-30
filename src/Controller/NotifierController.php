@@ -41,8 +41,13 @@ class NotifierController extends ControllerBase {
     }
 
     public function newsletterPage() {
+        $location = Drupal::request()->query->get('location');
+        $advert = Drupal::request()->query->get('advert');
+        $property = Drupal::request()->query->get('property');
+        $dataAccessor = Drupal::service('rir_notifier.data_accessor');
         return [
           '#theme' => 'rir_campaign',
+          '#adverts' => $dataAccessor->getDailyAdverts($location, $advert, $property),
         ];
     }
 

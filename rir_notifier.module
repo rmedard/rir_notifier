@@ -6,6 +6,7 @@
 
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
+use Drupal\rir_notifier\Service\DataAccessor;
 use Drupal\webform\WebformSubmissionInterface;
 use Mailchimp\MailchimpAPIException;
 use Mailchimp\MailchimpCampaigns;
@@ -25,7 +26,7 @@ function rir_notifier_page_attachments(array &$attachments) {
  * Implements hook_theme().
  */
 function rir_notifier_theme($existing, $type, $theme, $path) {
-
+    $dataAccessor = Drupal::service('rir_notifier.data_accessor');
     return [
       'rir_subscribe_search' => [
         'variables' => [
@@ -34,7 +35,7 @@ function rir_notifier_theme($existing, $type, $theme, $path) {
       ],
       'rir_campaign' => [
         'variables' => [
-//          'adverts' => $nodes
+          'adverts' => $dataAccessor->getDailyAdverts()
         ]
       ],
     ];
@@ -81,7 +82,7 @@ function getRequestCategoryReference($location, $advertType, $propertyType) {
  * Implements hook_cron().
  */
 function rir_notifier_cron() {
-    $APIKey = 'e29c8cf2c4d114d83629a9aee4430992-us16';
+    $APIKey = DataAccessor::MAILCHIMP_API_KEY;
     $campaigns = new MailchimpCampaigns($APIKey);
     $lists = new MailchimpLists($APIKey);
     $interestObj = Node::load(96);

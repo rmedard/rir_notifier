@@ -12,6 +12,7 @@ namespace Drupal\rir_notifier\Plugin\QueueWorker;
 use Drupal;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\node\Entity\Node;
+use Drupal\rir_notifier\Service\DataAccessor;
 use function json_encode;
 use Mailchimp\Mailchimp;
 use Mailchimp\MailchimpAPIException;
@@ -59,7 +60,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
 
     $createInterestPath = '/lists/{list_id}/interest-categories/{interest_category_id}/interests';
 
-    $mailChimpAPIKey = 'e29c8cf2c4d114d83629a9aee4430992-us16';
+    $mailChimpAPIKey = DataAccessor::MAILCHIMP_API_KEY;
     $mailchimp = new Mailchimp($mailChimpAPIKey);
     $mailchimpLists = new MailchimpLists($mailChimpAPIKey);
 
