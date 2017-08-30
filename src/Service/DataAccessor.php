@@ -16,15 +16,17 @@ class DataAccessor {
     const MAILCHIMP_API_KEY = 'e29c8cf2c4d114d83629a9aee4430992-us16';
 
     /**
-     * @param $reference Interest reference
+     * @param $reference string reference
      *
      * @return mixed
      */
-    function countAdvertsByReference($reference) {
-        $keys = explode('-', $reference);
-        $location = $keys[0];
-        $advertType = $keys[1];
-        $propertyType = $keys[2];
+    function countAdvertsByReference($reference = NULL) {
+        if (isset($reference)){
+            $keys = explode('-', $reference);
+            $location = $keys[0];
+            $advertType = $keys[1];
+            $propertyType = $keys[2];
+        }
         return $this->getQuery($location, $advertType, $propertyType)->count()->execute();
     }
 
