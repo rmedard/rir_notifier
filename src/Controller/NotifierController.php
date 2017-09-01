@@ -46,10 +46,11 @@ class NotifierController extends ControllerBase {
         $property = Drupal::request()->query->get('property');
         $dataAccessor = Drupal::service('rir_notifier.data_accessor');
         Drupal::logger('rir_notifier')->debug('Available adverts - controller: ' . 'location: ' . $location . ' advert: ' . $advert . ' property: ' . $property);
-        return [
-          '#theme' => 'rir_campaign',
-          '#adverts' => $dataAccessor->getDailyAdverts($location, $advert, $property),
-        ];
+
+        $output = [];
+        $output[]['#cache']['max-age'] = 0; // No cache
+        $output[] = ['#theme' => 'rir_campaign', '#adverts' => $dataAccessor->getDailyAdverts($location, $advert, $property)];
+        return $output;
     }
 
 
