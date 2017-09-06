@@ -39,16 +39,7 @@ class NotifierController extends ControllerBase {
         return $response;
     }
 
-    public function newsletterPage($location, $advert, $property) {
-        if (!isset($location) or empty($location)){
-            $location = 'loc';
-        }
-        if (!isset($advert) or empty($advert)){
-            $advert = 'ad';
-        }
-        if (!isset($property) or empty($property)){
-            $property = 'pro';
-        }
+    public function newsletterPage($location = 'loc', $advert = 'ad', $property = 'pro') {
         $dataAccessor = Drupal::service('rir_notifier.data_accessor');
         $output = [];
         $output[]['#cache']['max-age'] = 0; // No cache
