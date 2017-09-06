@@ -8,7 +8,7 @@ rir_notifier.open_subscription_modal:
     js: 'nojs|ajax'
 
 rir_notifier.newsletter:
-  path: '/newsletter'
+  path: '/newsletter/{location}/{advert}/{property}'
   defaults:
     _title: 'Our latest adverts'
     _controller: '\Drupal\rir_notifier\Controller\NotifierController::newsletterPage'

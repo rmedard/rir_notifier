@@ -39,13 +39,17 @@ class NotifierController extends ControllerBase {
         return $response;
     }
 
-    public function newsletterPage() {
-        $location = Drupal::request()->query->get('location');
-        $advert = Drupal::request()->query->get('advert');
-        $property = Drupal::request()->query->get('property');
+    public function newsletterPage($location, $advert, $property) {
+        if (!isset($location) or empty($location)){
+            $location = 'loc';
+        }
+        if (!isset($advert) or empty($advert)){
+            $advert = 'ad';
+        }
+        if (!isset($property) or empty($property)){
+            $property = 'pro';
+        }
         $dataAccessor = Drupal::service('rir_notifier.data_accessor');
-        Drupal::logger('rir_notifier')->debug('Available adverts - controller: ' . 'location: ' . $location . ' advert: ' . $advert . ' property: ' . $property);
-
         $output = [];
         $output[]['#cache']['max-age'] = 0; // No cache
         $output[] = ['#theme' => 'rir_campaign', '#adverts' => $dataAccessor->getDailyAdverts($location, $advert, $property)];
