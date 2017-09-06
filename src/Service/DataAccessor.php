@@ -37,6 +37,10 @@ class DataAccessor {
         return Node::loadMultiple($adverts);
     }
 
+    /**
+     * Get Mailchimp API Key from Mailchimp module configuration
+     * @return array|mixed|null
+     */
     function getMailchimpAPIKey(){
         $config = Drupal::config('mailchimp.settings');
         return $config->get('api_key');
