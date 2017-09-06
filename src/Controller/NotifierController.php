@@ -18,7 +18,7 @@ use Drupal\webform\Entity\Webform;
 class NotifierController extends ControllerBase {
 
     public function openSubscriptionModal() {
-        $query = \Drupal::request()->query;
+        $query = Drupal::request()->query;
 
         $advertType = $query->get('advert');
         $propertyLocation = $query->get('location');
@@ -34,8 +34,7 @@ class NotifierController extends ControllerBase {
         ];
 
         $response = new AjaxResponse();
-        $webform = Webform::load($values['webform_id'])
-          ->getSubmissionForm($values);
+        $webform = Webform::load($values['webform_id'])->getSubmissionForm($values);
         $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert'), $webform, ['width' => '80%']));
         return $response;
     }
@@ -52,6 +51,5 @@ class NotifierController extends ControllerBase {
         $output[] = ['#theme' => 'rir_campaign', '#adverts' => $dataAccessor->getDailyAdverts($location, $advert, $property)];
         return $output;
     }
-
 
 }

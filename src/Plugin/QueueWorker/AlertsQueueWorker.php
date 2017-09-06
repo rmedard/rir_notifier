@@ -12,11 +12,10 @@ namespace Drupal\rir_notifier\Plugin\QueueWorker;
 use Drupal;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\node\Entity\Node;
-use Drupal\rir_notifier\Service\DataAccessor;
-use function json_encode;
 use Mailchimp\Mailchimp;
 use Mailchimp\MailchimpAPIException;
 use Mailchimp\MailchimpLists;
+use function json_encode;
 
 
 /**
@@ -31,88 +30,117 @@ use Mailchimp\MailchimpLists;
  */
 class AlertsQueueWorker extends QueueWorkerBase {
 
-  /**
-   * Works on a single queue item.
-   *
-   * @param mixed $data
-   *   The data that was passed to
-   *   \Drupal\Core\Queue\QueueInterface::createItem() when the item was queued.
-   *
-   * @throws \Drupal\Core\Queue\RequeueException
-   *   Processing is not yet finished. This will allow another process to claim
-   *   the item immediately.
-   * @throws \Exception
-   *   A QueueWorker plugin may throw an exception to indicate there was a
-   *   problem. The cron process will log the exception, and leave the item in
-   *   the queue to be processed again later.
-   * @throws \Drupal\Core\Queue\SuspendQueueException
-   *   More specifically, a SuspendQueueException should be thrown when a
-   *   QueueWorker plugin is aware that the problem will affect all subsequent
-   *   workers of its queue. For example, a callback that makes HTTP requests
-   *   may find that the remote server is not responding. The cron process will
-   *   behave as with a normal Exception, and in addition will not attempt to
-   *   process further items from the current item's queue during the current
-   *   cron run.
-   *
-   * @see \Drupal\Core\Cron::processQueues()
-   */
-  public function processItem($data) {
+    /**
+     * Works on a single queue item.
+     *
+     * @param mixed $data
+     *   The data that was passed to
+     *   \Drupal\Core\Queue\QueueInterface::createItem() when the item was
+     *   queued.
+     *
+     * @throws \Drupal\Core\Queue\RequeueException
+     *   Processing is not yet finished. This will allow another process to
+     *   claim the item immediately.
+     * @throws \Exception
+     *   A QueueWorker plugin may throw an exception to indicate there was a
+     *   problem. The cron process will log the exception, and leave the item
+     *   in
+     *   the queue to be processed again later.
+     * @throws \Drupal\Core\Queue\SuspendQueueException
+     *   More specifically, a SuspendQueueException should be thrown when a
+     *   QueueWorker plugin is aware that the problem will affect all
+     *   subsequent
+     *   workers of its queue. For example, a callback that makes HTTP requests
+     *   may find that the remote server is not responding. The cron process
+     *   will behave as with a normal Exception, and in addition will not
+     *   attempt to process further items from the current item's queue during
+     *   the current cron run.
+     *
+     * @see \Drupal\Core\Cron::processQueues()
+     */
+    public function processItem($data) {
 
-    $createInterestPath = '/lists/{list_id}/interest-categories/{interest_category_id}/interests';
+        $createInterestPath = '/lists/{list_id}/interest-categories/{interest_category_id}/interests';
+        $dataAccessor = Drupal::service('rir_notifier.data_accessor');
+        $mailChimpAPIKey = $dataAccessor->getMailchimpAPIKey();
+        $mailchimp = new Mailchimp($mailChimpAPIKey);
+        $mailchimpLists = new MailchimpLists($mailChimpAPIKey);
 
-    $mailChimpAPIKey = DataAccessor::MAILCHIMP_API_KEY;
-    $mailchimp = new Mailchimp($mailChimpAPIKey);
-    $mailchimpLists = new MailchimpLists($mailChimpAPIKey);
+        $mailChimpListId = '6ec516829b';
+        $mailchimpCategoryID = '970f627ce7';
 
-    $mailChimpListId = '6ec516829b';
-    $mailchimpCategoryID = '970f627ce7';
+        if (isset($mailchimp)) {
 
-    if (isset($mailchimp)){
+            $detailsRequestInterests = Drupal::entityQuery('node')
+              ->condition('status', 1)
+              ->condition('type', 'details_request_category')
+              ->condition('field_dr_reference', $data->reference)
+              ->execute();
 
-      $detailsRequestInterests = Drupal::entityQuery('node')
-        ->condition('status', 1)
-        ->condition('type', 'details_request_category')
-        ->condition('field_dr_reference', $data->reference)
-        ->execute();
+            $interestId = NULL;
+            if (empty($detailsRequestInterests)) {
 
-      $interestId = NULL;
-      if (empty($detailsRequestInterests)){
+                $responseData = $mailchimp->request('POST', $createInterestPath, [
+                  'list_id' => $mailChimpListId,
+                  'interest_category_id' => $mailchimpCategoryID,
+                ], ['name' => $data->reference], FALSE, TRUE);
+                $detailsRequestCategory = Node::create([
+                  'type' => 'details_request_category',
+                  'title' => $data->reference,
+                  'field_mailchimp_list_id' => $responseData['list_id'],
+                  'field_mailchimp_category_id' => $responseData['category_id'],
+                  'field_mailchimp_interest_id' => $responseData['id'],
+                  'field_dr_reference' => $responseData['name'],
+                ]);
+                $detailsRequestCategory->save();
+                $interestId = $responseData['id'];
+                try {
+                    $response1 = $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, [
+                      'status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
+                      'merge_fields' => [
+                        'FNAME' => $data->first_name,
+                        'LNAME' => $data->last_name,
+                      ],
+                      'email_type' => 'html',
+                      'interests' => [$interestId => TRUE],
+                    ], FALSE);
+                    Drupal::logger('rir_notifier')
+                      ->notice('New member subscribed: ' . $data->email . ' Response:' . json_encode($response1));
+                } catch (MailchimpAPIException $ex) {
+                    Drupal::logger('rir_notifier')
+                      ->error('MailChimp error: Code: ' . $response1->status . ' Title: ' . $response1->title);
+                }
 
-        $responseData = $mailchimp->request('POST', $createInterestPath, array('list_id' => $mailChimpListId, 'interest_category_id' => $mailchimpCategoryID), array('name' => $data->reference), FALSE, TRUE);
-        $detailsRequestCategory = Node::create([
-          'type' => 'details_request_category',
-          'title' => $data->reference,
-          'field_mailchimp_list_id' => $responseData['list_id'],
-          'field_mailchimp_category_id' => $responseData['category_id'],
-          'field_mailchimp_interest_id' => $responseData['id'],
-          'field_dr_reference' => $responseData['name']
-        ]);
-        $detailsRequestCategory->save();
-        $interestId = $responseData['id'];
-        try{
-          $response1 = $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED , 'merge_fields' => array('FNAME' => $data->first_name, 'LNAME' => $data->last_name), 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
-          Drupal::logger('rir_notifier')->notice('New member subscribed: ' . $data->email . ' Response:' . json_encode($response1));
-        }catch (MailchimpAPIException $ex){
-          Drupal::logger('rir_notifier')->error('MailChimp error: Code: ' . $response1->status . ' Title: ' . $response1->title);
+            }
+            else {
+                foreach ($detailsRequestInterests as $interestRequest) {
+                    $detailsRequestCategory = Node::load($interestRequest);
+                    if (isset($detailsRequestCategory)) {
+                        $interestId = $detailsRequestCategory->get('field_mailchimp_interest_id')->value;
+                    }
+                    try {
+                        $response2 = $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, [
+                          'status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
+                          'merge_fields' => [
+                            'FNAME' => $data->first_name,
+                            'LNAME' => $data->last_name,
+                          ],
+                          'email_type' => 'html',
+                          'interests' => [$interestId => TRUE],
+                        ], FALSE);
+                        Drupal::logger('rir_notifier')
+                          ->notice('Member subscription updated: ' . $data->email . ' Response:' . json_encode($response2));
+                    } catch (MailchimpAPIException $ex) {
+                        Drupal::logger('rir_notifier')
+                          ->error('MailChimp Code: ' . $response2->status . ' Title: ' . $response2->title);
+                    }
+
+                }
+            }
         }
-
-      } else {
-        foreach ($detailsRequestInterests as $interestRequest){
-          $detailsRequestCategory = Node::load($interestRequest);
-          if (isset($detailsRequestCategory)){
-            $interestId = $detailsRequestCategory->get('field_mailchimp_interest_id')->value;
-          }
-          try{
-            $response2 = $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED , 'merge_fields' => array('FNAME' => $data->first_name, 'LNAME' => $data->last_name), 'email_type' => 'html', 'interests' => array($interestId => TRUE)), FALSE);
-            Drupal::logger('rir_notifier')->notice('Member subscription updated: ' . $data->email . ' Response:' . json_encode($response2));
-          }catch (MailchimpAPIException $ex){
-            Drupal::logger('rir_notifier')->error('MailChimp Code: ' . $response2->status . ' Title: ' . $response2->title);
-          }
-
+        else {
+            Drupal::logger('rir_notifier')
+              ->error('Mailchimp Instantiation Failed with Key: ' . $mailChimpAPIKey);
         }
-      }
-    } else {
-      Drupal::logger('rir_notifier')->error('Mailchimp Instantiation Failed with Key: ' . $mailChimpAPIKey);
     }
-  }
 }

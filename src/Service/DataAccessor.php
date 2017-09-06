@@ -14,8 +14,6 @@ use Drupal\node\Entity\Node;
 
 class DataAccessor {
 
-    const MAILCHIMP_API_KEY = 'e29c8cf2c4d114d83629a9aee4430992-us16';
-
     /**
      * @param $reference string reference
      *
@@ -37,6 +35,11 @@ class DataAccessor {
     function getDailyAdverts($location = NULL, $advert = NULL, $property = NULL) {
         $adverts = $this->getQuery($location, $advert, $property)->execute();
         return Node::loadMultiple($adverts);
+    }
+
+    function getMailchimpAPIKey(){
+        $config = Drupal::config('mailchimp.settings');
+        return $config->get('api_key');
     }
 
     private function getQuery($location, $advert, $property){

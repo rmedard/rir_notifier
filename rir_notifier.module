@@ -6,7 +6,6 @@
 
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
-use Drupal\rir_notifier\Service\DataAccessor;
 use Drupal\webform\WebformSubmissionInterface;
 use Mailchimp\MailchimpAPIException;
 use Mailchimp\MailchimpCampaigns;
@@ -82,11 +81,11 @@ function getRequestCategoryReference($location, $advertType, $propertyType) {
  * Implements hook_cron().
  */
 function rir_notifier_cron() {
-    $APIKey = DataAccessor::MAILCHIMP_API_KEY;
+    $dataAccessor = Drupal::service('rir_notifier.data_accessor');
+    $APIKey = $dataAccessor->getMailchimpAPIKey();
     $campaigns = new MailchimpCampaigns($APIKey);
     $lists = new MailchimpLists($APIKey);
     $interestObj = Node::load(96);
-    $dataAccessor = Drupal::service('rir_notifier.data_accessor');
     if ($interestObj instanceof NodeInterface and $interestObj->bundle() == 'details_request_category') {
         $reference = $interestObj->get('field_dr_reference')->value;
         if ($dataAccessor->countAdvertsByReference($reference) > 0) {
