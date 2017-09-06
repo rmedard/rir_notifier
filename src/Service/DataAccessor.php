@@ -42,8 +42,7 @@ class DataAccessor {
      * @return array|mixed|null
      */
     function getMailchimpAPIKey(){
-        $config = Drupal::config('mailchimp.settings');
-        return $config->get('api_key');
+        return Drupal::config('mailchimp.settings')->get('api_key');
     }
 
     private function getQuery($location, $advert, $property){

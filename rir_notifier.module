@@ -34,8 +34,8 @@ function rir_notifier_theme($existing, $type, $theme, $path) {
       ],
       'rir_campaign' => [
         'variables' => [
-          'adverts' => $dataAccessor->getDailyAdverts()
-        ]
+          'adverts' => $dataAccessor->getDailyAdverts(),
+        ],
       ],
     ];
 }
@@ -90,18 +90,20 @@ function rir_notifier_cron() {
         $reference = $interestObj->get('field_dr_reference')->value;
         if ($dataAccessor->countAdvertsByReference($reference) > 0) {
             $members = $lists->getMembers($interestObj->get('field_mailchimp_list_id')->value,
-              array(
+              [
                 'interest_category_id' => $interestObj->get('field_mailchimp_category_id')->value,
                 'interest_ids' => $interestObj->get('field_mailchimp_interest_id')->value,
-                'interest_match' => 'all'
-              ));
-            $members_array = json_decode(json_encode($members, true));
+                'interest_match' => 'all',
+              ]);
+            $members_array = json_decode(json_encode($members, TRUE));
             if ($members_array->total_items > 0) {
                 $settings = [
                   'subject_line' => 'Interesting adverts',
                   'title' => 'Campaign - ' . $reference,
                   'from_name' => Drupal::config('system.site')->get('name'),
                   'reply_to' => Drupal::config('system.site')->get('mail'),
+                  'inline_css' => TRUE,
+                  'template_id' => 32543,
                 ];
 
                 $campaign = $campaigns->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR, $members, (object) $settings);
@@ -109,13 +111,15 @@ function rir_notifier_cron() {
                 Drupal::logger('rir_notifier')
                   ->debug('Created campaign: ' . $campaign->id);
                 try {
-                    $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
+                    $sections = ['advert_location' => 'Aho inzu iri', 'advert_type' => 'Irakodeshwa'];
+                    $campaigns->setCampaignContent($campaign->id, ['template' => array('id' => 32543, 'sections' => (object) $sections)]);
                 } catch (MailchimpAPIException $exp) {
                     Drupal::logger('rir_notifier')
                       ->error('Setting Campaign content failed: ' . $exp->getTraceAsString());
                 }
             }
-        } else {
+        }
+        else {
             Drupal::logger('rir_notifier')
               ->debug('No adverts found for reference: ' . $reference);
         }
@@ -130,7 +134,8 @@ function getHtmlContent($reference) {
     $location = $keys[0];
     $advertType = $keys[1];
     $propertyType = $keys[2];
-    $template_location = 'http://' . Drupal::request()->getHost() . '/newsletter?location=' . $location . '&advert=' . $advertType . '&property=' . $propertyType;
+    $template_location = 'http://' . Drupal::request()
+        ->getHost() . '/newsletter?location=' . $location . '&advert=' . $advertType . '&property=' . $propertyType;
     $html = file_get_contents($template_location);
     if ($html !== FALSE) {
         $html = explode('<!-- RIR_CAMPAIGN_TEMPLATE -->', $html);
