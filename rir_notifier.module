@@ -133,18 +133,6 @@ function getHtmlContent($reference) {
     $location = $keys[0];
     $advertType = $keys[1];
     $propertyType = $keys[2];
-//    $template_location = 'http://' . Drupal::request()
-//        ->getHost() . '/newsletter?location=' . $location . '&advert=' . $advertType . '&property=' . $propertyType;
-//    $html = file_get_contents($template_location);
-//    if ($html !== FALSE) {
-//        $html = explode('<!-- RIR_CAMPAIGN_TEMPLATE -->', $html);
-//        return $html[1];
-//    }
-//    else {
-//        Drupal::logger('rir_notifier')
-//          ->error('Campaign template file not found!');
-//    }
-
     $twig_service = Drupal::service('twig');
     $variables = ['adverts' => $dataAccessor->getDailyAdverts($location, $advertType, $propertyType)];
     return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.html.twig')->render($variables);

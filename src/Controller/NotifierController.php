@@ -39,12 +39,4 @@ class NotifierController extends ControllerBase {
         return $response;
     }
 
-    public function newsletterPage($location = 'loc', $advert = 'ad', $property = 'pro') {
-        $dataAccessor = Drupal::service('rir_notifier.data_accessor');
-        $output = [];
-        $output[]['#cache']['max-age'] = 0; // No cache
-        $output[] = ['#theme' => 'rir_campaign', '#adverts' => $dataAccessor->getDailyAdverts($location, $advert, $property)];
-        return $output;
-    }
-
 }
