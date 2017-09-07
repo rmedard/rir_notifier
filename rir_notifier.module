@@ -25,16 +25,10 @@ function rir_notifier_page_attachments(array &$attachments) {
  * Implements hook_theme().
  */
 function rir_notifier_theme($existing, $type, $theme, $path) {
-    $dataAccessor = Drupal::service('rir_notifier.data_accessor');
     return [
       'rir_subscribe_search' => [
         'variables' => [
           'button' => t('Subscribe'),
-        ],
-      ],
-      'rir_campaign' => [
-        'variables' => [
-          'adverts' => $dataAccessor->getDailyAdverts(),
         ],
       ],
     ];
@@ -107,19 +101,16 @@ function rir_notifier_cron() {
 
                 $campaign = $campaigns->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR, $members, (object) $settings);
                 $campaign = json_decode(json_encode($campaign, TRUE));
-                Drupal::logger('rir_notifier')
-                  ->debug('Created campaign: ' . $campaign->id);
+                Drupal::logger('rir_notifier')->debug('Created campaign: ' . $campaign->id);
                 try {
                     $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
                 } catch (MailchimpAPIException $exp) {
-                    Drupal::logger('rir_notifier')
-                      ->error('Setting Campaign content failed: ' . $exp->getTraceAsString());
+                    Drupal::logger('rir_notifier')->error('Setting Campaign content failed: ' . $exp->getTraceAsString());
                 }
             }
         }
         else {
-            Drupal::logger('rir_notifier')
-              ->debug('No adverts found for reference: ' . $reference);
+            Drupal::logger('rir_notifier')->debug('No adverts found for reference: ' . $reference);
         }
     }
     else {
