@@ -117,6 +117,8 @@ function rir_notifier_cron() {
                       Drupal::logger('rir_notifier')->error('Sending Campaign: ' . $exp->getMessage() . ' Full trace: ' . $exp->getTraceAsString());
                     }
                 }
+            } else {
+              Drupal::logger('rir_notifier')->debug('More members than expected');
             }
         } else {
             Drupal::logger('rir_notifier')->debug('No adverts found for reference: ' . $reference);
