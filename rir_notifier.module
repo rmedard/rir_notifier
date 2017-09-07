@@ -145,8 +145,7 @@ function getHtmlContent($reference) {
 //          ->error('Campaign template file not found!');
 //    }
 
-    return [
-      '#theme' => 'rir_campaign',
-      '#adverts' => $dataAccessor->getDailyAdverts($location, $advertType, $propertyType)
-    ];
+    $twig_service = Drupal::service('twig');
+    $variables = ['adverts' => $dataAccessor->getDailyAdverts($location, $advertType, $propertyType)];
+    return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.html.twig')->render($variables);
 }
