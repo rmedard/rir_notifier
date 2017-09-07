@@ -101,16 +101,18 @@ function rir_notifier_cron() {
                   'inline_css' => TRUE,
                 ];
                 $campaign = $campaigns->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR, $members, (object) $settings);
-                $campaign = json_decode(json_encode($campaign, TRUE));
-                Drupal::logger('rir_notifier')->debug('Created campaign: ' . $campaign->id);
-                try {
-                    $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
-                    $campaigns->send($campaign->id, TRUE);
-//                    $path = '/campaigns/{campaign_id}/actions/send';
-//                    $mailchimp->request('POST', $path, array('campaign_id' => $campaign->id), NULL, TRUE, TRUE);
-                    $mailchimp->processBatchOperations();
-                } catch (MailchimpAPIException $exp) {
-                    Drupal::logger('rir_notifier')->error('Sending Campaign: ' . $exp->getMessage() . ' Error code: ' . $exp->getCode());
+                if ($campaign){
+                    $campaign = json_decode(json_encode($campaign, TRUE));
+                    Drupal::logger('rir_notifier')->debug('Created campaign: ' . $campaign->id);
+                    try {
+                      $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
+                      $campaigns->send($campaign->id, TRUE);
+                      //                    $path = '/campaigns/{campaign_id}/actions/send';
+                      //                    $mailchimp->request('POST', $path, array('campaign_id' => $campaign->id), NULL, TRUE, TRUE);
+                      $mailchimp->processBatchOperations();
+                    } catch (MailchimpAPIException $exp) {
+                      Drupal::logger('rir_notifier')->error('Sending Campaign: ' . $exp->getMessage() . ' Error code: ' . $exp->getCode());
+                    }
                 }
             }
         } else {
