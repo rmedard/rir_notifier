@@ -105,11 +105,11 @@ function rir_notifier_cron() {
                     $campaign = json_decode(json_encode($campaign, TRUE));
                     Drupal::logger('rir_notifier')->debug('Created campaign: ' . $campaign->id);
                     try {
-                      $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
-                      $campaigns->send($campaign->id, TRUE);
-                      //                    $path = '/campaigns/{campaign_id}/actions/send';
-                      //                    $mailchimp->request('POST', $path, array('campaign_id' => $campaign->id), NULL, TRUE, TRUE);
-                      $mailchimp->processBatchOperations();
+                        $obj = $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
+                        if ($obj){
+                            $campaigns->send($campaign->id, FALSE);
+//                            $mailchimp->processBatchOperations();
+                        }
                     } catch (MailchimpAPIException $exp) {
                       Drupal::logger('rir_notifier')->error('Sending Campaign: ' . $exp->getMessage() . ' Error code: ' . $exp->getCode());
                     }
