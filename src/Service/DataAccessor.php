@@ -46,7 +46,6 @@ class DataAccessor {
     }
 
     private function getQuery($location, $advert, $property){
-        Drupal::logger('rir_notifier')->debug('location: ' . $location . ' advert: ' . $advert . ' property: ' . $property);
         $query = Drupal::entityQuery('node')
           ->condition('type', 'advert')
           ->condition('status', 1);
