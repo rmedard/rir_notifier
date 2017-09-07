@@ -607,9 +607,9 @@
                                     <tr class="advert">
                                         <td id="imageBlockId">
                                             {% if advert.field_advert_picture is not empty %}
-                                                <img src="{{ 'http://rirdev.ml' ~ file_url(advert.field_advert_picture.0.entity.uri.value) }}" style="width:90px; height: auto" class="templateImage" alt="advertImage">
+                                                <img src="{{ 'http://rirdev.ml' ~ advert.field_advert_picture.0.entity.uri.value|image_style('scaled_90x90') }}" class="templateImage" alt="advertImage">
                                             {% else %}
-                                                <img src="{{ 'http://rirdev.ml' ~ file_url('public://default_images/no_img.png') }}" style="width:90px; height: auto" class="templateImage" alt="noImage">
+                                                <img src="{{ 'http://rirdev.ml' ~ 'public://default_images/no_img.png'|image_style('scaled_90x90') }}" class="templateImage" alt="noImage">
                                             {% endif %}
                                         </td>
                                         <td id="detailsBlockId">
