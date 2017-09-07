@@ -595,12 +595,12 @@
                         <td valign="top" id="templateBody">
                             <!-- BEGIN MODULE: BODY CONTENT // -->
                             <div class="body_content">
-                                <h1 style="text-align:center;">Rent in Rwanda</h1>
+                                <h1 style="text-align:center;">{{ drupal_token('site:name') }}</h1>
                                 <h2 style="display:none;">Heading 2</h2>
-                                <h3>Our latest adverts</h3>
+                                <h3>Our latest properties</h3>
                                 <h4 style="display:none;">Heading 4</h4>
                                 <p><strong>Dear *|FNAME|*, </strong>
-                                    <br>Please find the latest adverts that may interest you.</p>
+                                    <br>Please find the latest properties that may interest you.</p>
 
                                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                     {% for advert in adverts %}
@@ -613,10 +613,10 @@
                                             {% endif %}
                                         </td>
                                         <td id="detailsBlockId">
-                                            <p id="titleId"><a href="#">{{ advert.title.value|capitalize }}</a> - Ref: <span>{{ advert.field_advert_reference.value }}</span> - <span>{{ advert.field_advert_price.value }} {{ advert.field_advert_currency.value|capitalize }}</span>
+                                            <p id="titleId"><a href="#">{{ advert.title.value|capitalize }}</a> - Ref: <span>{{ advert.field_advert_reference.value }}</span> - <span>{{ advert.field_advert_price.value }} {{ advert.field_advert_currency.value|upper }}</span>
                                             </p>
                                             <p>{{ advert.field_advert_district.entity.name.value }}, Kimironko</p>
-                                            <p>{{ advert.field_advert_property_type.value }} for {{ advert.field_advert_type.value }}</p>
+                                            <p>{{ advert.field_advert_property_type.value|capitalize }} for {{ advert.field_advert_type.value|capitalize }}</p>
                                         </td>
                                     </tr>
                                     {% endfor %}
