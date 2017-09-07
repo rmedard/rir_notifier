@@ -7,6 +7,7 @@
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use Drupal\webform\WebformSubmissionInterface;
+use Mailchimp\Mailchimp;
 use Mailchimp\MailchimpAPIException;
 use Mailchimp\MailchimpCampaigns;
 use Mailchimp\MailchimpLists;
@@ -79,6 +80,7 @@ function rir_notifier_cron() {
     $APIKey = $dataAccessor->getMailchimpAPIKey();
     $campaigns = new MailchimpCampaigns($APIKey);
     $lists = new MailchimpLists($APIKey);
+    $mailchimp = new Mailchimp($APIKey);
     $interestObj = Node::load(96);
     if ($interestObj instanceof NodeInterface and $interestObj->bundle() == 'details_request_category') {
         $reference = $interestObj->get('field_dr_reference')->value;
@@ -104,6 +106,9 @@ function rir_notifier_cron() {
                 Drupal::logger('rir_notifier')->debug('Created campaign: ' . $campaign->id);
                 try {
                     $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
+                    $path = '/campaigns/{campaign_id}/actions/send';
+                    $mailchimp->request('POST', $path, array('campaign_id' => $campaign->id), NULL, TRUE, TRUE);
+                    $mailchimp->processBatchOperations();
                 } catch (MailchimpAPIException $exp) {
                     Drupal::logger('rir_notifier')->error('Setting Campaign content failed: ' . $exp->getTraceAsString());
                 }
