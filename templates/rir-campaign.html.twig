@@ -607,9 +607,9 @@
                                     <tr class="advert">
                                         <td id="imageBlockId">
                                             {% if advert.field_advert_picture is not empty %}
-                                                <img src="{{ path('<front>') ~ advert.field_advert_picture.0.entity.uri.value|image_style('scaled_90x90') }}" class="templateImage" alt="advertImage">
+                                                <img src="{{ drupal_token('site:url') ~ advert.field_advert_picture.0.entity.uri.value|image_style('scaled_90x90') }}" class="templateImage" alt="advertImage">
                                             {% else %}
-                                                <img src="{{ path('<front>') ~ 'public://default_images/no_img.png'|image_style('scaled_90x90') }}" class="templateImage" alt="noImage">
+                                                <img src="{{ drupal_token('site:url') ~ 'public://default_images/no_img.png'|image_style('scaled_90x90') }}" class="templateImage" alt="noImage">
                                             {% endif %}
                                         </td>
                                         <td id="detailsBlockId">
