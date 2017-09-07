@@ -136,7 +136,6 @@ function getHtmlContent($reference) {
     $twig_service = Drupal::service('twig');
     $variables = [
       'adverts' => $dataAccessor->getDailyAdverts($location, $advertType, $propertyType),
-      'host' => Drupal::request()->getHost()
     ];
     return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.html.twig')->render($variables);
 }
