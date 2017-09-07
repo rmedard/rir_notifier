@@ -103,7 +103,6 @@ function rir_notifier_cron() {
                   'from_name' => Drupal::config('system.site')->get('name'),
                   'reply_to' => Drupal::config('system.site')->get('mail'),
                   'inline_css' => TRUE,
-                  'template_id' => 30515,
                 ];
 
                 $campaign = $campaigns->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR, $members, (object) $settings);
@@ -111,8 +110,7 @@ function rir_notifier_cron() {
                 Drupal::logger('rir_notifier')
                   ->debug('Created campaign: ' . $campaign->id);
                 try {
-                    $sections = ['advert_location' => 'Aho inzu iri', 'advert_type' => 'Irakodeshwa'];
-                    $campaigns->setCampaignContent($campaign->id, ['template' => array('id' => 30515, 'sections' => (object) $sections)]);
+                    $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
                 } catch (MailchimpAPIException $exp) {
                     Drupal::logger('rir_notifier')
                       ->error('Setting Campaign content failed: ' . $exp->getTraceAsString());
@@ -130,19 +128,28 @@ function rir_notifier_cron() {
 }
 
 function getHtmlContent($reference) {
+    $dataAccessor = Drupal::service('rir_notifier.data_accessor');
     $keys = explode('-', $reference);
     $location = $keys[0];
     $advertType = $keys[1];
     $propertyType = $keys[2];
-    $template_location = 'http://' . Drupal::request()
-        ->getHost() . '/newsletter?location=' . $location . '&advert=' . $advertType . '&property=' . $propertyType;
-    $html = file_get_contents($template_location);
-    if ($html !== FALSE) {
-        $html = explode('<!-- RIR_CAMPAIGN_TEMPLATE -->', $html);
-        return $html[1];
-    }
-    else {
-        Drupal::logger('rir_notifier')
-          ->error('Campaign template file not found!');
-    }
+//    $template_location = 'http://' . Drupal::request()
+//        ->getHost() . '/newsletter?location=' . $location . '&advert=' . $advertType . '&property=' . $propertyType;
+//    $html = file_get_contents($template_location);
+//    if ($html !== FALSE) {
+//        $html = explode('<!-- RIR_CAMPAIGN_TEMPLATE -->', $html);
+//        return $html[1];
+//    }
+//    else {
+//        Drupal::logger('rir_notifier')
+//          ->error('Campaign template file not found!');
+//    }
+
+    return [
+      'rir_campaign' => [
+        'variables' => [
+          'adverts' => $dataAccessor->getDailyAdverts($location, $advertType, $propertyType),
+        ],
+      ]
+    ];
 }
