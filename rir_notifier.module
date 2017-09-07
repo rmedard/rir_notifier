@@ -111,7 +111,7 @@ function rir_notifier_cron() {
                 Drupal::logger('rir_notifier')
                   ->debug('Created campaign: ' . $campaign->id);
                 try {
-                    $sections = ['advert_location' => 'Aho inzu iri', 'advert_type' => 'Irakodeshwa'];
+                    $sections = ['advert' => ['advert_location' => 'Aho inzu iri', 'advert_type' => 'Irakodeshwa']];
                     $campaigns->setCampaignContent($campaign->id, ['template' => array('id' => 30515, 'sections' => (object) $sections)]);
                 } catch (MailchimpAPIException $exp) {
                     Drupal::logger('rir_notifier')
