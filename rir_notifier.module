@@ -146,10 +146,7 @@ function getHtmlContent($reference) {
 //    }
 
     return [
-      'rir_campaign' => [
-        'variables' => [
-          'adverts' => $dataAccessor->getDailyAdverts($location, $advertType, $propertyType),
-        ],
-      ]
+      '#theme' => 'rir_campaign',
+      '#adverts' => $dataAccessor->getDailyAdverts($location, $advertType, $propertyType)
     ];
 }
