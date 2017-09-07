@@ -100,7 +100,6 @@ function rir_notifier_cron() {
                   'reply_to' => Drupal::config('system.site')->get('mail'),
                   'inline_css' => TRUE,
                 ];
-
                 $campaign = $campaigns->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR, $members, (object) $settings);
                 $campaign = json_decode(json_encode($campaign, TRUE));
                 Drupal::logger('rir_notifier')->debug('Created campaign: ' . $campaign->id);
