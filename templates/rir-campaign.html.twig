@@ -609,7 +609,7 @@
                                             {% if advert.field_advert_picture is not empty %}
                                                 <img src="{{ file_url(advert.field_advert_picture.0.entity.fileuri) }}" style="width:90px; height: auto" class="templateImage" alt="advertImage">
                                             {% else %}
-                                                <img src="{{ file_url('public://default_images/no_img.png') }}" style="width:90px; height: auto" class="templateImage" alt="noImage">
+                                                <img src="{{ 'http://rirdev.ml' + file_url('public://default_images/no_img.png') }}" style="width:90px; height: auto" class="templateImage" alt="noImage">
                                             {% endif %}
                                         </td>
                                         <td id="detailsBlockId">
