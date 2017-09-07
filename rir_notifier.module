@@ -103,7 +103,7 @@ function rir_notifier_cron() {
                   'from_name' => Drupal::config('system.site')->get('name'),
                   'reply_to' => Drupal::config('system.site')->get('mail'),
                   'inline_css' => TRUE,
-                  'template_id' => 32543,
+                  'template_id' => 30515,
                 ];
 
                 $campaign = $campaigns->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR, $members, (object) $settings);
@@ -112,7 +112,7 @@ function rir_notifier_cron() {
                   ->debug('Created campaign: ' . $campaign->id);
                 try {
                     $sections = ['advert_location' => 'Aho inzu iri', 'advert_type' => 'Irakodeshwa'];
-                    $campaigns->setCampaignContent($campaign->id, ['template' => array('id' => 32543, 'sections' => (object) $sections)]);
+                    $campaigns->setCampaignContent($campaign->id, ['template' => array('id' => 30515, 'sections' => (object) $sections)]);
                 } catch (MailchimpAPIException $exp) {
                     Drupal::logger('rir_notifier')
                       ->error('Setting Campaign content failed: ' . $exp->getTraceAsString());
