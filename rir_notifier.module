@@ -107,7 +107,7 @@ function rir_notifier_cron() {
                     try {
                         $obj = $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
                         if ($obj){
-                            $campaigns->send($campaign->id, FALSE);
+                            $campaigns->send(intval($campaign->id), FALSE);
 //                            $mailchimp->processBatchOperations();
                         }
                     } catch (MailchimpAPIException $exp) {
