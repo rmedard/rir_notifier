@@ -106,9 +106,10 @@ function rir_notifier_cron() {
                 Drupal::logger('rir_notifier')->debug('Created campaign: ' . $campaign->id);
                 try {
                     $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
-                    $path = '/campaigns/{campaign_id}/actions/send';
-                    $mailchimp->request('POST', $path, array('campaign_id' => $campaign->id), NULL, TRUE, TRUE);
-                    $mailchimp->processBatchOperations();
+                    $campaigns->send($campaign->id);
+//                    $path = '/campaigns/{campaign_id}/actions/send';
+//                    $mailchimp->request('POST', $path, array('campaign_id' => $campaign->id), NULL, TRUE, TRUE);
+//                    $mailchimp->processBatchOperations();
                 } catch (MailchimpAPIException $exp) {
                     Drupal::logger('rir_notifier')->error('Setting Campaign content failed: ' . $exp->getTraceAsString());
                 }
