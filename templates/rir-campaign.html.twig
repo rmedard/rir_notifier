@@ -599,7 +599,7 @@
                                 <h2 style="display:none;">Heading 2</h2>
                                 <h3>Our latest adverts</h3>
                                 <h4 style="display:none;">Heading 4</h4>
-                                <p><strong>Dear user!</strong>
+                                <p><strong>Dear *|FNAME|*, </strong>
                                     <br>Please find the latest adverts that may interest you.</p>
 
                                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -607,9 +607,9 @@
                                     <tr class="advert">
                                         <td id="imageBlockId">
                                             {% if advert.field_advert_picture is not empty %}
-                                                <img src="{{ 'http://rirdev.ml' ~ advert.field_advert_picture.0.entity.uri.value|image_style('scaled_90x90') }}" class="templateImage" alt="advertImage">
+                                                <img src="{{ host ~ advert.field_advert_picture.0.entity.uri.value|image_style('scaled_90x90') }}" class="templateImage" alt="advertImage">
                                             {% else %}
-                                                <img src="{{ 'http://rirdev.ml' ~ 'public://default_images/no_img.png'|image_style('scaled_90x90') }}" class="templateImage" alt="noImage">
+                                                <img src="{{ host ~ 'public://default_images/no_img.png'|image_style('scaled_90x90') }}" class="templateImage" alt="noImage">
                                             {% endif %}
                                         </td>
                                         <td id="detailsBlockId">
