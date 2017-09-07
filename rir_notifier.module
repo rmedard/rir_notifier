@@ -85,14 +85,15 @@ function rir_notifier_cron() {
     if ($interestObj instanceof NodeInterface and $interestObj->bundle() == 'details_request_category') {
         $reference = $interestObj->get('field_dr_reference')->value;
         if ($dataAccessor->countAdvertsByReference($reference) > 0) {
-            $members = $lists->getMembers($interestObj->get('field_mailchimp_list_id')->value,
-              [
-                'interest_category_id' => $interestObj->get('field_mailchimp_category_id')->value,
-                'interest_ids' => $interestObj->get('field_mailchimp_interest_id')->value,
-                'interest_match' => 'all',
-              ]);
+          $list_id = $interestObj->get('field_mailchimp_list_id')->value;
+          $category_id = $interestObj->get('field_mailchimp_category_id')->value;
+          $interest_ids = $interestObj->get('field_mailchimp_interest_id')->value;
+          Drupal::logger('rir_notifier')->debug('list: ' . $list_id . ' category: ' . $category_id . ' interest: ' .$interest_ids);
+            $members = $lists->getMembers($list_id,
+              array('interest_category_id' => $category_id, 'interest_ids' => $interest_ids, 'interest_match' => 'all')
+            );
             $members_array = json_decode(json_encode($members, TRUE));
-            if ($members_array->total_items > 0) {
+            if ($members_array->total_items == 1) {
                 $settings = [
                   'subject_line' => 'Interesting adverts',
                   'title' => 'Campaign - ' . $reference,
@@ -107,8 +108,8 @@ function rir_notifier_cron() {
                     try {
                         $obj = $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
                         if (!empty($obj)){
-                            $response = $campaigns->send($campaign->id, FALSE);
-//                            $mailchimp->processBatchOperations();
+                            $campaigns->send($campaign->id, TRUE);
+                            $mailchimp->processBatchOperations();
                         } else {
                           Drupal::logger('rir_notifier')->debug('Empty campaign content: ' . $campaign->id);
                         }
