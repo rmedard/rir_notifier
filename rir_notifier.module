@@ -113,12 +113,10 @@ function rir_notifier_cron() {
                     Drupal::logger('rir_notifier')->error('Setting Campaign content failed: ' . $exp->getTraceAsString());
                 }
             }
-        }
-        else {
+        } else {
             Drupal::logger('rir_notifier')->debug('No adverts found for reference: ' . $reference);
         }
-    }
-    else {
+    } else {
         Drupal::logger('rir_notifier')->error('Interest Object not found');
     }
 }
