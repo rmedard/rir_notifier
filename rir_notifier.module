@@ -107,13 +107,13 @@ function rir_notifier_cron() {
                     try {
                         $obj = $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
                         if (!empty($obj)){
-                            $campaigns->send($campaign->id, FALSE);
+                            $response = $campaigns->send($campaign->id, FALSE);
 //                            $mailchimp->processBatchOperations();
                         } else {
                           Drupal::logger('rir_notifier')->debug('Empty campaign content: ' . $campaign->id);
                         }
                     } catch (MailchimpAPIException $exp) {
-                      Drupal::logger('rir_notifier')->error('Sending Campaign: ' . $exp->getMessage() . ' Error code: ' . $exp->getCode());
+                      Drupal::logger('rir_notifier')->error('Sending Campaign: ' . $exp->getMessage() . ' Full trace: ' . $exp->getTraceAsString());
                     }
                 }
             }
