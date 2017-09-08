@@ -59,7 +59,7 @@ class DataAccessor {
         $query = Drupal::entityQuery('node')
           ->condition('type', 'advert')
           ->condition('status', 1)
-          ->condition('created',  array($start_time, $end_time, 'BETWEEN'));
+          ->condition('created', array($start_time, $end_time), 'BETWEEN');
 
         if (isset($location) and !empty($location) and $location !== 'loc'){
             $group = $query->orConditionGroup()
