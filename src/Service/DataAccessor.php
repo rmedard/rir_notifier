@@ -10,7 +10,9 @@ namespace Drupal\rir_notifier\Service;
 
 
 use function date;
+use DateTimeZone;
 use Drupal;
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\node\Entity\Node;
 use function strtotime;
 
@@ -48,9 +50,10 @@ class DataAccessor {
     }
 
     private function getQuery($location, $advert, $property){
-        $yesterday = date('d-m-Y', strtotime("-1 days"));
-        $start_time = strtotime(date('Y-m-d 00:00:00', $yesterday));
-        $end_time = strtotime(date('Y-m-d 23:59:59', $yesterday));
+        $yesterday = new DrupalDateTime('1 day ago');
+        $yesterday->setTimezone(new DateTimeZone(DATETIME_STORAGE_TIMEZONE));
+        $start_time = $yesterday->setTime(00, 0);
+        $end_time = $yesterday->setTime(23, 0);
         $query = Drupal::entityQuery('node')
           ->condition('type', 'advert')
           ->condition('status', 1)
