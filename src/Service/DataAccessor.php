@@ -50,7 +50,7 @@ class DataAccessor {
     }
 
     private function getQuery($location, $advert, $property){
-        $yesterday = new DrupalDateTime('1 day ago');
+        $yesterday = new DrupalDateTime('2 days ago');
         $yesterday->setTimezone(new DateTimeZone(DATETIME_STORAGE_TIMEZONE));
         $yesterday->setTime(00, 0);
         $start_time = $yesterday->format(DATETIME_DATETIME_STORAGE_FORMAT);
