@@ -12,6 +12,7 @@ namespace Drupal\rir_notifier\Service;
 use function date;
 use Drupal;
 use Drupal\node\Entity\Node;
+use function strtotime;
 
 class DataAccessor {
 
@@ -48,10 +49,12 @@ class DataAccessor {
 
     private function getQuery($location, $advert, $property){
         $yesterday = date('d-m-Y', strtotime("-1 days"));
+        $start_time = strtotime(date('Y-m-d 00:00:00', $yesterday));
+        $end_time = strtotime(date('Y-m-d 23:59:59', $yesterday));
         $query = Drupal::entityQuery('node')
           ->condition('type', 'advert')
           ->condition('status', 1)
-          ->condition('created',  array(date('d-m-Y 00:00:00', $yesterday), date('d-m-Y 23:59:59', $yesterday), 'BETWEEN'));
+          ->condition('created',  array($start_time, $end_time, 'BETWEEN'));
 
         if (isset($location) and !empty($location) and $location !== 'loc'){
             $group = $query->orConditionGroup()
