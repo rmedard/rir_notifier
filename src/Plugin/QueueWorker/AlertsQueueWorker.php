@@ -67,7 +67,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
         $mailchimpLists = new MailchimpLists($mailChimpAPIKey);
 
         $mailChimpListId = '6ec516829b';
-        $mailchimpCategoryID = '970f627ce7';
+        $mailchimpCategoryID = '2ccf64b283';
 
         if (isset($mailchimp)) {
 
@@ -80,20 +80,23 @@ class AlertsQueueWorker extends QueueWorkerBase {
             $interestId = NULL;
             if (empty($detailsRequestInterests)) {
 
-                $responseData = $mailchimp->request('POST', $createInterestPath, [
+                $responseInterest = $mailchimp->request('POST', $createInterestPath, [
                   'list_id' => $mailChimpListId,
                   'interest_category_id' => $mailchimpCategoryID,
                 ], ['name' => $data->reference], FALSE, TRUE);
+
+                $responseSegment = $mailchimpLists->addSegment($mailChimpListId, $data->reference);
                 $detailsRequestCategory = Node::create([
                   'type' => 'details_request_category',
                   'title' => $data->reference,
-                  'field_mailchimp_list_id' => $responseData['list_id'],
-                  'field_mailchimp_category_id' => $responseData['category_id'],
-                  'field_mailchimp_interest_id' => $responseData['id'],
-                  'field_dr_reference' => $responseData['name'],
+                  'field_mailchimp_list_id' => $responseInterest['list_id'],
+                  'field_mailchimp_category_id' => $responseInterest['category_id'],
+                  'field_mailchimp_interest_id' => $responseInterest['id'],
+                  'field_mailchimp_segment_id' => $responseSegment->id,
+                  'field_dr_reference' => $responseInterest['name'],
                 ]);
                 $detailsRequestCategory->save();
-                $interestId = $responseData['id'];
+                $interestId = $responseInterest['id'];
                 try {
                     $response1 = $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, [
                       'status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
@@ -104,6 +107,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
                       'email_type' => 'html',
                       'interests' => [$interestId => TRUE],
                     ], FALSE);
+                    $mailchimpLists->addSegmentMember($mailChimpListId, $responseSegment->id, $data->email);
                     Drupal::logger('rir_notifier')
                       ->notice('New member subscribed: ' . $data->email . ' Response:' . json_encode($response1));
                 } catch (MailchimpAPIException $ex) {
@@ -111,30 +115,30 @@ class AlertsQueueWorker extends QueueWorkerBase {
                       ->error('MailChimp error: Code: ' . $response1->status . ' Title: ' . $response1->title);
                 }
 
-            }
-            else {
+            } else {
                 foreach ($detailsRequestInterests as $interestRequest) {
                     $detailsRequestCategory = Node::load($interestRequest);
                     if (isset($detailsRequestCategory)) {
                         $interestId = $detailsRequestCategory->get('field_mailchimp_interest_id')->value;
+                        $segmentId = $detailsRequestCategory->get('field_mailchimp_segment_id')->value;
+                        try {
+                          $response2 = $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, [
+                            'status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
+                            'merge_fields' => [
+                              'FNAME' => $data->first_name,
+                              'LNAME' => $data->last_name,
+                            ],
+                            'email_type' => 'html',
+                            'interests' => [$interestId => TRUE],
+                          ], FALSE);
+                          $mailchimpLists->addSegmentMember($mailChimpListId, $segmentId, $data->email);
+                          Drupal::logger('rir_notifier')
+                            ->notice('Member subscription updated: ' . $data->email . ' Response:' . json_encode($response2));
+                        } catch (MailchimpAPIException $ex) {
+                          Drupal::logger('rir_notifier')
+                            ->error('MailChimp Code: ' . $response2->status . ' Title: ' . $response2->title);
+                        }
                     }
-                    try {
-                        $response2 = $mailchimpLists->addOrUpdateMember($mailChimpListId, $data->email, [
-                          'status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
-                          'merge_fields' => [
-                            'FNAME' => $data->first_name,
-                            'LNAME' => $data->last_name,
-                          ],
-                          'email_type' => 'html',
-                          'interests' => [$interestId => TRUE],
-                        ], FALSE);
-                        Drupal::logger('rir_notifier')
-                          ->notice('Member subscription updated: ' . $data->email . ' Response:' . json_encode($response2));
-                    } catch (MailchimpAPIException $ex) {
-                        Drupal::logger('rir_notifier')
-                          ->error('MailChimp Code: ' . $response2->status . ' Title: ' . $response2->title);
-                    }
-
                 }
             }
         }
