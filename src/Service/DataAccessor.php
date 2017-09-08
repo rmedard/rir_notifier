@@ -9,6 +9,7 @@
 namespace Drupal\rir_notifier\Service;
 
 
+use function date;
 use Drupal;
 use Drupal\node\Entity\Node;
 
@@ -46,9 +47,11 @@ class DataAccessor {
     }
 
     private function getQuery($location, $advert, $property){
+        $yesterday = date('d-m-Y', strtotime("-1 days"));
         $query = Drupal::entityQuery('node')
           ->condition('type', 'advert')
-          ->condition('status', 1);
+          ->condition('status', 1)
+          ->condition('created',  array(date('d-m-Y 00:00:00', $yesterday), date('d-m-Y 23:59:59', $yesterday), 'BETWEEN'));
 
         if (isset($location) and !empty($location) and $location !== 'loc'){
             $group = $query->orConditionGroup()
