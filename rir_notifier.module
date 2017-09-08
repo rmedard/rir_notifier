@@ -79,6 +79,7 @@ function rir_notifier_cron() {
     $current_time = Drupal::time()->getCurrentTime();
     $request_time = Drupal::time()->getRequestTime();
     $hour = date('H', $current_time);
+    Drupal::state()->set('notifications.last.sent', $request_time);
     Drupal::logger('rir_notifier')->debug('Current time: ' . $current_time . ' Request time: ' . $request_time . ' Hour: ' . $hour);
     if ($current_time < 0) {
         $dataAccessor = Drupal::service('rir_notifier.data_accessor');
