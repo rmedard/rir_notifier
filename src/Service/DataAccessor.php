@@ -50,12 +50,8 @@ class DataAccessor {
     }
 
     private function getQuery($location, $advert, $property){
-        $yesterday = new DrupalDateTime('2 days ago');
-        $yesterday->setTimezone(new DateTimeZone(DATETIME_STORAGE_TIMEZONE));
-        $yesterday->setTime(00, 0);
-        $start_time = $yesterday->format(DATETIME_DATETIME_STORAGE_FORMAT);
-        $yesterday->setTime(23, 0);
-        $end_time = $yesterday->format(DATETIME_DATETIME_STORAGE_FORMAT);
+        $start_time = strtotime('-2 days 00:00:00');
+        $end_time = strtotime('-2 days 23:59:59');
         $query = Drupal::entityQuery('node')
           ->condition('type', 'advert')
           ->condition('status', 1)
