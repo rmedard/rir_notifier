@@ -78,7 +78,8 @@ function getRequestCategoryReference($location, $advertType, $propertyType) {
 function rir_notifier_cron() {
     $current_time = Drupal::time()->getCurrentTime();
     $request_time = Drupal::time()->getRequestTime();
-    Drupal::logger('rir_notifier')->debug('Current time: ' . $current_time . ' Request time: ' . $request_time);
+    $hour = date('H', $current_time);
+    Drupal::logger('rir_notifier')->debug('Current time: ' . $current_time . ' Request time: ' . $request_time . ' Hour: ' . $hour);
     if ($current_time < 0) {
         $dataAccessor = Drupal::service('rir_notifier.data_accessor');
         $APIKey = $dataAccessor->getMailchimpAPIKey();
