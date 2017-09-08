@@ -83,13 +83,13 @@ function rir_notifier_cron() {
     $lastrun = Drupal::state()->get('notifications.last.sent');
 
     Drupal::logger('rir_notifier')->debug('Current time: ' . $current_time . ' Request time: ' . $request_time . ' Hour: ' . $hour . ' Last sent: ' . Drupal::state()->get('notifications.last.sent'));
-    if ($current_time < 0) {
+    if ($current_time > 0) {
         $dataAccessor = Drupal::service('rir_notifier.data_accessor');
         $APIKey = $dataAccessor->getMailchimpAPIKey();
         $campaigns = new MailchimpCampaigns($APIKey);
         $lists = new MailchimpLists($APIKey);
         $mailchimp = new Mailchimp($APIKey);
-        $interestObj = Node::load(132);
+        $interestObj = Node::load(136);
         if ($interestObj instanceof NodeInterface and $interestObj->bundle() == 'details_request_category') {
             $reference = $interestObj->get('field_dr_reference')->value;
             if ($dataAccessor->countAdvertsByReference($reference) > 0) {
