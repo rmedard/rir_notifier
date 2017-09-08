@@ -92,6 +92,7 @@ function rir_notifier_cron() {
             $members = $lists->getMembers($list_id,
               array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED, 'interest_category_id' => $category_id, 'interest_ids' => $interest_ids, 'interest_match' => 'all')
             );
+            $members_obj = (object)['list_id' => $list_id, 'match' => 'all', 'conditions' => array('condition_type' => 'Interests', 'op' => 'interestcontains', 'field' => $reference, 'value' => array())];
             $members_array = json_decode(json_encode($members, TRUE));
             if ($members_array->total_items == 1) {
                 $settings = [
@@ -101,7 +102,7 @@ function rir_notifier_cron() {
                   'reply_to' => Drupal::config('system.site')->get('mail'),
                   'inline_css' => TRUE,
                 ];
-                $campaign = $campaigns->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR, $members, (object) $settings);
+                $campaign = $campaigns->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR, $members_obj, (object) $settings);
                 if ($campaign){
                     $campaign = json_decode(json_encode($campaign, TRUE));
                     Drupal::logger('rir_notifier')->debug('Created campaign: ' . $campaign->id);
