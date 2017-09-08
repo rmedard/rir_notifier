@@ -81,7 +81,7 @@ function rir_notifier_cron() {
     $campaigns = new MailchimpCampaigns($APIKey);
     $lists = new MailchimpLists($APIKey);
     $mailchimp = new Mailchimp($APIKey);
-    $interestObj = Node::load(96);
+    $interestObj = Node::load(132);
     if ($interestObj instanceof NodeInterface and $interestObj->bundle() == 'details_request_category') {
         $reference = $interestObj->get('field_dr_reference')->value;
         if ($dataAccessor->countAdvertsByReference($reference) > 0) {
