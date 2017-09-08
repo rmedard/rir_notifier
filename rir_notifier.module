@@ -105,6 +105,8 @@ function rir_notifier_cron() {
                 $campaign = NULL;
                 try {
                     $campaign = $campaigns->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR, $members_obj, (object) $settings);
+                    kint(json_encode($campaign, TRUE));
+                    die();
                     if ($campaign){
                         $campaign = json_decode(json_encode($campaign, TRUE));
                         Drupal::logger('rir_notifier')->debug('Created campaign: ' . $campaign->id);
@@ -122,8 +124,6 @@ function rir_notifier_cron() {
                     }
                 } catch (MailchimpAPIException $exp2){
                     Drupal::logger('rir_notifier')->error('Creating Campaign: ' . $exp2->getMessage() . ' Full trace: ' . $exp2->getTraceAsString());
-                    kint(json_encode($campaign, TRUE));
-                    die();
                 }
             } else {
               Drupal::logger('rir_notifier')->debug('More members than expected');
