@@ -115,12 +115,12 @@ function rir_notifier_cron() {
                             } else {
                                 Drupal::logger('rir_notifier')->debug('Empty campaign content: ' . $campaign->id);
                             }
-                        } catch (MailchimpAPIException $exp) {
-                            Drupal::logger('rir_notifier')->error('Sending Campaign: ' . $exp->getMessage() . ' Full trace: ' . $exp->getTraceAsString());
+                        } catch (MailchimpAPIException $exp1) {
+                            Drupal::logger('rir_notifier')->error('Sending Campaign: ' . $exp1->getMessage() . ' Full trace: ' . $exp1->getTraceAsString());
                         }
                     }
-                } catch (MailchimpAPIException $exp){
-                    Drupal::logger('rir_notifier')->error('Creating Campaign: ' . $exp->getMessage() . ' Full trace: ' . $exp->getTraceAsString());
+                } catch (MailchimpAPIException $exp2){
+                    Drupal::logger('rir_notifier')->error('Creating Campaign: ' . $exp2->getMessage() . ' Full trace: ' . $exp2->getTraceAsString());
                 }
             } else {
               Drupal::logger('rir_notifier')->debug('More members than expected');
