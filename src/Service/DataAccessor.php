@@ -51,7 +51,7 @@ class DataAccessor {
 
     private function getQuery($location, $advert, $property){
         $start_time = strtotime('-2 days 00:00:00');
-        $end_time = strtotime('-2 days 23:59:59');
+        $end_time = strtotime('-2 days 15:20:59');
         $query = Drupal::entityQuery('node')
           ->condition('type', 'advert')
           ->condition('status', 1)
