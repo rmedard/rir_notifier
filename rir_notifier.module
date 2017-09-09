@@ -71,16 +71,15 @@ function getRequestCategoryReference($location, $advertType, $propertyType) {
  */
 function rir_notifier_cron() {
     $request_time = Drupal::time()->getRequestTime();
-    $hour = date('H', $request_time);
     $day = date('dmY', $request_time);
     $lastrun = Drupal::state()->get('notifications.last.sent');
-
     if (isset($lastrun)){
       if (date('dmY', $lastrun) != $day){
         Drupal::queue('campaigns_processor')->createItem(NULL);
         Drupal::state()->set('notifications.last.sent', $request_time);
       }
     } else {
+      $hour = date('H', $request_time);
       if (intval($hour) < 6){
         Drupal::queue('campaigns_processor')->createItem(NULL);
         Drupal::state()->set('notifications.last.sent', $request_time);

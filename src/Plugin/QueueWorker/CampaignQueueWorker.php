@@ -74,7 +74,7 @@ class CampaignQueueWorker extends QueueWorkerBase {
           );
           $members_obj = (object)['list_id' => $list_id, 'segment_opts' => (object)['saved_segment_id' => intval($interest->get('field_mailchimp_segment_id')->value)]];
           $members_array = json_decode(json_encode($members, TRUE));
-          if ($members_array->total_items == 1) {
+          if ($members_array->total_items > 0) {
             $settings = [
               'subject_line' => 'Interesting adverts',
               'title' => 'Campaign - ' . $reference,
@@ -104,7 +104,7 @@ class CampaignQueueWorker extends QueueWorkerBase {
               Drupal::logger('rir_notifier')->error('Creating Campaign: ' . $exp2->getMessage() . ' Full trace: ' . $exp2->getTraceAsString());
             }
           } else {
-            Drupal::logger('rir_notifier')->debug('More members than expected');
+            Drupal::logger('rir_notifier')->debug('No subscribers found');
           }
         } else {
           Drupal::logger('rir_notifier')->debug('No adverts found for reference: ' . $reference);
