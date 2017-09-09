@@ -77,14 +77,14 @@ function rir_notifier_cron() {
       if (date('dmY', $lastrun) != $day){
         Drupal::queue('campaigns_processor')->createItem(NULL);
         Drupal::state()->set('notifications.last.sent', $request_time);
-        Drupal::logger('rir_norifier')->notice('Sending notifications scheduled!');
+        Drupal::logger('rir_notifier')->notice('Sending notifications scheduled!');
       }
     } else {
       $hour = date('H', $request_time);
       if (intval($hour) < 6){
         Drupal::queue('campaigns_processor')->createItem(NULL);
         Drupal::state()->set('notifications.last.sent', $request_time);
-        Drupal::logger('rir_norifier')->notice('Sending notifications scheduled!');
+        Drupal::logger('rir_notifier')->notice('Sending notifications scheduled!');
       }
     }
 }
