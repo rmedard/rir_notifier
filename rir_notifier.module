@@ -84,7 +84,7 @@ function rir_notifier_cron() {
       if (intval($hour) < 6){
         Drupal::queue('campaigns_processor')->createItem(NULL);
         Drupal::state()->set('notifications.last.sent', $request_time);
-        Drupal::logger('rir_notifier')->notice('Sending notifications scheduled!');
+        Drupal::logger('rir_notifier')->notice('First sending notifications scheduled!');
       }
     }
 }
