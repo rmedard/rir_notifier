@@ -4,13 +4,7 @@
  * A description of what your module does.
  */
 
-use Drupal\node\Entity\Node;
-use Drupal\node\NodeInterface;
 use Drupal\webform\WebformSubmissionInterface;
-use Mailchimp\Mailchimp;
-use Mailchimp\MailchimpAPIException;
-use Mailchimp\MailchimpCampaigns;
-use Mailchimp\MailchimpLists;
 
 /**
  * Implements hook_page_attachments().
@@ -76,70 +70,21 @@ function getRequestCategoryReference($location, $advertType, $propertyType) {
  * Implements hook_cron().
  */
 function rir_notifier_cron() {
-    $current_time = Drupal::time()->getCurrentTime();
     $request_time = Drupal::time()->getRequestTime();
-    $hour = date('H', $current_time);
-//    Drupal::state()->set('notifications.last.sent', $request_time);
+    $hour = date('H', $request_time);
+    $day = date('dmY', $request_time);
     $lastrun = Drupal::state()->get('notifications.last.sent');
 
-    Drupal::logger('rir_notifier')->debug('Current time: ' . $current_time . ' Request time: ' . $request_time . ' Hour: ' . $hour . ' Last sent: ' . Drupal::state()->get('notifications.last.sent'));
-    if ($current_time > 0) {
-        $dataAccessor = Drupal::service('rir_notifier.data_accessor');
-        $APIKey = $dataAccessor->getMailchimpAPIKey();
-        $campaigns = new MailchimpCampaigns($APIKey);
-        $lists = new MailchimpLists($APIKey);
-        $mailchimp = new Mailchimp($APIKey);
-        $interestObj = Node::load(136);
-        if ($interestObj instanceof NodeInterface and $interestObj->bundle() == 'details_request_category') {
-            $reference = $interestObj->get('field_dr_reference')->value;
-            if ($dataAccessor->countAdvertsByReference($reference) > 0) {
-                $list_id = $interestObj->get('field_mailchimp_list_id')->value;
-                $category_id = $interestObj->get('field_mailchimp_category_id')->value;
-                $interest_ids = $interestObj->get('field_mailchimp_interest_id')->value;
-                Drupal::logger('rir_notifier')->debug('list: ' . $list_id . ' category: ' . $category_id . ' interest: ' .$interest_ids);
-                $members = $lists->getMembers($list_id,
-                  array('status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED, 'interest_category_id' => $category_id, 'interest_ids' => $interest_ids, 'interest_match' => 'all')
-                );
-                $members_obj = (object)['list_id' => $list_id, 'segment_opts' => (object)['saved_segment_id' => intval($interestObj->get('field_mailchimp_segment_id')->value)]];
-                $members_array = json_decode(json_encode($members, TRUE));
-                if ($members_array->total_items == 1) {
-                    $settings = [
-                      'subject_line' => 'Interesting adverts',
-                      'title' => 'Campaign - ' . $reference,
-                      'from_name' => Drupal::config('system.site')->get('name'),
-                      'reply_to' => Drupal::config('system.site')->get('mail'),
-                      'inline_css' => TRUE,
-                    ];
-                    $campaign = NULL;
-                    try {
-                        $campaign = $campaigns->addCampaign(MailchimpCampaigns::CAMPAIGN_TYPE_REGULAR, $members_obj, (object) $settings);
-                        if ($campaign){
-                            $campaign = json_decode(json_encode($campaign, TRUE));
-                            Drupal::logger('rir_notifier')->debug('Created campaign: ' . $campaign->id);
-                            try {
-                                $obj = $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
-                                if (!empty($obj)){
-                                    $campaigns->send($campaign->id, FALSE);
-                                    //$mailchimp->processBatchOperations();
-                                } else {
-                                    Drupal::logger('rir_notifier')->debug('Empty campaign content: ' . $campaign->id);
-                                }
-                            } catch (MailchimpAPIException $exp1) {
-                                Drupal::logger('rir_notifier')->error('Sending Campaign: ' . $exp1->getMessage() . ' Full trace: ' . $exp1->getTraceAsString());
-                            }
-                        }
-                    } catch (MailchimpAPIException $exp2){
-                        Drupal::logger('rir_notifier')->error('Creating Campaign: ' . $exp2->getMessage() . ' Full trace: ' . $exp2->getTraceAsString());
-                    }
-                } else {
-                    Drupal::logger('rir_notifier')->debug('More members than expected');
-                }
-            } else {
-                Drupal::logger('rir_notifier')->debug('No adverts found for reference: ' . $reference);
-            }
-        } else {
-            Drupal::logger('rir_notifier')->error('Interest Object not found');
-        }
+    if (isset($lastrun)){
+      if (date('dmY', $lastrun) != $day){
+        Drupal::queue('campaigns_processor')->createItem(NULL);
+        Drupal::state()->set('notifications.last.sent', $request_time);
+      }
+    } else {
+      if (intval($hour) < 6){
+        Drupal::queue('campaigns_processor')->createItem(NULL);
+        Drupal::state()->set('notifications.last.sent', $request_time);
+      }
     }
 }
 
