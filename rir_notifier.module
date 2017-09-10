@@ -103,7 +103,8 @@ function rir_notifier_mail($key, &$message, $params) {
     case 'advert_insert_alert':
       $message['from'] = Drupal::config('system.site')->get('mail');
       $message['subject'] = t('Ticket created: @title', array('@title' => $params['advert_title']), $options);
-      $message['body'][] = getAdvertNotificationHtmlContent($params['contact_name']);
+//      $message['body'][] = getAdvertNotificationHtmlContent($params['contact_name']);
+      $message['body'][] = $params['message'];
       break;
   }
 }
