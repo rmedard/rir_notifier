@@ -76,7 +76,8 @@ function rir_notifier_cron() {
     $lastrun = Drupal::state()->get('notifications.last.sent');
     if (isset($lastrun)){
       if (date('dmY', $lastrun) != $day){
-        Drupal::queue('campaigns_processor')->createItem(NULL);
+        $campaign_processor = Drupal::queue('campaigns_processor');
+        $campaign_processor->createItem(new stdClass());
         Drupal::state()->set('notifications.last.sent', $request_time);
         Drupal::logger('rir_notifier')->notice('Sending notifications scheduled!');
       }
@@ -85,7 +86,7 @@ function rir_notifier_cron() {
       if (intval($hour) < 6){
         Drupal::queue('campaigns_processor')->createItem(NULL);
         Drupal::state()->set('notifications.last.sent', $request_time);
-        Drupal::logger('rir_notifier')->notice('Sending notifications scheduled!');
+        Drupal::logger('rir_notifier')->notice('First sending notifications scheduled!');
       }
     }
 }

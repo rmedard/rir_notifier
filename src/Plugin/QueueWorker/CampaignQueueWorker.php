@@ -24,6 +24,7 @@ use Mailchimp\MailchimpLists;
  *  @QueueWorker(
  *  id = "campaigns_processor",
  *  title = "Campaigns Queue Worker",
+ *  cron = {"time" = 90}
  * )
  */
 class CampaignQueueWorker extends QueueWorkerBase {
