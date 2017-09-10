@@ -4,6 +4,7 @@
  * A description of what your module does.
  */
 
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\webform\WebformSubmissionInterface;
 
 /**
@@ -89,7 +90,24 @@ function rir_notifier_cron() {
     }
 }
 
-function getHtmlContent($reference) {
+/**
+ * Implements hook_mail().
+ */
+function rir_notifier_mail($key, &$message, $params) {
+  $options = array(
+    'langcode' => $message['langcode'],
+  );
+
+  switch ($key) {
+    case 'advert_insert_alert':
+      $message['from'] = Drupal::config('system.site')->get('mail');
+      $message['subject'] = t('Ticket created: @title', array('@title' => $params['node_title']), $options);
+      $message['body'][] = getAdvertNotificationHtmlContent($params['contact_name']);
+      break;
+  }
+}
+
+function getCampaignHtmlContent($reference) {
     $dataAccessor = Drupal::service('rir_notifier.data_accessor');
     $keys = explode('-', $reference);
     $location = $keys[0];
@@ -100,4 +118,12 @@ function getHtmlContent($reference) {
       'adverts' => $dataAccessor->getDailyAdverts($location, $advertType, $propertyType),
     ];
     return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.html.twig')->render($variables);
+}
+
+function getAdvertNotificationHtmlContent($contact_name){
+  $twig_service = Drupal::service('twig');
+  $variables = [
+    'contact_name' => $contact_name
+  ];
+  return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/rir-advert-notification.html.twig')->render($variables);
 }

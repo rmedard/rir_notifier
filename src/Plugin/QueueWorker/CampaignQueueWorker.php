@@ -90,7 +90,7 @@ class CampaignQueueWorker extends QueueWorkerBase {
                 $campaign = json_decode(json_encode($campaign, TRUE));
                 Drupal::logger('rir_notifier')->debug('Created campaign: ' . $campaign->id);
                 try {
-                  $obj = $campaigns->setCampaignContent($campaign->id, ['html' => getHtmlContent($reference)]);
+                  $obj = $campaigns->setCampaignContent($campaign->id, ['html' => getCampaignHtmlContent($reference)]);
                   if (!empty($obj)){
                     $campaigns->send($campaign->id, FALSE);
                     //$mailchimp->processBatchOperations();
