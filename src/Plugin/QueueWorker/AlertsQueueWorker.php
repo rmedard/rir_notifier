@@ -162,6 +162,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
         $mailchimpLists = new MailchimpLists($this->getMailchimpAPIKey());
         $all_interests = $mailchimpLists->getInterests($this::MAILCHIMP_LIST_ID, $this::MAILCHIMP_CATEGORY_ID);
         foreach ($all_interests as $interest){
+            $interest = (object)$interest;
             if (strcmp($interest->name, $reference) == 0){
                 return $interest;
             }
@@ -173,6 +174,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
         $mailchimpLists = new MailchimpLists($this->getMailchimpAPIKey());
         $all_segments = $mailchimpLists->getSegments($this::MAILCHIMP_LIST_ID);
         foreach ($all_segments as $segment){
+            $segment = (object)$segment;
             if (strcmp($segment->name, $reference) == 0){
                 return $segment;
             }

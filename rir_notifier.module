@@ -4,7 +4,6 @@
  * A description of what your module does.
  */
 
-use Drupal\Component\Utility\SafeMarkup;
 use Drupal\webform\WebformSubmissionInterface;
 
 /**
