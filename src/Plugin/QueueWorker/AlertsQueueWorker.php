@@ -160,9 +160,11 @@ class AlertsQueueWorker extends QueueWorkerBase {
 
     private function checkIfRemoteInterestExists($reference){
         $mailchimpLists = new MailchimpLists($this->getMailchimpAPIKey());
+        $mailchimp = new Mailchimp($this->getMailchimpAPIKey());
+        $path = '/lists/{list_id}/interest-categories/{interest_category_id}/interests/{interest_id}';
         $all_interests = $mailchimpLists->getInterests($this::MAILCHIMP_LIST_ID, $this::MAILCHIMP_CATEGORY_ID);
         foreach ($all_interests as $interest){
-            Drupal::logger('rir_notifier')->debug(json_encode($interest, TRUE));
+            $interest = $mailchimp->request('GET', $path, ['list_id' => $this::MAILCHIMP_LIST_ID, 'interest_category_id' => $this::MAILCHIMP_CATEGORY_ID, 'interest_id' => $interest]);
             if (strcmp($interest->name, $reference) == 0){
                 return $interest;
             }
@@ -174,7 +176,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
         $mailchimpLists = new MailchimpLists($this->getMailchimpAPIKey());
         $all_segments = $mailchimpLists->getSegments($this::MAILCHIMP_LIST_ID);
         foreach ($all_segments as $segment){
-            Drupal::logger('rir_notifier')->debug(json_encode($segment, TRUE));
+            $segment = $mailchimpLists->getSegment($this::MAILCHIMP_LIST_ID, $segment);
             if (strcmp($segment->name, $reference) == 0){
                 return $segment;
             }
