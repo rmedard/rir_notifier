@@ -116,7 +116,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
                       'email_type' => 'html',
                       'interests' => [$interest->id => TRUE],
                     ], FALSE);
-                    $mailchimpLists->addSegmentMember($this::MAILCHIMP_LIST_ID, $segment->id, $data->email);
+                    $mailchimpLists->addSegmentMember($this::MAILCHIMP_LIST_ID, $segment->id, $response1->email_address);
                     Drupal::logger('rir_notifier')
                       ->notice('New member subscribed: ' . $data->email . ' Response:' . json_encode($response1));
                 } catch (MailchimpAPIException $ex) {
@@ -141,7 +141,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
                             'email_type' => 'html',
                             'interests' => [$interestId => TRUE],
                           ], FALSE);
-                          $mailchimpLists->addSegmentMember($this::MAILCHIMP_LIST_ID, $segmentId, $data->email);
+                          $mailchimpLists->addSegmentMember($this::MAILCHIMP_LIST_ID, $segmentId, $response2->email_address);
                           Drupal::logger('rir_notifier')
                             ->notice('Member subscription updated: ' . $data->email . ' Response:' . json_encode($response2));
                         } catch (MailchimpAPIException $ex) {
