@@ -160,13 +160,9 @@ class AlertsQueueWorker extends QueueWorkerBase {
 
     private function checkIfRemoteInterestExists($reference){
         $mailchimpLists = new MailchimpLists($this->getMailchimpAPIKey());
-        $mailchimp = new Mailchimp($this->getMailchimpAPIKey());
-        $path = '/lists/{list_id}/interest-categories/{interest_category_id}/interests/{interest_id}';
-        $all_interests = $mailchimpLists->getInterests($this::MAILCHIMP_LIST_ID, $this::MAILCHIMP_CATEGORY_ID);
-        foreach ($all_interests->interests as $interest){
-            Drupal::logger('rir_notifier')->debug('Dore interestt: ' . $interest->name);
-//            $interest = $mailchimp->request('GET', $path, ['list_id' => $this::MAILCHIMP_LIST_ID, 'interest_category_id' => $this::MAILCHIMP_CATEGORY_ID, 'interest_id' => $interest]);
-            if (strcmp($interest['name'], $reference) == 0){
+        $response = $mailchimpLists->getInterests($this::MAILCHIMP_LIST_ID, $this::MAILCHIMP_CATEGORY_ID);
+        foreach ($response->interests as $interest){
+            if (strcmp($interest->name, $reference) == 0){
                 return $interest;
             }
         }
@@ -175,8 +171,8 @@ class AlertsQueueWorker extends QueueWorkerBase {
 
     private function checkIfRemoteSegmentExists($reference){
         $mailchimpLists = new MailchimpLists($this->getMailchimpAPIKey());
-        $all_segments = $mailchimpLists->getSegments($this::MAILCHIMP_LIST_ID);
-        foreach ($all_segments as $segment){;
+        $response = $mailchimpLists->getSegments($this::MAILCHIMP_LIST_ID);
+        foreach ($response->segments as $segment){;
             if (strcmp($segment['name'], $reference) == 0){
                 return $segment;
             }
