@@ -163,7 +163,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
         $mailchimp = new Mailchimp($this->getMailchimpAPIKey());
         $path = '/lists/{list_id}/interest-categories/{interest_category_id}/interests/{interest_id}';
         $all_interests = $mailchimpLists->getInterests($this::MAILCHIMP_LIST_ID, $this::MAILCHIMP_CATEGORY_ID);
-        foreach ($all_interests as $interest){
+        foreach ($all_interests->interests as $interest){
             Drupal::logger('rir_notifier')->debug('Dore interestt: ' . $interest->name);
 //            $interest = $mailchimp->request('GET', $path, ['list_id' => $this::MAILCHIMP_LIST_ID, 'interest_category_id' => $this::MAILCHIMP_CATEGORY_ID, 'interest_id' => $interest]);
             if (strcmp($interest['name'], $reference) == 0){
