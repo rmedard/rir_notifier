@@ -173,7 +173,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
         $mailchimpLists = new MailchimpLists($this->getMailchimpAPIKey());
         $response = $mailchimpLists->getSegments($this::MAILCHIMP_LIST_ID);
         foreach ($response->segments as $segment){;
-            if (strcmp($segment['name'], $reference) == 0){
+            if (strcmp($segment->name, $reference) == 0){
                 return $segment;
             }
         }
