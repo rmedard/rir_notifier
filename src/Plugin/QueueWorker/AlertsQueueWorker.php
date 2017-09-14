@@ -160,7 +160,8 @@ class AlertsQueueWorker extends QueueWorkerBase {
 
     private function checkIfRemoteInterestExists($reference){
         $mailchimpLists = new MailchimpLists($this->getMailchimpAPIKey());
-        $response = $mailchimpLists->getInterests($this::MAILCHIMP_LIST_ID, $this::MAILCHIMP_CATEGORY_ID);
+        $fields = array('interests.category_id', 'interests.list_id', 'interests.id', 'interests.name');
+        $response = $mailchimpLists->getInterests($this::MAILCHIMP_LIST_ID, $this::MAILCHIMP_CATEGORY_ID, ['fields' => $fields]);
         foreach ($response->interests as $interest){
             if (strcmp($interest->name, $reference) == 0){
                 return $interest;
@@ -171,6 +172,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
 
     private function checkIfRemoteSegmentExists($reference){
         $mailchimpLists = new MailchimpLists($this->getMailchimpAPIKey());
+        $fields = array('segments.id', 'segments.name');
         $response = $mailchimpLists->getSegments($this::MAILCHIMP_LIST_ID);
         foreach ($response->segments as $segment){;
             if (strcmp($segment->name, $reference) == 0){
