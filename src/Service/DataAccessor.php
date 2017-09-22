@@ -11,7 +11,6 @@ namespace Drupal\rir_notifier\Service;
 
 use Drupal;
 use Drupal\Core\Entity\EntityTypeManager;
-use Drupal\node\Entity\Node;
 use function strtotime;
 
 class DataAccessor {
@@ -47,8 +46,9 @@ class DataAccessor {
     }
 
     function getDailyAdverts($location = NULL, $advert = NULL, $property = NULL) {
-        $adverts = $this->getQuery($location, $advert, $property)->execute();
-        return Node::loadMultiple($adverts);
+        $adverts_ids = $this->getQuery($location, $advert, $property)->execute();
+        $storage = $this->entityTypeManager->getStorage('node');
+        return $storage->loadMultiple($adverts_ids);
     }
 
     /**
