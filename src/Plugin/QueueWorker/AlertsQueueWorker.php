@@ -70,13 +70,37 @@ class AlertsQueueWorker extends QueueWorkerBase {
 
         if (isset($mailchimp)) {
 
-            $detailsRequestInterests = Drupal::entityQuery('node')
+            $detailsRequestInterestsIds = Drupal::entityQuery('node')
               ->condition('status', 1)
               ->condition('type', 'details_request_category')
               ->condition('field_dr_reference', $data->reference)
               ->execute();
 
-            if (empty($detailsRequestInterests)) {
+            if (isset($detailsRequestInterestsIds) and count($detailsRequestInterestsIds) > 0){
+                $detailsRequestInterests = Node::loadMultiple($detailsRequestInterestsIds);
+                foreach ($detailsRequestInterests as $detailsRequestInterest){
+                    $interestId = $detailsRequestInterest->get('field_mailchimp_interest_id')->value;
+                    $segmentId = $detailsRequestInterest->get('field_mailchimp_segment_id')->value;
+                    $response2 = NULL;
+                    try {
+                        $response2 = $mailchimpLists->addOrUpdateMember($this::MAILCHIMP_LIST_ID, $data->email, [
+                          'status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
+                          'merge_fields' => [
+                            'FNAME' => $data->first_name,
+                            'LNAME' => $data->last_name,
+                          ],
+                          'email_type' => 'html',
+                          'interests' => [$interestId => TRUE],
+                        ], FALSE);
+                        $mailchimpLists->addSegmentMember($this::MAILCHIMP_LIST_ID, $segmentId, $response2->email_address);
+                        Drupal::logger('rir_notifier')
+                          ->notice('Member subscription updated: ' . $data->email . ' Response:' . json_encode($response2));
+                    } catch (MailchimpAPIException $ex) {
+                        Drupal::logger('rir_notifier')
+                          ->error('MailChimp Code: ' . $response2->status . ' Title: ' . $response2->title);
+                    }
+                }
+            } else {
                 $interestExists = $this->checkIfRemoteInterestExists($data->reference);
                 $interest = NULL;
                 if ($interestExists !== FALSE){
@@ -124,32 +148,6 @@ class AlertsQueueWorker extends QueueWorkerBase {
                       ->error('MailChimp error: Code: ' . $response1->status . ' Title: ' . $response1->title);
                 }
 
-            } else {
-                foreach ($detailsRequestInterests as $interestRequest) {
-                    $detailsRequestCategory = Node::load($interestRequest);
-                    if (isset($detailsRequestCategory)) {
-                        $interestId = $detailsRequestCategory->get('field_mailchimp_interest_id')->value;
-                        $segmentId = $detailsRequestCategory->get('field_mailchimp_segment_id')->value;
-                        $response2 = NULL;
-                        try {
-                          $response2 = $mailchimpLists->addOrUpdateMember($this::MAILCHIMP_LIST_ID, $data->email, [
-                            'status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
-                            'merge_fields' => [
-                              'FNAME' => $data->first_name,
-                              'LNAME' => $data->last_name,
-                            ],
-                            'email_type' => 'html',
-                            'interests' => [$interestId => TRUE],
-                          ], FALSE);
-                          $mailchimpLists->addSegmentMember($this::MAILCHIMP_LIST_ID, $segmentId, $response2->email_address);
-                          Drupal::logger('rir_notifier')
-                            ->notice('Member subscription updated: ' . $data->email . ' Response:' . json_encode($response2));
-                        } catch (MailchimpAPIException $ex) {
-                          Drupal::logger('rir_notifier')
-                            ->error('MailChimp Code: ' . $response2->status . ' Title: ' . $response2->title);
-                        }
-                    }
-                }
             }
         }
         else {
