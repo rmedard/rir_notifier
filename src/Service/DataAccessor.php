@@ -10,10 +10,23 @@ namespace Drupal\rir_notifier\Service;
 
 
 use Drupal;
+use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\node\Entity\Node;
 use function strtotime;
 
 class DataAccessor {
+
+    protected $entityTypeManager;
+
+    /**
+     * DataAccessor constructor.
+     *
+     * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+     */
+    public function __construct(EntityTypeManager $entityTypeManager) {
+        $this->entityTypeManager = $entityTypeManager;
+    }
+
 
     /**
      * @param $reference string reference
@@ -49,7 +62,9 @@ class DataAccessor {
     private function getQuery($location, $advert, $property){
         $start_time = strtotime('-1 days 00:00:00');
         $end_time = strtotime('-1 days 23:59:59');
-        $query = Drupal::entityQuery('node')
+
+        $storage = $this->entityTypeManager->getStorage('node');
+        $query = $storage->getQuery()
           ->condition('type', 'advert')
           ->condition('status', 1)
           ->condition('created', array($start_time, $end_time), 'BETWEEN');

@@ -1,3 +1,4 @@
 services:
   rir_notifier.data_accessor:
     class: Drupal\rir_notifier\Service\DataAccessor
+    arguments: ["@entity_type.manager"]
