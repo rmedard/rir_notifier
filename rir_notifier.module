@@ -105,6 +105,11 @@ function rir_notifier_mail($key, &$message, $params) {
 //      $message['body'][] = getAdvertNotificationHtmlContent($params['contact_name']);
       $message['body'][] = $params['message'];
       break;
+    case 'advert_first_published':
+      $message['from'] = Drupal::config('system.site')->get('mail');
+      $message['subject'] = t('Your advert at ' . Drupal::config('system.site')->get('name') . ' has been validated');
+      $message['body'][] = \Drupal\Component\Utility\SafeMarkup::checkPlain($params['message']);
+      break;
   }
 }
 
