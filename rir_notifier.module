@@ -90,29 +90,6 @@ function rir_notifier_cron() {
     }
 }
 
-/**
- * Implements hook_mail().
- */
-function rir_notifier_mail($key, &$message, $params) {
-  $options = array(
-    'langcode' => $message['langcode'],
-  );
-
-  switch ($key) {
-    case 'advert_insert_alert':
-      $message['from'] = Drupal::config('system.site')->get('mail');
-      $message['subject'] = t('Ticket created: @title', array('@title' => $params['advert_title']), $options);
-//      $message['body'][] = getAdvertNotificationHtmlContent($params['contact_name']);
-      $message['body'][] = $params['message'];
-      break;
-    case 'advert_first_published':
-      $message['from'] = Drupal::config('system.site')->get('mail');
-      $message['subject'] = t('Your advert at ' . Drupal::config('system.site')->get('name') . ' has been validated');
-      $message['body'][] = \Drupal\Component\Utility\SafeMarkup::checkPlain($params['message']);
-      break;
-  }
-}
-
 function getCampaignHtmlContent($reference) {
     $dataAccessor = Drupal::service('rir_notifier.data_accessor');
     $keys = explode('-', $reference);
