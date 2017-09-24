@@ -119,8 +119,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
                 if ($segmentExists !== FALSE){
                     $segment = $segmentExists;
                 } else {
-                    Drupal::logger('rir_notifier')->debug('Create segment with email: ' . $data->email);
-                    $segment = $mailchimpLists->addSegment($this->getMailchimpListId(), $data->reference, ['static_segment' => array($data->email)]);
+                    $segment = $mailchimpLists->addSegment($this->getMailchimpListId(), $data->reference);
                 }
                 $detailsRequestCategory = Node::create([
                   'type' => 'details_request_category',
