@@ -30,8 +30,6 @@ use function json_encode;
  */
 class AlertsQueueWorker extends QueueWorkerBase {
 
-    const MAILCHIMP_CATEGORY_ID = '2ccf64b283';
-
     /**
      * Works on a single queue item.
      *
@@ -107,7 +105,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
                 } else {
                     $interest = $mailchimp->request('POST', $createInterestPath, [
                       'list_id' => $this->getMailchimpListId(),
-                      'interest_category_id' => $this::MAILCHIMP_CATEGORY_ID,
+                      'interest_category_id' => $this->getMailchimpCategoryId(),
                     ], ['name' => $data->reference], FALSE, FALSE);
                 }
 
@@ -158,7 +156,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
     private function checkIfRemoteInterestExists($reference){
         $mailchimpLists = new MailchimpLists($this->getMailchimpAPIKey());
         $fields = array('interests.category_id', 'interests.list_id', 'interests.id', 'interests.name');
-        $response = $mailchimpLists->getInterests($this->getMailchimpListId(), $this::MAILCHIMP_CATEGORY_ID, ['fields' => $fields]);
+        $response = $mailchimpLists->getInterests($this->getMailchimpListId(), $this->getMailchimpCategoryId(), ['fields' => $fields]);
         foreach ($response->interests as $interest){
             if (strcmp($interest->name, $reference) == 0){
                 return $interest;
@@ -186,5 +184,9 @@ class AlertsQueueWorker extends QueueWorkerBase {
 
     private function getMailchimpListId(){
         return Drupal::config('rir_notifier.settings')->get('main_list_id');
+    }
+
+    private function getMailchimpCategoryId(){
+        return Drupal::config('rir_notifier.settings')->get('main_category_id');
     }
 }
