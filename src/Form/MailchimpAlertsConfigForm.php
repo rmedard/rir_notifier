@@ -42,7 +42,14 @@ class MailchimpAlertsConfigForm extends ConfigFormBase {
         $form['main_list_id'] = array(
             '#type' => 'textfield',
             '#title' => $this->t('Main list ID'),
-            '#default_value' => $config->get('main_list_id')
+            '#default_value' => $config->get('main_list_id'),
+            '#required' => TRUE
+        );
+        $form['main_category_id'] = array(
+          '#type' => 'textfield',
+          '#title' => $this->t('Main category ID'),
+          '#default_value' => $config->get('main_category_id'),
+          '#required' => TRUE
         );
         return parent::buildForm($form, $form_state);
     }
@@ -50,6 +57,7 @@ class MailchimpAlertsConfigForm extends ConfigFormBase {
     public function submitForm(array &$form, FormStateInterface $form_state) {
         $values = $form_state->getValues();
         $this->config('rir_notifier.settings')->set('main_list_id', $values['main_list_id'])->save();
+        $this->config('rir_notifier.settings')->set('main_category_id', $values['main_category_id'])->save();
         parent::submitForm($form, $form_state);
     }
 }

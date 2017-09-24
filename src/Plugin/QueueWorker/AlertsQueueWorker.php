@@ -30,7 +30,6 @@ use function json_encode;
  */
 class AlertsQueueWorker extends QueueWorkerBase {
 
-    const MAILCHIMP_LIST_ID = '6ec516829b';
     const MAILCHIMP_CATEGORY_ID = '2ccf64b283';
 
     /**
@@ -83,7 +82,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
                     $segmentId = $detailsRequestInterest->get('field_mailchimp_segment_id')->value;
                     $response2 = NULL;
                     try {
-                        $response2 = $mailchimpLists->addOrUpdateMember($this::MAILCHIMP_LIST_ID, $data->email, [
+                        $response2 = $mailchimpLists->addOrUpdateMember($this->getMailchimpListId(), $data->email, [
                           'status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
                           'merge_fields' => [
                             'FNAME' => $data->first_name,
@@ -92,7 +91,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
                           'email_type' => 'html',
                           'interests' => [$interestId => TRUE],
                         ], FALSE);
-                        $mailchimpLists->addSegmentMember($this::MAILCHIMP_LIST_ID, $segmentId, $response2->email_address);
+                        $mailchimpLists->addSegmentMember($this->getMailchimpListId(), $segmentId, $response2->email_address);
                         Drupal::logger('rir_notifier')
                           ->notice('Member subscription updated: ' . $data->email . ' Response:' . json_encode($response2));
                     } catch (MailchimpAPIException $ex) {
@@ -107,7 +106,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
                     $interest = $interestExists;
                 } else {
                     $interest = $mailchimp->request('POST', $createInterestPath, [
-                      'list_id' => $this::MAILCHIMP_LIST_ID,
+                      'list_id' => $this->getMailchimpListId(),
                       'interest_category_id' => $this::MAILCHIMP_CATEGORY_ID,
                     ], ['name' => $data->reference], FALSE, FALSE);
                 }
@@ -117,7 +116,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
                 if ($segmentExists !== FALSE){
                     $segment = $segmentExists;
                 } else {
-                    $segment = $mailchimpLists->addSegment($this::MAILCHIMP_LIST_ID, $data->reference, ['static_segment' => array($data->email)]);
+                    $segment = $mailchimpLists->addSegment($this->getMailchimpListId(), $data->reference, ['static_segment' => array($data->email)]);
                 }
                 $detailsRequestCategory = Node::create([
                   'type' => 'details_request_category',
@@ -131,7 +130,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
                 $detailsRequestCategory->save();
                 $response1 = NULL;
                 try {
-                    $response1 = $mailchimpLists->addOrUpdateMember($this::MAILCHIMP_LIST_ID, $data->email, [
+                    $response1 = $mailchimpLists->addOrUpdateMember($this->getMailchimpListId(), $data->email, [
                       'status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
                       'merge_fields' => [
                         'FNAME' => $data->first_name,
@@ -140,7 +139,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
                       'email_type' => 'html',
                       'interests' => [$interest->id => TRUE],
                     ], FALSE);
-                    $mailchimpLists->addSegmentMember($this::MAILCHIMP_LIST_ID, $segment->id, $response1->email_address);
+                    $mailchimpLists->addSegmentMember($this->getMailchimpListId(), $segment->id, $response1->email_address);
                     Drupal::logger('rir_notifier')
                       ->notice('New member subscribed: ' . $data->email . ' Response:' . json_encode($response1));
                 } catch (MailchimpAPIException $ex) {
@@ -159,7 +158,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
     private function checkIfRemoteInterestExists($reference){
         $mailchimpLists = new MailchimpLists($this->getMailchimpAPIKey());
         $fields = array('interests.category_id', 'interests.list_id', 'interests.id', 'interests.name');
-        $response = $mailchimpLists->getInterests($this::MAILCHIMP_LIST_ID, $this::MAILCHIMP_CATEGORY_ID, ['fields' => $fields]);
+        $response = $mailchimpLists->getInterests($this->getMailchimpListId(), $this::MAILCHIMP_CATEGORY_ID, ['fields' => $fields]);
         foreach ($response->interests as $interest){
             if (strcmp($interest->name, $reference) == 0){
                 return $interest;
@@ -171,7 +170,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
     private function checkIfRemoteSegmentExists($reference){
         $mailchimpLists = new MailchimpLists($this->getMailchimpAPIKey());
         $fields = array('segments.id', 'segments.name');
-        $response = $mailchimpLists->getSegments($this::MAILCHIMP_LIST_ID);
+        $response = $mailchimpLists->getSegments($this->getMailchimpListId());
         foreach ($response->segments as $segment){;
             if (strcmp($segment->name, $reference) == 0){
                 return $segment;
@@ -183,5 +182,9 @@ class AlertsQueueWorker extends QueueWorkerBase {
     private function getMailchimpAPIKey(){
         $dataAccessor = Drupal::service('rir_notifier.data_accessor');
         return $dataAccessor->getMailchimpAPIKey();
+    }
+
+    private function getMailchimpListId(){
+        return Drupal::config('rir_notifier.settings')->get('main_list_id');
     }
 }
