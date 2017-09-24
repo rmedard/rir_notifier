@@ -90,9 +90,13 @@ class AlertsQueueWorker extends QueueWorkerBase {
                           'email_type' => 'html',
                           'interests' => [$interestId => TRUE],
                         ], FALSE);
-                        $mailchimpLists->addSegmentMember($this->getMailchimpListId(), $segmentId, $response2->email_address);
-                        Drupal::logger('rir_notifier')
-                          ->notice('Member subscription updated: ' . $data->email . ' Response:' . json_encode($response2));
+                        if (isset($response2) and !empty($response2->email_address)){
+                            $mailchimpLists->addSegmentMember($this->getMailchimpListId(), $segmentId, $response2->email_address);
+                            Drupal::logger('rir_notifier')
+                              ->notice('Member subscription updated: ' . $data->email . ' Response:' . json_encode($response2));
+                        } else {
+                            Drupal::logger('rir_notifier')->error('Failed to subscribe: ' . $data->email);
+                        }
                     } catch (MailchimpAPIException $ex) {
                         Drupal::logger('rir_notifier')
                           ->error('MailChimp Code: ' . $response2->status . ' Title: ' . $response2->title);
@@ -139,9 +143,12 @@ class AlertsQueueWorker extends QueueWorkerBase {
                       'email_type' => 'html',
                       'interests' => [$interest->id => TRUE],
                     ], FALSE);
-                    $mailchimpLists->addSegmentMember($this->getMailchimpListId(), $segment->id, $response1->email_address);
-                    Drupal::logger('rir_notifier')
-                      ->notice('New member subscribed: ' . $data->email . ' Response:' . json_encode($response1));
+                    if (isset($response1) and !empty($response1->email_address)){
+                        $mailchimpLists->addSegmentMember($this->getMailchimpListId(), $segment->id, $response1->email_address);
+                        Drupal::logger('rir_notifier')->notice('New member subscribed: ' . $data->email . ' Response:' . json_encode($response1));
+                    } else {
+                        Drupal::logger('rir_notifier')->error('Failed to subscribe: ' . $data->email);
+                    }
                 } catch (MailchimpAPIException $ex) {
                     Drupal::logger('rir_notifier')
                       ->error('MailChimp error: Code: ' . $response1->status . ' Title: ' . $response1->title);
