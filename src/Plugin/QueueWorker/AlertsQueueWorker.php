@@ -119,7 +119,12 @@ class AlertsQueueWorker extends QueueWorkerBase {
                 if ($segmentExists !== FALSE){
                     $segment = $segmentExists;
                 } else {
-                    $segment = $mailchimpLists->addSegment($this->getMailchimpListId(), $data->reference);
+                    $segment = $mailchimpLists->addSegment($this->getMailchimpListId(), $data->reference, [
+                      'options' => array(
+                        'condition_type' => 'Interests',
+                        'Interests' => ['op' => 'interestcontains', 'field' => $data->reference, 'value' => array()]
+                      )
+                    ]);
                 }
                 $detailsRequestCategory = Node::create([
                   'type' => 'details_request_category',
