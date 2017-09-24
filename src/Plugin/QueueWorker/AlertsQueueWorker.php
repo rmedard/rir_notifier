@@ -114,38 +114,9 @@ class AlertsQueueWorker extends QueueWorkerBase {
                     ], ['name' => $data->reference], FALSE, FALSE);
                 }
 
-                $segmentExists = $this->checkIfRemoteSegmentExists($data->reference);
-                $segment = NULL;
-                if ($segmentExists !== FALSE){
-                    $segment = $segmentExists;
-                } else {
-                    $segment = $mailchimpLists->addSegment($this->getMailchimpListId(),
-                      $data->reference,
-                      array(
-                        'options' => ['match' => 'any', 'conditions' => [
-                          'condition_type' => 'Interests',
-                          'Interests' => [
-                            'op' => 'interestcontains',
-                            'field' => $data->reference,
-                            'value' => array()
-                          ]
-                        ]
-                        ]
-                      )
-                    );
-                }
-                $detailsRequestCategory = Node::create([
-                  'type' => 'details_request_category',
-                  'title' => $data->reference,
-                  'field_mailchimp_list_id' => $interest->list_id,
-                  'field_mailchimp_category_id' => $interest->category_id,
-                  'field_mailchimp_interest_id' => $interest->id,
-                  'field_mailchimp_segment_id' => $segment->id,
-                  'field_dr_reference' => $interest->name,
-                ]);
-                $detailsRequestCategory->save();
                 $response1 = NULL;
                 try {
+
                     $response1 = $mailchimpLists->addOrUpdateMember($this->getMailchimpListId(), $data->email,
                       array(
                         'status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
@@ -154,21 +125,37 @@ class AlertsQueueWorker extends QueueWorkerBase {
                         'email_type' => 'html',
                         'interests' => [$interest->id => TRUE],
                       ), FALSE);
-                    if (isset($response1) and !empty($response1->email_address)){
-                        Drupal::logger('rir_notifier')->debug('Returned email: ' . $response1->email_address);
+
+                    $segmentExists = $this->checkIfRemoteSegmentExists($data->reference);
+                    $segment = NULL;
+                    if ($segmentExists !== FALSE){
+                        $segment = $segmentExists;
                         $mailchimpLists->addSegmentMember($this->getMailchimpListId(), $segment->id, $response1->email_address);
-                        Drupal::logger('rir_notifier')->notice('New member subscribed: ' . $data->email . ' Response:' . json_encode($response1));
                     } else {
-                        Drupal::logger('rir_notifier')->error('Failed to subscribe: ' . $data->email);
+                        $segment = $mailchimpLists->addSegment($this->getMailchimpListId(),
+                          $data->reference,
+                          array(
+                            'static_segment' => array($response1->email_address)
+                          )
+                        );
                     }
+                    $detailsRequestCategory = Node::create([
+                      'type' => 'details_request_category',
+                      'title' => $data->reference,
+                      'field_mailchimp_list_id' => $interest->list_id,
+                      'field_mailchimp_category_id' => $interest->category_id,
+                      'field_mailchimp_interest_id' => $interest->id,
+                      'field_mailchimp_segment_id' => $segment->id,
+                      'field_dr_reference' => $interest->name,
+                    ]);
+                    $detailsRequestCategory->save();
                 } catch (MailchimpAPIException $ex) {
                     Drupal::logger('rir_notifier')
                       ->error('MailChimp error: Code: ' . $response1->status . ' Title: ' . $response1->title);
                 }
 
             }
-        }
-        else {
+        } else {
             Drupal::logger('rir_notifier')
               ->error('Mailchimp Instantiation Failed with Key: ' . $mailChimpAPIKey);
         }
