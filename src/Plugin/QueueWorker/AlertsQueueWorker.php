@@ -122,14 +122,14 @@ class AlertsQueueWorker extends QueueWorkerBase {
                     $segment = $mailchimpLists->addSegment($this->getMailchimpListId(),
                       $data->reference,
                       array(
-                        'options' => ['match' => 'any', 'conditions' => array(
+                        'options' => ['match' => 'any', 'conditions' => [
                           'condition_type' => 'Interests',
                           'Interests' => [
                             'op' => 'interestcontains',
                             'field' => $data->reference,
                             'value' => array()
                           ]
-                        )
+                        ]
                         ]
                       )
                     );
