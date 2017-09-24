@@ -183,7 +183,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
     private function checkIfRemoteSegmentExists($reference){
         $mailchimpLists = new MailchimpLists($this->getMailchimpAPIKey());
         $fields = array('segments.id', 'segments.name');
-        $response = $mailchimpLists->getSegments($this->getMailchimpListId());
+        $response = $mailchimpLists->getSegments($this->getMailchimpListId(), array('fields' => $fields));
         foreach ($response->segments as $segment){;
             if (strcmp($segment->name, $reference) == 0){
                 return $segment;
