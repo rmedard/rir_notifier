@@ -1,6 +1,7 @@
 name: RiR Notifier
-description: 'This module handles RiR subscriptions to search notifications.'
+description: 'This module handles alerts and notifications.'
 package: RIR Custom Modules
+configure: rir_notifier.admin_settings
 
 type: module
 core: 8.x

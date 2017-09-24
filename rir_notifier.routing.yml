@@ -6,3 +6,11 @@ rir_notifier.open_subscription_modal:
   requirements:
     _access: 'TRUE'
     js: 'nojs|ajax'
+
+rir_notifier.admin_settings:
+  path: '/admin/config/rir_notifier'
+  defaults:
+    _form: '\Drupal\rir_notifier\Form\MailchimpAlertsConfigForm'
+    _title: 'Mailchimp alerts configuration'
+  requirements:
+    _permission: 'administer site configuration'
