@@ -78,9 +78,8 @@ class AlertsQueueWorker extends QueueWorkerBase {
                 foreach ($detailsRequestInterests as $detailsRequestInterest){
                     $interestId = $detailsRequestInterest->get('field_mailchimp_interest_id')->value;
                     $segmentId = $detailsRequestInterest->get('field_mailchimp_segment_id')->value;
-                    $response2 = NULL;
-                    try {
 
+                    try {
                         $response2 = $mailchimpLists->addOrUpdateMember($this->getMailchimpListId(), $data->email,
                           array(
                             'status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
@@ -90,16 +89,13 @@ class AlertsQueueWorker extends QueueWorkerBase {
                             'interests' => [$interestId => TRUE],
                             ), FALSE);
                         if (isset($response2) and !empty($response2->email_address)){
-                            Drupal::logger('rir_notifier')->debug('Returned email: ' . $response2->email_address);
                             $mailchimpLists->addSegmentMember($this->getMailchimpListId(), $segmentId, $response2->email_address);
-                            Drupal::logger('rir_notifier')
-                              ->notice('Member subscription updated: ' . $data->email . ' Response:' . json_encode($response2));
+                            Drupal::logger('rir_notifier')->notice('Member subscription updated: ' . $data->email . ' Response:' . json_encode($response2));
                         } else {
                             Drupal::logger('rir_notifier')->error('Failed to subscribe: ' . $data->email);
                         }
                     } catch (MailchimpAPIException $ex) {
-                        Drupal::logger('rir_notifier')
-                          ->error('MailChimp Code: ' . $response2->status . ' Title: ' . $response2->title);
+                        Drupal::logger('rir_notifier')->error('MailChimp Error: ' . $ex);
                     }
                 }
             } else {
@@ -114,7 +110,6 @@ class AlertsQueueWorker extends QueueWorkerBase {
                     ], ['name' => $data->reference], FALSE, FALSE);
                 }
 
-                $response1 = NULL;
                 try {
 
                     $response1 = $mailchimpLists->addOrUpdateMember($this->getMailchimpListId(), $data->email,
@@ -150,14 +145,12 @@ class AlertsQueueWorker extends QueueWorkerBase {
                     ]);
                     $detailsRequestCategory->save();
                 } catch (MailchimpAPIException $ex) {
-                    Drupal::logger('rir_notifier')
-                      ->error('MailChimp error: Code: ' . $response1->status . ' Title: ' . $response1->title);
+                    Drupal::logger('rir_notifier')->error('MailChimp error: ' . $ex);
                 }
 
             }
         } else {
-            Drupal::logger('rir_notifier')
-              ->error('Mailchimp Instantiation Failed with Key: ' . $mailChimpAPIKey);
+            Drupal::logger('rir_notifier')->error('Mailchimp Instantiation Failed with Key: ' . $mailChimpAPIKey);
         }
     }
 
