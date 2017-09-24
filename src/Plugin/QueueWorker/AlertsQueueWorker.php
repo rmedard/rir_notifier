@@ -16,6 +16,8 @@ use Mailchimp\Mailchimp;
 use Mailchimp\MailchimpAPIException;
 use Mailchimp\MailchimpLists;
 use function json_encode;
+use function md5;
+use function strtolower;
 
 
 /**
@@ -61,6 +63,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
     public function processItem($data) {
 
         $createInterestPath = '/lists/{list_id}/interest-categories/{interest_category_id}/interests';
+        $addOrUpdateMemberPath = '/lists/{list_id}/members/{subscriber_hash}';
         $mailChimpAPIKey = $this->getMailchimpAPIKey();
         $mailchimp = new Mailchimp($mailChimpAPIKey);
         $mailchimpLists = new MailchimpLists($mailChimpAPIKey);
@@ -80,16 +83,19 @@ class AlertsQueueWorker extends QueueWorkerBase {
                     $segmentId = $detailsRequestInterest->get('field_mailchimp_segment_id')->value;
                     $response2 = NULL;
                     try {
-                        $response2 = $mailchimpLists->addOrUpdateMember($this->getMailchimpListId(), $data->email, [
-                          'status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
-                          'status_if_new' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
-                          'merge_fields' => [
-                            'FNAME' => $data->first_name,
-                            'LNAME' => $data->last_name,
-                          ],
-                          'email_type' => 'html',
-                          'interests' => [$interestId => TRUE],
-                        ], FALSE);
+
+//                        $mailchimp->request('PUT', $addOrUpdateMemberPath,
+//                          array('list_id' => $this->getMailchimpListId(), 'subscriber_hash' => md5(strtolower($data->email))),
+//                          );
+
+                        $response2 = $mailchimpLists->addOrUpdateMember($this->getMailchimpListId(), $data->email,
+                          array(
+                            'status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
+                            'status_if_new' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
+                            'merge_fields' => ['FNAME' => $data->first_name, 'LNAME' => $data->last_name],
+                            'email_type' => 'html',
+                            'interests' => [$interestId => TRUE],
+                            ), FALSE);
                         if (isset($response2) and !empty($response2->email_address)){
                             Drupal::logger('rir_interface')->debug('Returned email: ' . $response2->email_address);
                             $mailchimpLists->addSegmentMember($this->getMailchimpListId(), $segmentId, $response2->email_address);
@@ -134,16 +140,14 @@ class AlertsQueueWorker extends QueueWorkerBase {
                 $detailsRequestCategory->save();
                 $response1 = NULL;
                 try {
-                    $response1 = $mailchimpLists->addOrUpdateMember($this->getMailchimpListId(), $data->email, [
-                      'status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
-                      'status_if_new' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
-                      'merge_fields' => [
-                        'FNAME' => $data->first_name,
-                        'LNAME' => $data->last_name,
-                      ],
-                      'email_type' => 'html',
-                      'interests' => [$interest->id => TRUE],
-                    ], FALSE);
+                    $response1 = $mailchimpLists->addOrUpdateMember($this->getMailchimpListId(), $data->email,
+                      array(
+                        'status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
+                        'status_if_new' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
+                        'merge_fields' => ['FNAME' => $data->first_name, 'LNAME' => $data->last_name],
+                        'email_type' => 'html',
+                        'interests' => [$interest->id => TRUE],
+                      ), FALSE);
                     if (isset($response1) and !empty($response1->email_address)){
                         Drupal::logger('rir_interface')->debug('Returned email: ' . $response1->email_address);
                         $mailchimpLists->addSegmentMember($this->getMailchimpListId(), $segment->id, $response1->email_address);
