@@ -91,6 +91,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
                           'interests' => [$interestId => TRUE],
                         ], FALSE);
                         if (isset($response2) and !empty($response2->email_address)){
+                            Drupal::logger('rir_interface')->debug('Returned email: ' . $response2->email_address);
                             $mailchimpLists->addSegmentMember($this->getMailchimpListId(), $segmentId, $response2->email_address);
                             Drupal::logger('rir_notifier')
                               ->notice('Member subscription updated: ' . $data->email . ' Response:' . json_encode($response2));
@@ -144,6 +145,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
                       'interests' => [$interest->id => TRUE],
                     ], FALSE);
                     if (isset($response1) and !empty($response1->email_address)){
+                        Drupal::logger('rir_interface')->debug('Returned email: ' . $response1->email_address);
                         $mailchimpLists->addSegmentMember($this->getMailchimpListId(), $segment->id, $response1->email_address);
                         Drupal::logger('rir_notifier')->notice('New member subscribed: ' . $data->email . ' Response:' . json_encode($response1));
                     } else {
