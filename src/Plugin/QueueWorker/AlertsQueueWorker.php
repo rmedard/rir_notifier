@@ -82,6 +82,7 @@ class AlertsQueueWorker extends QueueWorkerBase {
                     try {
                         $response2 = $mailchimpLists->addOrUpdateMember($this->getMailchimpListId(), $data->email, [
                           'status' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
+                          'status_if_new' => MailchimpLists::MEMBER_STATUS_SUBSCRIBED,
                           'merge_fields' => [
                             'FNAME' => $data->first_name,
                             'LNAME' => $data->last_name,
