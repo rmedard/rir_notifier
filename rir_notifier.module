@@ -102,11 +102,3 @@ function getCampaignHtmlContent($reference) {
     ];
     return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.html.twig')->render($variables);
 }
-
-function getAdvertNotificationHtmlContent($contact_name){
-  $twig_service = Drupal::service('twig');
-  $variables = [
-    'contact_name' => $contact_name
-  ];
-  return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/rir-advert-notification.html.twig')->render($variables);
-}
