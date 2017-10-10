@@ -11,6 +11,7 @@ namespace Drupal\rir_notifier\Service;
 
 use Drupal;
 use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\node\Entity\Node;
 use function strtotime;
 
 class DataAccessor {
@@ -66,7 +67,7 @@ class DataAccessor {
         $storage = $this->entityTypeManager->getStorage('node');
         $query = $storage->getQuery()
           ->condition('type', 'advert')
-          ->condition('status', 1)
+          ->condition('status', Node::PUBLISHED)
           ->condition('created', array($start_time, $end_time), 'BETWEEN');
 
         if (isset($location) and !empty($location) and $location !== 'loc'){

@@ -92,7 +92,7 @@ class CampaignQueueWorker extends QueueWorkerBase {
                 $members_array = json_decode(json_encode($members, TRUE));
                 if ($members_array->total_items > 0) {
                     $settings = [
-                      'subject_line' => 'Interesting adverts',
+                      'subject_line' => 'New properties matching your selection on Houseinrwanda.com',
                       'title' => 'Campaign - ' . $reference,
                       'from_name' => Drupal::config('system.site')->get('name'),
                       'reply_to' => Drupal::config('system.site')->get('mail'),
