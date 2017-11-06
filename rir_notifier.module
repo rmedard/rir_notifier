@@ -34,12 +34,12 @@ function rir_notifier_theme($existing, $type, $theme, $path) {
  */
 function rir_notifier_webform_submission_insert(WebformSubmissionInterface $entity) {
     if ($entity->getWebform()->id() == 'notification_subscription') {
-        $location = $entity->getData('notif_property_location');
-        $advertType = $entity->getData('notif_advert_type');
-        $propertyType = $entity->getData('notif_property_type');
-        $email = $entity->getData('notif_email');
-        $firstName = $entity->getData('notif_firstname');
-        $lastName = $entity->getData('notif_lastname');
+        $location = $entity->getElementData('notif_property_location');
+        $advertType = $entity->getElementData('notif_advert_type');
+        $propertyType = $entity->getElementData('notif_property_type');
+        $email = $entity->getElementData('notif_email');
+        $firstName = $entity->getElementData('notif_firstname');
+        $lastName = $entity->getElementData('notif_lastname');
         $referenceNbr = getRequestCategoryReference($location, $advertType, $propertyType);
 
         $alertsQueueWorker = Drupal::queue('alerts_processor');
