@@ -88,4 +88,19 @@ class DataAccessor {
         return $query;
     }
 
+    public function getExpiringAdvertsByDate($date){
+				$storage = $this->entityTypeManager->getStorage('node');
+				$query = $storage->getQuery()
+					->condition('type', 'advert')
+					->condition('status', Node::PUBLISHED)
+					->condition('field_advert_expirydate', $date, '=');
+				$expiring_adverts_ids = $query->execute();
+				if (isset($expiring_adverts_ids) and count($expiring_adverts_ids) > 0){
+						return $storage->loadMultiple($expiring_adverts_ids);
+				} else {
+						Drupal::logger('rir_notifier')->debug('No expiring adverts on date: ' . $date);
+						return array();
+				}
+		}
+
 }
