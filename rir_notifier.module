@@ -146,7 +146,7 @@ function getExpiringAdvertsEmailContent($expiring_adverts, $date) {
 		$counted_adverts = array();
 		foreach ($expiring_adverts as $key => $expiring_advert){
 				$node_view = Drupal::service('statistics.storage.node')->fetchView($expiring_advert->id());
-				$counted_adverts[(intval($key) + 1) . '_' . $node_view['totalcount']] = $expiring_advert;
+				$counted_adverts[(intval($key) + 1) . '_' . $node_view->getTotalCount()] = $expiring_advert;
 		}
 
 		$variables = [
