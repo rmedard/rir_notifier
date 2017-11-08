@@ -106,9 +106,9 @@ function rir_notifier_cron() {
 				if (!empty($expiring_adverts)) {
 						$mailManager = Drupal::service('plugin.manager.mail');
 						$module = 'rir_interface';
-						$key = 'advert_first_published';
+						$key = 'expiring_adverts_alert';
 						$to = Drupal::config('system.site')->get('mail');
-						$reply = Drupal::config('system.site')->get('mail');
+						$reply = NULL;
 						$params['message'] = Markup::create(getExpiringAdvertsEmailContent($expiring_adverts, $today));
 						$langcode = Drupal::currentUser()->getPreferredLangcode();
 						$send = TRUE;
