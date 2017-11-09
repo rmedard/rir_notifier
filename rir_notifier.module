@@ -10,150 +10,155 @@ use Drupal\webform\WebformSubmissionInterface;
 /**
  * Implements hook_page_attachments().
  */
-function rir_notifier_page_attachments(array &$attachments) {
-		if (Drupal::currentUser()->isAnonymous()) {
-				$attachments['#attached']['library'][] = 'rir_notifier/rir_scripts';
-				$attachments['#attached']['library'][] = 'core/drupal.dialog.ajax';
-		}
+function rir_notifier_page_attachments(array &$attachments)
+{
+    if (Drupal::currentUser()->isAnonymous()) {
+        $attachments['#attached']['library'][] = 'rir_notifier/rir_scripts';
+        $attachments['#attached']['library'][] = 'core/drupal.dialog.ajax';
+    }
 }
 
 /**
  * Implements hook_theme().
  */
-function rir_notifier_theme($existing, $type, $theme, $path) {
-		return [
-			'rir_subscribe_search' => [
-				'variables' => [
-					'button' => t('Subscribe'),
-				],
-			],
-		];
+function rir_notifier_theme($existing, $type, $theme, $path)
+{
+    return [
+        'rir_subscribe_search' => [
+            'variables' => [
+                'button' => t('Subscribe'),
+            ],
+        ],
+    ];
 }
 
 /**
  * Implements hook_ENTITY_TYPE_insert().
  */
-function rir_notifier_webform_submission_insert(WebformSubmissionInterface $entity) {
-		if ($entity->getWebform()->id() == 'notification_subscription') {
-				$location = $entity->getElementData('notif_property_location');
-				$advertType = $entity->getElementData('notif_advert_type');
-				$propertyType = $entity->getElementData('notif_property_type');
-				$email = $entity->getElementData('notif_email');
-				$firstName = $entity->getElementData('notif_firstname');
-				$lastName = $entity->getElementData('notif_lastname');
-				$referenceNbr = getRequestCategoryReference($location, $advertType, $propertyType);
+function rir_notifier_webform_submission_insert(WebformSubmissionInterface $entity)
+{
+    if ($entity->getWebform()->id() == 'notification_subscription') {
+        $location = $entity->getElementData('notif_property_location');
+        $advertType = $entity->getElementData('notif_advert_type');
+        $propertyType = $entity->getElementData('notif_property_type');
+        $email = $entity->getElementData('notif_email');
+        $firstName = $entity->getElementData('notif_firstname');
+        $lastName = $entity->getElementData('notif_lastname');
+        $referenceNbr = getRequestCategoryReference($location, $advertType, $propertyType);
 
-				$alertsQueueWorker = Drupal::queue('alerts_processor');
-				$data = (object) [
-					'email' => $email,
-					'first_name' => $firstName,
-					'last_name' => $lastName,
-					'reference' => strtolower($referenceNbr),
-				];
-				$alertsQueueWorker->createItem($data);
-		}
+        $alertsQueueWorker = Drupal::queue('alerts_processor');
+        $data = (object)[
+            'email' => $email,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'reference' => strtolower($referenceNbr),
+        ];
+        $alertsQueueWorker->createItem($data);
+    }
 }
 
-function getRequestCategoryReference($location, $advertType, $propertyType) {
-		if (empty($location)) {
-				$location = 'loc';
-		}
-		if (empty($advertType) or $advertType == 'All') {
-				$advertType = 'ad';
-		}
-		if (empty($propertyType) or $propertyType == 'All') {
-				$propertyType = 'pro';
-		}
-		return $location . '-' . $advertType . '-' . $propertyType;
+function getRequestCategoryReference($location, $advertType, $propertyType)
+{
+    if (empty($location)) {
+        $location = 'loc';
+    }
+    if (empty($advertType) or $advertType == 'All') {
+        $advertType = 'ad';
+    }
+    if (empty($propertyType) or $propertyType == 'All') {
+        $propertyType = 'pro';
+    }
+    return $location . '-' . $advertType . '-' . $propertyType;
 }
 
 /**
  * Implements hook_cron().
  */
-function rir_notifier_cron() {
-		$request_time = Drupal::time()->getRequestTime();
-		$day = date('dmY', $request_time);
-		$hour = date('H', $request_time);
-		$last_notifications_sent = Drupal::state()->get('notifications.last.sent');
-		if (isset($last_notifications_sent)) {
-				if (date('dmY', $last_notifications_sent) != $day) {
-						$campaign_processor = Drupal::queue('campaigns_processor');
-						$campaign_processor->createItem(new stdClass());
-						Drupal::state()->set('notifications.last.sent', $request_time);
-						Drupal::logger('rir_notifier')
-							->notice('Sending notifications scheduled!');
-				}
-		}
-		else {
-				if (intval($hour) < 6) {
-						Drupal::queue('campaigns_processor')->createItem(new stdClass());
-						Drupal::state()->set('notifications.last.sent', $request_time);
-						Drupal::logger('rir_notifier')
-							->notice('First sending notifications scheduled!');
-				}
-		}
+function rir_notifier_cron()
+{
+    $request_time = Drupal::time()->getRequestTime();
+    $day = date('dmY', $request_time);
+    $hour = date('H', $request_time);
+    $last_notifications_sent = Drupal::state()->get('notifications.last.sent');
+    if (isset($last_notifications_sent)) {
+        if (date('dmY', $last_notifications_sent) != $day) {
+            $campaign_processor = Drupal::queue('campaigns_processor');
+            $campaign_processor->createItem(new stdClass());
+            Drupal::state()->set('notifications.last.sent', $request_time);
+            Drupal::logger('rir_notifier')
+                ->notice('Sending notifications scheduled!');
+        }
+    } else {
+        if (intval($hour) < 6) {
+            Drupal::queue('campaigns_processor')->createItem(new stdClass());
+            Drupal::state()->set('notifications.last.sent', $request_time);
+            Drupal::logger('rir_notifier')
+                ->notice('First sending notifications scheduled!');
+        }
+    }
 
-		$last_expirations_sent = Drupal::state()->get('expirations.last.sent');
-		if (!isset($last_expirations_sent)) {
-				Drupal::state()->set('expirations.last.sent', $request_time);
-				$last_expirations_sent = Drupal::state()->get('expirations.last.sent');
-		}
+    $last_expirations_sent = Drupal::state()->get('expirations.last.sent');
+    if (!isset($last_expirations_sent)) {
+        Drupal::state()->set('expirations.last.sent', $request_time);
+        $last_expirations_sent = Drupal::state()->get('expirations.last.sent');
+    }
 
-		if (date('dmY', $last_expirations_sent) != $day and intval($hour) >= 7) {
-				$dataAccessor = Drupal::service('rir_notifier.data_accessor');
-				$today = strtotime('now');
-				$expiring_adverts = $dataAccessor->getExpiringAdvertsByDate(date('Y-m-d', $today));
-				if (!empty($expiring_adverts)) {
-						$mailManager = Drupal::service('plugin.manager.mail');
-						$module = 'rir_interface';
-						$key = 'expiring_adverts_alert';
-						$to = Drupal::config('system.site')->get('mail');
-						$reply = NULL;
-						$params['message'] = Markup::create(getExpiringAdvertsEmailContent($expiring_adverts, date('D d F, Y', $today)));
-						$langcode = Drupal::currentUser()->getPreferredLangcode();
-						$send = TRUE;
-						$result = $mailManager->mail($module, $key, $to, $langcode, $params, $reply, $send);
-						if ($result['result'] !== TRUE) {
-								$message = t('There was a problem sending expired adverts email.');
-								Drupal::logger('rir_interface')
-									->error($message . ' Whole Error: ' . json_encode($result, TRUE));
-								return;
-						}
-						$message = t('An email of expiring adverts has been sent.');
-						Drupal::logger('rir_interface')->notice($message);
-				}
-				Drupal::state()->set('expirations.last.sent', $request_time);
-				Drupal::logger('rir_notifier')
-					->notice('Sending expired adverts scheduled!');
-		}
+    if (date('dmY', $last_expirations_sent) != $day and intval($hour) >= 7) {
+        $dataAccessor = Drupal::service('rir_notifier.data_accessor');
+        $today = strtotime('now');
+        $expiring_adverts = $dataAccessor->getExpiringAdvertsByDate(date('Y-m-d', $today));
+        if (!empty($expiring_adverts)) {
+            $mailManager = Drupal::service('plugin.manager.mail');
+            $module = 'rir_interface';
+            $key = 'expiring_adverts_alert';
+            $to = Drupal::config('system.site')->get('mail');
+            $reply = NULL;
+            $params['message'] = Markup::create(getExpiringAdvertsEmailContent($expiring_adverts, date('D d F, Y', $today)));
+            $langcode = Drupal::currentUser()->getPreferredLangcode();
+            $send = TRUE;
+            $result = $mailManager->mail($module, $key, $to, $langcode, $params, $reply, $send);
+            if ($result['result'] !== TRUE) {
+                $message = t('There was a problem sending expired adverts email.');
+                Drupal::logger('rir_interface')
+                    ->error($message . ' Whole Error: ' . json_encode($result, TRUE));
+                return;
+            }
+            $message = t('An email of expiring adverts has been sent.');
+            Drupal::logger('rir_interface')->notice($message);
+        }
+        Drupal::state()->set('expirations.last.sent', $request_time);
+        Drupal::logger('rir_notifier')->notice('Sending expired adverts scheduled!');
+    }
 }
 
-function getCampaignHtmlContent($reference) {
-		$dataAccessor = Drupal::service('rir_notifier.data_accessor');
-		$keys = explode('-', $reference);
-		$location = $keys[0];
-		$advertType = $keys[1];
-		$propertyType = $keys[2];
-		$twig_service = Drupal::service('twig');
-		$variables = [
-			'adverts' => $dataAccessor->getDailyAdverts($location, $advertType, $propertyType),
-		];
-		return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.html.twig')
-			->render($variables);
+function getCampaignHtmlContent($reference)
+{
+    $dataAccessor = Drupal::service('rir_notifier.data_accessor');
+    $keys = explode('-', $reference);
+    $location = $keys[0];
+    $advertType = $keys[1];
+    $propertyType = $keys[2];
+    $twig_service = Drupal::service('twig');
+    $variables = [
+        'adverts' => $dataAccessor->getDailyAdverts($location, $advertType, $propertyType),
+    ];
+    return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.html.twig')
+        ->render($variables);
 }
 
-function getExpiringAdvertsEmailContent($expiring_adverts, $date) {
-		$counted_adverts = array();
-		foreach ($expiring_adverts as $key => $expiring_advert){
-				$node_view = Drupal::service('statistics.storage.node')->fetchView($expiring_advert->id());
-				$counted_adverts[(intval($key) + 1) . '_' . $node_view->getTotalCount()] = $expiring_advert;
-		}
+function getExpiringAdvertsEmailContent($expiring_adverts, $date)
+{
+    $counted_adverts = array();
+    foreach ($expiring_adverts as $key => $expiring_advert) {
+        $node_view = Drupal::service('statistics.storage.node')->fetchView($expiring_advert->id());
+        $counted_adverts[(intval($key) + 1) . '_' . $node_view->getTotalCount()] = $expiring_advert;
+    }
 
-		$variables = [
-			'counted_adverts' => $counted_adverts,
-			'date' => $date
-		];
-		$twig_service = Drupal::service('twig');
-		return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/hir-expiring-adverts.html.twig')
-			->render($variables);
+    $variables = [
+        'counted_adverts' => $counted_adverts,
+        'date' => $date
+    ];
+    $twig_service = Drupal::service('twig');
+    return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/hir-expiring-adverts.html.twig')
+        ->render($variables);
 }
