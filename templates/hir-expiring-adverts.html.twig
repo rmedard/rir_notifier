@@ -9,9 +9,8 @@
     <title>Expiration</title>
 </head>
 <body>
-<center>
     <h3>Adverts expiring today: {{ date }}</h3>
-    <table align="center" border="1" cellpadding="5" cellspacing="0" width="100%" id="bodyTable" style="height:100%;">
+    <table align="center" border="1" cellpadding="5" cellspacing="0" width="100%" style="height:100%;">
         <thead>
         <tr>
             <th>#</th>
@@ -22,19 +21,20 @@
         </thead>
         <tbody>
         {% for key, advert in counted_adverts %}
-        <tr>
-            <td>{{ loop.index }}</td>
-            <td><a href="{{ drupal_token('site:url') ~ path('entity.node.canonical', {'node':advert.id}) }}">{{ advert.title.value }}</a></td>
-            {# Split key into 2 and take the second part #}
-            {% set index = key|split('_', 2) %}
-            <td>{{ index[1] }}</td>
-            <td>{{ advert.field_visit_contact_name.value }} <br>
-                Tel: {{ advert.field_visit_cellphone.value }} <br>
-                Email: {{ advert.field_visit_email_address1.value }}</td>
-        </tr>
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>
+                    <a href="{{ drupal_token('site:url') ~ path('entity.node.canonical', {'node':advert.id}) }}">{{ advert.title.value }}</a>
+                </td>
+                {# Split key into 2 and take the second part #}
+                {% set index = key|split('_', 2) %}
+                <td>{{ index[1] }}</td>
+                <td>{{ advert.field_visit_contact_name.value }} <br>
+                    Tel: {{ advert.field_visit_cellphone.value }} <br>
+                    Email: {{ advert.field_visit_email_address1.value }}</td>
+            </tr>
         {% endfor %}
         </tbody>
     </table>
-</center>
 </body>
 </html>
