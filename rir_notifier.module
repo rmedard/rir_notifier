@@ -123,7 +123,6 @@ function rir_notifier_cron()
                     $message = t('There was a problem sending expired adverts email.');
                     Drupal::logger('rir_interface')
                         ->error($message . ' Whole Error: ' . json_encode($result, TRUE));
-                    return;
                 }
                 $message = t('An email of expiring adverts has been sent.');
                 Drupal::logger('rir_interface')->notice($message);
