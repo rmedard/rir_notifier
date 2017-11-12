@@ -120,7 +120,7 @@ function rir_notifier_cron()
                 $send = TRUE;
                 $result = $mailManager->mail($module, $key, $to, $langcode, $params, $reply, $send);
                 kint($result);
-                die();
+//                die();
                 if ($result['result'] !== TRUE) {
                     $message = t('There was a problem sending expired adverts email.');
                     Drupal::logger('rir_interface')
