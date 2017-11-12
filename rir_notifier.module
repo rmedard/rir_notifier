@@ -109,23 +109,27 @@ function rir_notifier_cron()
         $today = strtotime('now');
         $expiring_adverts = $dataAccessor->getExpiringAdvertsByDate(date('Y-m-d', $today));
         if (!empty($expiring_adverts)) {
-            $mailManager = Drupal::service('plugin.manager.mail');
-            $module = 'rir_interface';
-            $key = 'expiring_adverts_alert';
-            $to = Drupal::config('system.site')->get('mail');
-            $reply = Drupal::config('system.site')->get('mail');
-            $params['message'] = Markup::create(getExpiringAdvertsEmailContent($expiring_adverts, date('D d F, Y', $today)));
-            $langcode = Drupal::currentUser()->getPreferredLangcode();
-            $send = TRUE;
-            $result = $mailManager->mail($module, $key, $to, $langcode, $params, $reply, $send);
-            if ($result['result'] !== TRUE) {
-                $message = t('There was a problem sending expired adverts email.');
-                Drupal::logger('rir_interface')
-                    ->error($message . ' Whole Error: ' . json_encode($result, TRUE));
-                return;
+            try{
+                $mailManager = Drupal::service('plugin.manager.mail');
+                $module = 'rir_interface';
+                $key = 'expiring_adverts_alert';
+                $to = Drupal::config('system.site')->get('mail');
+                $reply = Drupal::config('system.site')->get('mail');
+                $params['message'] = Markup::create(getExpiringAdvertsEmailContent($expiring_adverts, date('D d F, Y', $today)));
+                $langcode = Drupal::currentUser()->getPreferredLangcode();
+                $send = TRUE;
+                $result = $mailManager->mail($module, $key, $to, $langcode, $params, $reply, $send);
+                if ($result['result'] !== TRUE) {
+                    $message = t('There was a problem sending expired adverts email.');
+                    Drupal::logger('rir_interface')
+                        ->error($message . ' Whole Error: ' . json_encode($result, TRUE));
+                    return;
+                }
+                $message = t('An email of expiring adverts has been sent.');
+                Drupal::logger('rir_interface')->notice($message);
+            } catch (Exception $ex){
+                Drupal::logger('rir_notifier')->error('Error sending expired adverts: ' . $ex);
             }
-            $message = t('An email of expiring adverts has been sent.');
-            Drupal::logger('rir_interface')->notice($message);
         }
         Drupal::state()->set('expirations.last.sent', $request_time);
         Drupal::logger('rir_notifier')->notice('Sending expired adverts scheduled!');
