@@ -102,7 +102,7 @@ function rir_notifier_cron()
         Drupal::state()->set('expirations.last.sent', $request_time);
         $last_expirations_sent = Drupal::state()->get('expirations.last.sent');
     }
-
+$result = null;
     if (date('dmY', $last_expirations_sent) == $day and intval($hour) >= 7) {
         Drupal::logger('rir_notifier')->notice('Sending expired adverts: flag: ' . date('dmY', $last_expirations_sent) . ' Hour: ' . intval($hour) . ' Timestamp: ' . $last_expirations_sent);
         $dataAccessor = Drupal::service('rir_notifier.data_accessor');
@@ -119,8 +119,7 @@ function rir_notifier_cron()
                 $langcode = Drupal::currentUser()->getPreferredLangcode();
                 $send = TRUE;
                 $result = $mailManager->mail($module, $key, $to, $langcode, $params, $reply, $send);
-                kint($result);
-//                die();
+
                 if ($result['result'] !== TRUE) {
                     $message = t('There was a problem sending expired adverts email.');
                     Drupal::logger('rir_interface')
@@ -135,6 +134,8 @@ function rir_notifier_cron()
         Drupal::state()->set('expirations.last.sent', $request_time);
         Drupal::logger('rir_notifier')->notice('Sending expired adverts scheduled!');
     }
+    kint($result);
+    die();
 }
 
 function getCampaignHtmlContent($reference)
