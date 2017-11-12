@@ -113,7 +113,7 @@ function rir_notifier_cron()
             $module = 'rir_interface';
             $key = 'expiring_adverts_alert';
             $to = Drupal::config('system.site')->get('mail');
-            $reply = NULL;
+            $reply = Drupal::config('system.site')->get('mail');
             $params['message'] = Markup::create(getExpiringAdvertsEmailContent($expiring_adverts, date('D d F, Y', $today)));
             $langcode = Drupal::currentUser()->getPreferredLangcode();
             $send = TRUE;
