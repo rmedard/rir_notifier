@@ -104,6 +104,7 @@ function rir_notifier_cron()
     }
 
     if (date('dmY', $last_expirations_sent) != $day and intval($hour) >= 7) {
+        Drupal::logger('rir_notifier')->notice('Sending expired adverts: flag: ' . date('dmY', $last_expirations_sent) . ' Hour: ' . intval($hour));
         $dataAccessor = Drupal::service('rir_notifier.data_accessor');
         $today = strtotime('now');
         $expiring_adverts = $dataAccessor->getExpiringAdvertsByDate(date('Y-m-d', $today));
