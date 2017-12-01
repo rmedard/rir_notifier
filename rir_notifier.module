@@ -80,7 +80,8 @@ function rir_notifier_cron()
 		$module_handler = Drupal::service('module_handler');
 		if ($module_handler->moduleExists('cdn')){
 				$cdn_enabled = Drupal::config('cdn.settings')->get('status');
-				Drupal::logger('rir_notifier')->info('CDN Enabled: ' . intval($cdn_enabled));
+				$cdn_domain = Drupal::config('cdn.settings')->get('mapping.domain');
+				Drupal::logger('rir_notifier')->info('CDN Enabled: ' . intval($cdn_enabled) . ' URL: ' . $cdn_domain);
 		} else {
 				Drupal::logger('rir_notifier')->info('CDN Module not enabled');
 		}
