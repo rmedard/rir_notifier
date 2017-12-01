@@ -76,7 +76,17 @@ function getRequestCategoryReference($location, $advertType, $propertyType)
  */
 function rir_notifier_cron()
 {
-    $request_time = Drupal::time()->getRequestTime();
+
+		$module_handler = Drupal::service('module_handler');
+		if ($module_handler->moduleExists('cdn')){
+				$cdn_enabled = Drupal::config('cdn.settings')->get('status');
+				Drupal::logger('rir_notifier')->info('CDN Enabled: ' . $cdn_enabled);
+		} else {
+				Drupal::logger('rir_notifier')->info('CDN Module not enabled');
+		}
+
+
+		$request_time = Drupal::time()->getRequestTime();
     $day = date('dmY', $request_time);
     $hour = date('H', $request_time);
     $last_notifications_sent = Drupal::state()->get('notifications.last.sent');
@@ -143,6 +153,13 @@ function getCampaignHtmlContent($reference)
     $propertyType = $keys[2];
     $twig_service = Drupal::service('twig');
     $module_handler = Drupal::service('module_handler');
+    if ($module_handler->moduleExists('cdn')){
+				$cdn_enabled = Drupal::config('cdn.settings')->get('status');
+				Drupal::logger('rir_notifier')->info('CDN Enabled: ' . $cdn_enabled);
+		} else {
+				Drupal::logger('rir_notifier')->info('CDN Module not enabled');
+		}
+
     $variables = [
         'adverts' => $dataAccessor->getDailyAdverts($location, $advertType, $propertyType),
         'cdn_enabled' => $module_handler->moduleExists('cdn')
