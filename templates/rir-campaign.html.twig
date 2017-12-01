@@ -557,7 +557,7 @@
                                     {% for advert in adverts %}
                                     <tr class="advert">
                                         <td id="imageBlockId">
-                                            {% if cdn_enable == 1 %}
+                                            {% if cdn_enabled == 1 %}
                                                 {% if advert.field_advert_picture is not empty %}
                                                     <img src="{{ advert.field_advert_picture.0.entity.uri.value|image_style('scaled_90x90') }}" class="templateImage" alt="advertImage" />
                                                 {% else %}
