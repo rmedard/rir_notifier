@@ -142,9 +142,10 @@ function getCampaignHtmlContent($reference)
     $advertType = $keys[1];
     $propertyType = $keys[2];
     $twig_service = Drupal::service('twig');
+    $module_handler = Drupal::service('module_handler');
     $variables = [
         'adverts' => $dataAccessor->getDailyAdverts($location, $advertType, $propertyType),
-        'cdn_enabled' => Drupal::moduleHandler()->moduleExists('cdn')
+        'cdn_enabled' => $module_handler->moduleExists('cdn')
     ];
     return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.html.twig')
         ->render($variables);
