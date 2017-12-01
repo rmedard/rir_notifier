@@ -562,7 +562,7 @@
                                                 <p>Domain: {{ domain }}</p>
                                                 <img src="{{ domain ~ advert.field_advert_picture.0.entity.uri.value|image_style('scaled_90x90') }}" class="templateImage" alt="advertImage">
                                             {% else %}
-                                                <img src="{{ domain ~ 'public://default_images/no_img.png'|image_style('scaled_90x90') }}" class="templateImage" alt="noImage">
+                                                <img src="{{ drupal_token('site:url') ~ 'public://default_images/no_img.png'|image_style('scaled_90x90') }}" class="templateImage" alt="noImage">
                                             {% endif %}
                                         </td>
                                         <td id="detailsBlockId" style="padding-left: 10px">
