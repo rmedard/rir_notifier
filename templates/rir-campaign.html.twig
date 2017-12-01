@@ -557,7 +557,7 @@
                                     {% for advert in adverts %}
                                     <tr class="advert">
                                         <td id="imageBlockId">
-                                            {% set domain = cdn_enable == 1 ? cdn_domain : drupal_token('site:url') %}
+                                            {% set domain = ((cdn_enable == 1) ? cdn_domain : drupal_token('site:url')) %}
                                             {% if advert.field_advert_picture is not empty %}
                                                 <img src="{{ domain ~ advert.field_advert_picture.0.entity.uri.value|image_style('scaled_90x90') }}" class="templateImage" alt="advertImage">
                                             {% else %}
