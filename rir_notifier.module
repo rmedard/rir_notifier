@@ -77,22 +77,12 @@ function getRequestCategoryReference($location, $advertType, $propertyType)
 function rir_notifier_cron()
 {
 
-		$module_handler = Drupal::service('module_handler');
-		if ($module_handler->moduleExists('cdn')){
-				$cdn_enabled = Drupal::config('cdn.settings')->get('status');
-				$cdn_domain = Drupal::config('cdn.settings')->get('mapping.domain');
-				Drupal::logger('rir_notifier')->info('CDN Enabled: ' . intval($cdn_enabled) . ' URL: ' . $cdn_domain);
-		} else {
-				Drupal::logger('rir_notifier')->info('CDN Module not enabled');
-		}
-
-
 		$request_time = Drupal::time()->getRequestTime();
     $day = date('dmY', $request_time);
     $hour = date('H', $request_time);
     $last_notifications_sent = Drupal::state()->get('notifications.last.sent');
     if (isset($last_notifications_sent)) {
-        if (date('dmY', $last_notifications_sent) != $day) {
+        if (date('dmY', $last_notifications_sent) == $day) {
             $campaign_processor = Drupal::queue('campaigns_processor');
             $campaign_processor->createItem(new stdClass());
             Drupal::state()->set('notifications.last.sent', $request_time);
@@ -155,13 +145,16 @@ function getCampaignHtmlContent($reference)
     $twig_service = Drupal::service('twig');
     $module_handler = Drupal::service('module_handler');
     $cdn_enabled = 0;
-    if ($module_handler->moduleExists('cdn') and Drupal::config('cdn.settings')->get('status') == '1'){
-				$cdn_enabled = 1;
+    $cdn_domain = '';
+    if ($module_handler->moduleExists('cdn')){
+				$cdn_enabled = intval(Drupal::config('cdn.settings')->get('status'));
+				$cdn_domain = Drupal::config('cdn.settings')->get('mapping.domain');
 		}
 
     $variables = [
         'adverts' => $dataAccessor->getDailyAdverts($location, $advertType, $propertyType),
-        'cdn_enabled' => $cdn_enabled
+        'cdn_enabled' => $cdn_enabled,
+				'cdn_domain' => $cdn_domain
     ];
     return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.html.twig')
         ->render($variables);

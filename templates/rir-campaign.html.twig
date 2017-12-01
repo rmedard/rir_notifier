@@ -557,10 +557,11 @@
                                     {% for advert in adverts %}
                                     <tr class="advert">
                                         <td id="imageBlockId">
+                                            {% set domain = cdn_enable == 1 ? cdn_domain : drupal_token('site:url') %}
                                             {% if advert.field_advert_picture is not empty %}
-                                                <img src="{{ drupal_token('site:url') ~ advert.field_advert_picture.0.entity.uri.value|image_style('scaled_90x90') }}" class="templateImage" alt="advertImage">
+                                                <img src="{{ domain ~ advert.field_advert_picture.0.entity.uri.value|image_style('scaled_90x90') }}" class="templateImage" alt="advertImage">
                                             {% else %}
-                                                <img src="{{ drupal_token('site:url') ~ 'public://default_images/no_img.png'|image_style('scaled_90x90') }}" class="templateImage" alt="noImage">
+                                                <img src="{{ domain ~ 'public://default_images/no_img.png'|image_style('scaled_90x90') }}" class="templateImage" alt="noImage">
                                             {% endif %}
                                         </td>
                                         <td id="detailsBlockId" style="padding-left: 10px">
