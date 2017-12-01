@@ -80,7 +80,7 @@ function rir_notifier_cron()
 		$module_handler = Drupal::service('module_handler');
 		if ($module_handler->moduleExists('cdn')){
 				$cdn_enabled = Drupal::config('cdn.settings')->get('status');
-				Drupal::logger('rir_notifier')->info('CDN Enabled: ' . $cdn_enabled);
+				Drupal::logger('rir_notifier')->info('CDN Enabled: ' . intval($cdn_enabled));
 		} else {
 				Drupal::logger('rir_notifier')->info('CDN Module not enabled');
 		}
@@ -153,16 +153,14 @@ function getCampaignHtmlContent($reference)
     $propertyType = $keys[2];
     $twig_service = Drupal::service('twig');
     $module_handler = Drupal::service('module_handler');
-    if ($module_handler->moduleExists('cdn')){
-				$cdn_enabled = Drupal::config('cdn.settings')->get('status');
-				Drupal::logger('rir_notifier')->info('CDN Enabled: ' . $cdn_enabled);
-		} else {
-				Drupal::logger('rir_notifier')->info('CDN Module not enabled');
+    $cdn_enabled = 0;
+    if ($module_handler->moduleExists('cdn') and Drupal::config('cdn.settings')->get('status') == '1'){
+				$cdn_enabled = 1;
 		}
 
     $variables = [
         'adverts' => $dataAccessor->getDailyAdverts($location, $advertType, $propertyType),
-        'cdn_enabled' => $module_handler->moduleExists('cdn')
+        'cdn_enabled' => $cdn_enabled
     ];
     return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.html.twig')
         ->render($variables);
