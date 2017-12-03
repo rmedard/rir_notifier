@@ -145,18 +145,14 @@ function getCampaignHtmlContent($reference)
     $twig_service = Drupal::service('twig');
     $module_handler = Drupal::service('module_handler');
     $cdn_enabled = 0;
-    $cdn_domain = '';
     if ($module_handler->moduleExists('cdn')) {
         $cdn_enabled = intval(Drupal::config('cdn.settings')->get('status'));
-        $cdn_domain = 'http://' . Drupal::config('cdn.settings')->get('mapping.domain');
     }
 
     $variables = [
         'adverts' => $dataAccessor->getDailyAdverts($location, $advertType, $propertyType),
-        'cdn_enabled' => $cdn_enabled,
-        'cdn_domain' => $cdn_domain
+        'cdn_enabled' => $cdn_enabled
     ];
-    Drupal::logger('rir_notifier')->debug('CDN Domain: ' . $cdn_domain);
     return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.html.twig')
         ->render($variables);
 }
