@@ -82,7 +82,7 @@ function rir_notifier_cron()
     $hour = date('H', $request_time);
     $last_notifications_sent = Drupal::state()->get('notifications.last.sent');
     if (isset($last_notifications_sent)) {
-        if (date('dmY', $last_notifications_sent) != $day) {
+        if (date('dmY', $last_notifications_sent) == $day) {
             $campaign_processor = Drupal::queue('campaigns_processor');
             $campaign_processor->createItem(new stdClass());
             Drupal::state()->set('notifications.last.sent', $request_time);
