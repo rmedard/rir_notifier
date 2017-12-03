@@ -156,6 +156,7 @@ function getCampaignHtmlContent($reference)
         'cdn_enabled' => $cdn_enabled,
         'cdn_domain' => 'http://' . $cdn_domain
     ];
+    Drupal::logger('rir_notifier')->debug('CDN Domain: ' . $cdn_domain);
     return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.html.twig')
         ->render($variables);
 }
