@@ -67,7 +67,7 @@ class DataAccessor
 
     private function getQuery($location, $advert, $property)
     {
-        $start_time = strtotime('-1 days 00:00:00');
+        $start_time = strtotime('-3 days 00:00:00');
         $end_time = strtotime('+1 days 23:59:59');
 
         $storage = $this->entityTypeManager->getStorage('node');

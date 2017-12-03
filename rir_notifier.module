@@ -77,7 +77,7 @@ function getRequestCategoryReference($location, $advertType, $propertyType)
 function rir_notifier_cron()
 {
 
-		$request_time = Drupal::time()->getRequestTime();
+    $request_time = Drupal::time()->getRequestTime();
     $day = date('dmY', $request_time);
     $hour = date('H', $request_time);
     $last_notifications_sent = Drupal::state()->get('notifications.last.sent');
@@ -108,7 +108,7 @@ function rir_notifier_cron()
         $today = strtotime('now');
         $expiring_adverts = $dataAccessor->getExpiringAdvertsByDate(date('Y-m-d', $today));
         if (!empty($expiring_adverts)) {
-            try{
+            try {
                 $mailManager = Drupal::service('plugin.manager.mail');
                 $module = 'rir_interface';
                 $key = 'expiring_adverts_alert';
@@ -126,7 +126,7 @@ function rir_notifier_cron()
                 }
                 $message = t('An email of expiring adverts has been sent.');
                 Drupal::logger('rir_interface')->notice($message);
-            } catch (Exception $ex){
+            } catch (Exception $ex) {
                 Drupal::logger('rir_notifier')->error('Error sending expired adverts: ' . $ex);
             }
         }
@@ -146,15 +146,15 @@ function getCampaignHtmlContent($reference)
     $module_handler = Drupal::service('module_handler');
     $cdn_enabled = 0;
     $cdn_domain = '';
-    if ($module_handler->moduleExists('cdn')){
-				$cdn_enabled = intval(Drupal::config('cdn.settings')->get('status'));
-				$cdn_domain = Drupal::config('cdn.settings')->get('mapping.domain');
-		}
+    if ($module_handler->moduleExists('cdn')) {
+        $cdn_enabled = intval(Drupal::config('cdn.settings')->get('status'));
+        $cdn_domain = Drupal::config('cdn.settings')->get('mapping.domain');
+    }
 
     $variables = [
         'adverts' => $dataAccessor->getDailyAdverts($location, $advertType, $propertyType),
         'cdn_enabled' => $cdn_enabled,
-				'cdn_domain' => $cdn_domain
+        'cdn_domain' => $cdn_domain
     ];
     return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.html.twig')
         ->render($variables);
