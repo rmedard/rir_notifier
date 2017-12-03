@@ -534,7 +534,7 @@
                         <td align="center" valign="top" width="600" style="width:600px;">
                 <![endif]-->
                 <table border="0" cellpadding="0" cellspacing="0" width="100%" class="templateContainer">
-                    {% set protocol = cdn_enabled == 1 ? 'http:' : '' %}
+                    {% set protocol = cdn_enabled == 1 ? 'http:' : drupal_token('site:url') %}
                     <!-- BEGIN HEADER // -->
                     <tr>
                         <td valign="top" id="templateHeader">
