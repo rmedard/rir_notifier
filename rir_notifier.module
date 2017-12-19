@@ -161,7 +161,11 @@ function getExpiringAdvertsEmailContent($expiring_adverts, $date)
     $counted_adverts = array();
     foreach ($expiring_adverts as $key => $expiring_advert) {
         $node_view_stats = Drupal::service('statistics.storage.node')->fetchView($expiring_advert->id());
-        $counted_adverts[$key . '_' . $node_view_stats->getTotalCount()] = $expiring_advert;
+        if ($node_view_stats !== FALSE){
+        		$counted_adverts[$key . '_' . $node_view_stats->getTotalCount()] = $expiring_advert;
+				} else {
+        		Drupal::logger('rir_notifier')->error('Expiring advert id:' . $expiring_advert->id() . ' not found.');
+				}
     }
 
     $variables = [
