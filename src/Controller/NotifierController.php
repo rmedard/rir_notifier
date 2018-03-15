@@ -35,6 +35,8 @@ class NotifierController extends ControllerBase {
 
         $response = new AjaxResponse();
         $webform = Webform::load($values['webform_id'])->getSubmissionForm($values);
+        kint($webform);
+        die();
         $options = array(
             'dialogClass' => 'ui-dialog ui-dialog-buttonpane',
             'width' => '80%',
