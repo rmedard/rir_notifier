@@ -3,5 +3,8 @@ rir_scripts:
   js:
     js/scripts.js: {}
   dependencies:
-    'core/drupal.dialog.ajax',
-    'core/jquery.form'
+    - core/jquery
+    - core/jquery.once
+    - core/drupal
+    - core/drupal.ajax
+    - core/drupalSettings
