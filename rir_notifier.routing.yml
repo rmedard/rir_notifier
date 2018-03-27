@@ -5,7 +5,6 @@ rir_notifier.open_subscription_modal:
     _controller: '\Drupal\rir_notifier\Controller\NotifierController::openSubscriptionModal'
   requirements:
     _permission: 'bypass node access'
-    js: 'nojs|ajax'
 
 rir_notifier.admin_settings:
   path: '/admin/config/rir_notifier'
