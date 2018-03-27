@@ -36,7 +36,9 @@ class NotifierController extends ControllerBase {
         $response = new AjaxResponse();
         $webform = Webform::load($values['webform_id'])->getSubmissionForm($values);
         $options = array(
-            'width' => '80%'
+            'width' => '80%',
+            'modal' => true,
+            'title' => 'Dore title'
         );
         $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert'), $webform, $options));
         return $response;
