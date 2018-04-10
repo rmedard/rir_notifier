@@ -10,6 +10,7 @@ namespace Drupal\rir_notifier\Service;
 
 
 use Drupal;
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\node\Entity\Node;
 use function strtotime;
@@ -96,16 +97,22 @@ class DataAccessor
 
     public function getExpiringAdvertsByDate($date)
     {
-        $storage = $this->entityTypeManager->getStorage('node');
-        $query = $storage->getQuery()
-            ->condition('type', 'advert')
-            ->condition('status', Node::PUBLISHED)
-            ->condition('field_advert_expirydate', $date, '=');
-        $expiring_adverts_ids = $query->execute();
-        if (isset($expiring_adverts_ids) and count($expiring_adverts_ids) > 0) {
-            return $storage->loadMultiple($expiring_adverts_ids);
-        } else {
-            Drupal::logger('rir_notifier')->debug('No expiring adverts on date: ' . $date);
+        try {
+            $storage = $this->entityTypeManager->getStorage('node');
+            $query = $storage->getQuery()
+                ->condition('type', 'advert')
+                ->condition('status', Node::PUBLISHED)
+                ->condition('field_advert_expirydate', $date, '=');
+            $expiring_adverts_ids = $query->execute();
+            if (isset($expiring_adverts_ids) and count($expiring_adverts_ids) > 0) {
+                return $storage->loadMultiple($expiring_adverts_ids);
+            } else {
+                Drupal::logger('rir_notifier')->debug('No expiring adverts on date: ' . $date);
+                return array();
+            }
+        } catch (InvalidPluginDefinitionException $e) {
+            Drupal::logger('rir_notifier')
+                ->error('Runtime error code: ' . $e->getCode() . '. Error message: ' . $e->getMessage());
             return array();
         }
     }
