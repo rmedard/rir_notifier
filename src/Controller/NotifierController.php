@@ -44,12 +44,12 @@ class NotifierController extends ControllerBase {
 
 //        $output = Drupal::entityTypeManager()->getViewBuilder('webform')->view($webform);
 
-        $output['notification_subscription'] = [
-            '#type' => 'webform',
-            '#webform' => 'notification_subscription'
-        ];
+//        $output['notification_subscription'] = [
+//            '#type' => 'webform',
+//            '#webform' => 'notification_subscription'
+//        ];
 
-        $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert'), $output));
+        $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert'), $webform));
         return $response;
     }
 
