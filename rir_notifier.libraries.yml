@@ -5,6 +5,7 @@ rir_scripts:
   dependencies:
     - core/jquery
     - core/jquery.once
+    - core/drupal.dialog.ajax
     - core/drupal.ajax
     - core/drupal
     - core/drupalSettings
