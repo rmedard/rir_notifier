@@ -11,6 +11,7 @@ namespace Drupal\rir_notifier\Service;
 
 use Drupal;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\node\Entity\Node;
 use function strtotime;
@@ -70,29 +71,37 @@ class DataAccessor
     {
         $start_time = strtotime('-1 days 00:00:00');
         $end_time = strtotime('-1 days 23:59:59');
+        $query = NULL;
+        try {
+            $storage = $this->entityTypeManager->getStorage('node');
+            $query = $storage->getQuery()
+                ->condition('type', 'advert')
+                ->condition('status', Node::PUBLISHED)
+                ->condition('created', array($start_time, $end_time), 'BETWEEN');
 
-        $storage = $this->entityTypeManager->getStorage('node');
-        $query = $storage->getQuery()
-            ->condition('type', 'advert')
-            ->condition('status', Node::PUBLISHED)
-            ->condition('created', array($start_time, $end_time), 'BETWEEN');
+            if (isset($location) and !empty($location) and $location !== 'loc') {
+                $group = $query->orConditionGroup()
+                    ->condition('field_advert_district.entity.name', $location)
+                    ->condition('field_advert_sector', $location)
+                    ->condition('field_advert_village', $location);
+                $query->condition($group);
+            }
 
-        if (isset($location) and !empty($location) and $location !== 'loc') {
-            $group = $query->orConditionGroup()
-                ->condition('field_advert_district.entity.name', $location)
-                ->condition('field_advert_sector', $location)
-                ->condition('field_advert_village', $location);
-            $query->condition($group);
+            if (isset($advert) and !empty($advert) and $advert !== 'ad') {
+                $query->condition('field_advert_type', $advert);
+            }
+
+            if (isset($property) and !empty($property) and $property !== 'pro') {
+                $query->condition('field_advert_property_type', $property);
+            }
+            return $query;
+        } catch (InvalidPluginDefinitionException $e) {
+            Drupal::logger('rir_notifier')->error("GetQuery failed: " . $e->getMessage());
+            return $query;
+        } catch (PluginNotFoundException $e) {
+            Drupal::logger('rir_notifier')->error("GetQuery failed: " . $e->getMessage());
+            return $query;
         }
-
-        if (isset($advert) and !empty($advert) and $advert !== 'ad') {
-            $query->condition('field_advert_type', $advert);
-        }
-
-        if (isset($property) and !empty($property) and $property !== 'pro') {
-            $query->condition('field_advert_property_type', $property);
-        }
-        return $query;
     }
 
     public function getExpiringAdvertsByDate($date)
