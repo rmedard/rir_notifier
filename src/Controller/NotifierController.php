@@ -36,21 +36,13 @@ class NotifierController extends ControllerBase {
         $response = new AjaxResponse();
 
         $webform = Webform::load($values['webform_id'])->getSubmissionForm($values);
-//        $options = array(
-//            'width' => '80%',
-//            'modal' => true,
-//            'title' => 'Dore title'
-//        );
+        $options = array(
+            'width' => '80%',
+            'modal' => true,
+            'title' => 'Free Email Alert1'
+        );
 
-//        $output = Drupal::entityManager()->getViewBuilder('webform')->view($webform);
-
-//        $output['notification_subscription'] = [
-//            '#type' => 'webform',
-//            '#webform' => 'notification_subscription'
-//        ];
-
-        return $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert'), $webform));
-//        return $response;
+        return $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert'), $webform, $options));
     }
 
 }
