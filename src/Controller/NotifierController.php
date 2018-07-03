@@ -40,7 +40,7 @@ class NotifierController extends ControllerBase {
             'width' => '30%'
         );
 
-        return $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert'), $webform, $options));
+        return $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert'), $webform));
     }
 
 }
