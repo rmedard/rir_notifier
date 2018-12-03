@@ -18,6 +18,7 @@ use Drupal\webform\Entity\Webform;
 class NotifierController extends ControllerBase {
 
     public function openSubscriptionModal() {
+
         $query = Drupal::request()->query;
 
         $advertType = $query->get('advert');
@@ -40,7 +41,7 @@ class NotifierController extends ControllerBase {
             'width' => '30%'
         );
 
-        return $response->addCommand(new OpenModalDialogCommand($this->t('Free Email Alert'), $webform));
+        return $response->addCommand(new OpenModalDialogCommand(t('Free Email Alert'), $webform));
     }
 
 }
