@@ -2,8 +2,3 @@ rir_scripts:
   version: VERSION
   js:
     js/scripts.js: {}
-  dependencies:
-    - core/jquery
-    - core/drupal.dialog.ajax
-    - core/drupal
-    - core/drupalSettings
