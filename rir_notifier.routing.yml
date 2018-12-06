@@ -1,11 +1,3 @@
-rir_notifier.open_subscription_modal:
-  path: '/search-subscribe'
-  defaults:
-    _title: 'Modal Form'
-    _controller: '\Drupal\rir_notifier\Controller\NotifierController::openSubscriptionModal'
-  requirements:
-    _permission: 'access content'
-
 rir_notifier.admin_settings:
   path: '/admin/config/rir_notifier'
   defaults:
