@@ -24,7 +24,7 @@
             <tr>
                 <td>{{ loop.index }}</td>
                 <td>
-                    <a href="{{ drupal_token('site:url') ~ path('entity.node.canonical', {'node':advert.id}) }}">{{ advert.title.value }}</a>
+                    <a href="{{ drupal_url('node/' ~ advert.id, {absolute: true}) }}">{{ advert.title.value }}</a>
                 </td>
                 {# Split key into 2 and take the second part #}
                 {% set index = key|split('_', 2) %}
