@@ -565,7 +565,7 @@
                                         </td>
                                         <td id="detailsBlockId" style="padding-left: 10px">
                                             {#<p id="titleId"><a href="{{ drupal_token('site:url') ~ path('entity.node.canonical', {'node':advert.id}) }}">{{ advert.title.value|capitalize }}</a> - Ref: <span>{{ advert.field_advert_reference.value }}</span> - <span>{{ advert.field_advert_price.value }} {{ advert.field_advert_currency.value|upper }}</span>#}
-                                            <p id="titleId"><a href="{{ drupal_url('node/' ~ node.id, {absolute: true}) }}">{{ advert.title.value|capitalize }}</a> - Ref: <span>{{ advert.field_advert_reference.value }}</span> - <span>{{ advert.field_advert_price.value }} {{ advert.field_advert_currency.value|upper }}</span>
+                                            <p id="titleId"><a href="{{ drupal_url('node/' ~ advert.id, {absolute: true}) }}">{{ advert.title.value|capitalize }}</a> - Ref: <span>{{ advert.field_advert_reference.value }}</span> - <span>{{ advert.field_advert_price.value }} {{ advert.field_advert_currency.value|upper }}</span>
                                             <br/>
                                             {{ advert.field_advert_district.entity.name.value }}, {{ advert.field_advert_sector.value }}<br/>
                                             {{ advert.field_advert_property_type.value|capitalize }} for {{ advert.field_advert_type.value|capitalize }}</p>
