@@ -79,23 +79,23 @@ function rir_notifier_cron()
     $request_time = Drupal::time()->getRequestTime();
     $day = date('dmY', $request_time);
     $hour = date('H', $request_time);
-    $last_notifications_sent = Drupal::state()->get('notifications.last.sent');
-    if (isset($last_notifications_sent)) {
-        if (date('dmY', $last_notifications_sent) != $day) {
-            $campaign_processor = Drupal::queue('campaigns_processor');
-            $campaign_processor->createItem(new stdClass());
-            Drupal::state()->set('notifications.last.sent', $request_time);
-            Drupal::logger('rir_notifier')
-                ->notice('Sending notifications scheduled!');
-        }
-    } else {
-        if (intval($hour) < 6) {
-            Drupal::queue('campaigns_processor')->createItem(new stdClass());
-            Drupal::state()->set('notifications.last.sent', $request_time);
-            Drupal::logger('rir_notifier')
-                ->notice('First sending notifications scheduled!');
-        }
-    }
+//    $last_notifications_sent = Drupal::state()->get('notifications.last.sent');
+//    if (isset($last_notifications_sent)) {
+//        if (date('dmY', $last_notifications_sent) != $day) {
+//            $campaign_processor = Drupal::queue('campaigns_processor');
+//            $campaign_processor->createItem(new stdClass());
+//            Drupal::state()->set('notifications.last.sent', $request_time);
+//            Drupal::logger('rir_notifier')
+//                ->notice('Sending notifications scheduled!');
+//        }
+//    } else {
+//        if (intval($hour) < 6) {
+//            Drupal::queue('campaigns_processor')->createItem(new stdClass());
+//            Drupal::state()->set('notifications.last.sent', $request_time);
+//            Drupal::logger('rir_notifier')
+//                ->notice('First sending notifications scheduled!');
+//        }
+//    }
 
     $last_expirations_sent = Drupal::state()->get('expirations.last.sent');
     if (!isset($last_expirations_sent)) {
