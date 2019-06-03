@@ -133,6 +133,14 @@ class DataAccessor
 //            $result = $storage->getQuery()->condition('webform_id', 'property_request_form')
 //                ->execute();
 
+
+            $ll = 'kayonza';
+            $term = $this->entityTypeManager->getStorage('taxonomy_term')
+                ->loadByProperties(['name' => ucwords($ll)]);
+
+            Drupal::logger('rirrir')->info('term id: ' . $term->id());
+
+            return array();
             $webform = Drupal\webform\Entity\Webform::load('notification_subscription');
             if ($submissionsStorage instanceof Drupal\webform\WebformSubmissionStorage) {
 //                $result = '';
