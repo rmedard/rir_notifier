@@ -135,7 +135,7 @@ class DataAccessor
 
             $webform = Drupal\webform\Entity\Webform::load('property_request_form');
             if ($storage instanceof Drupal\webform\WebformSubmissionStorage) {
-                return $storage->loadByEntities($webform);
+                return $storage->loadByEntities($webform, null, null);
             }
 
 //            $storage->loadByProperties()
