@@ -126,4 +126,28 @@ class DataAccessor
         }
     }
 
+
+    public function getNotificationSubscribers() {
+        try {
+            $storage = $this->entityTypeManager->getStorage('webform_submission');
+            $result = $storage->getQuery()->condition('webform_id', 'property_request_form')
+                ->execute();
+
+
+//            $storage->loadByProperties()
+//            Drupal\webform\WebformInterface::load('notification_subscription');
+
+            if (isset($result) and count($result) > 0) {
+                return $storage->loadMultiple($result);
+            }
+            return array();
+        } catch (InvalidPluginDefinitionException $e) {
+            Drupal::logger('rir_notifier')
+                ->error('Invalid plugin definition: ' . $e->getCode() . '. Error message: ' . $e->getMessage());
+        } catch (PluginNotFoundException $e) {
+            Drupal::logger('rir_notifier')
+                ->error('Plugin not found: ' . $e->getCode() . '. Error message: ' . $e->getMessage());
+        }
+        return array();
+    }
 }

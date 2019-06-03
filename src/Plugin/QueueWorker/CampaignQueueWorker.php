@@ -58,6 +58,15 @@ class CampaignQueueWorker extends QueueWorkerBase {
      * @see \Drupal\Core\Cron::processQueues()
      */
     public function processItem($data) {
+
+//        $storage = $this->entityTypeManager->getStorage('node');
+//        $query = $storage->getQuery()
+//            ->condition('type', 'advert')
+
+
+
+
+
         Drupal::logger('rir_notifier')->notice('Sending notifications started');
         $dataAccessor = Drupal::service('rir_notifier.data_accessor');
         $APIKey = $dataAccessor->getMailchimpAPIKey();
