@@ -130,16 +130,21 @@ class DataAccessor
     public function getNotificationSubscribers() {
         try {
             $storage = $this->entityTypeManager->getStorage('webform_submission');
-            $result = $storage->getQuery()->condition('webform_id', 'property_request_form')
-                ->execute();
+//            $result = $storage->getQuery()->condition('webform_id', 'property_request_form')
+//                ->execute();
 
+            $webform = Drupal\webform\Entity\Webform::load('property_request_form');
+            if ($storage instanceof Drupal\webform\WebformSubmissionStorage) {
+                return $storage->loadByEntities($webform);
+            }
 
 //            $storage->loadByProperties()
 //            Drupal\webform\WebformInterface::load('notification_subscription');
 
-            if (isset($result) and count($result) > 0) {
-                return $storage->loadMultiple($result);
-            }
+
+//            if (isset($result) and count($result) > 0) {
+//                return $storage->loadMultiple($result);
+//            }
             return array();
         } catch (InvalidPluginDefinitionException $e) {
             Drupal::logger('rir_notifier')
