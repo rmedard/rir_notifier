@@ -138,7 +138,7 @@ class DataAccessor
             $term = $this->entityTypeManager->getStorage('taxonomy_term')
                 ->loadByProperties(['name' => ucwords($ll)]);
 
-            Drupal::logger('rirrir')->info('term id: ' . $term->id());
+            Drupal::logger('rirrir')->info('term id: ' . json_encode($term));
 
             return array();
             $webform = Drupal\webform\Entity\Webform::load('notification_subscription');
