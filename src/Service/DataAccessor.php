@@ -129,28 +129,36 @@ class DataAccessor
 
     public function getNotificationSubscribers() {
         try {
-            $storage = $this->entityTypeManager->getStorage('webform_submission');
+            $submissionsStorage = $this->entityTypeManager->getStorage('webform_submission');
 //            $result = $storage->getQuery()->condition('webform_id', 'property_request_form')
 //                ->execute();
 
-            $webform = Drupal\webform\Entity\Webform::load('property_request_form');
-            if ($storage instanceof Drupal\webform\WebformSubmissionStorage) {
-                $result = '';
-                foreach ($storage->loadByEntities($webform, null, null) as $key => $submission) {
+            $webform = Drupal\webform\Entity\Webform::load('notification_subscription');
+            if ($submissionsStorage instanceof Drupal\webform\WebformSubmissionStorage) {
+//                $result = '';
+                foreach ($submissionsStorage->loadByEntities($webform, null, null) as $key => $submission) {
                     if ($submission instanceof Drupal\webform\WebformSubmissionInterface) {
-                        $result .= $key . ': ' . $submission->id() . ' | ';
+//                        $result .= $key . ': ' . $submission->getElementData('notif_advert_type') . ', ';
+
+                        $location = $submission->getElementData('notif_property_location');
+
+                        if (isset($location) and !empty($location)) {
+
+                            $possibilities = explode(' ', $location);
+                            foreach ($possibilities as $loc) {
+                                $term = $this->entityTypeManager->getStorage('taxonomy_term')
+                                    ->loadByProperties(['name' => ucwords($loc)]);
+                                if (isset($term) and $term instanceof Drupal\taxonomy\TermInterface) {
+                                    $submission->setElementData('property_location', $term->id());
+                                    $submission->save();
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
-                return $result;
+                return array();
             }
-
-//            $storage->loadByProperties()
-//            Drupal\webform\WebformInterface::load('notification_subscription');
-
-
-//            if (isset($result) and count($result) > 0) {
-//                return $storage->loadMultiple($result);
-//            }
             return array();
         } catch (InvalidPluginDefinitionException $e) {
             Drupal::logger('rir_notifier')
