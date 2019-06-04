@@ -189,7 +189,7 @@ class DataAccessor
 
                         $advertIds = $query->execute();
                         Drupal::logger('ririrrrr')->info('Query: ' . $advertType . '|' . $propertyType . '|' . $location);
-                        Drupal::logger('ririrrrr')->info('ads for : ' . $sid . ' are ' . json_encode($advertIds));
+                        Drupal::logger('ririrrrr')->info('ads for : ' . $sid . ' are ' . implode(',', $advertIds));
 
                         if (isset($advertIds) and !empty($advertIds)) {
                             $subscribers[$sid] = $advertIds;
