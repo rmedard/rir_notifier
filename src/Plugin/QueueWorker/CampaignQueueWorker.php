@@ -15,10 +15,6 @@ use Drupal\Core\Render\Markup;
 use Drupal\node\Entity\Node;
 use Drupal\webform\Entity\WebformSubmission;
 use Drupal\webform\WebformSubmissionInterface;
-use Mailchimp\Mailchimp;
-use Mailchimp\MailchimpAPIException;
-use Mailchimp\MailchimpCampaigns;
-use Mailchimp\MailchimpLists;
 
 /**
  * Class CampaignQueueWorker
