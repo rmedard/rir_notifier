@@ -134,13 +134,15 @@ class DataAccessor
 //                ->execute();
 
 
-            $ll = 'kayonza';
-            $term = $this->entityTypeManager->getStorage('taxonomy_term')
-                ->loadByProperties(['name' => ucwords($ll)]);
-
-            Drupal::logger('rirrir')->info('term id: ' . json_encode($term));
-
-            return array();
+//            $ll = 'kayonza';
+//            $term = $this->entityTypeManager->getStorage('taxonomy_term')
+//                ->loadByProperties(['name' => ucwords($ll)]);
+//
+//            if (isset($term) and $term instanceof Drupal\taxonomy\TermInterface)
+//
+//            Drupal::logger('rirrir')->info('term id: ' . json_encode($term));
+//
+//            return array();
             $webform = Drupal\webform\Entity\Webform::load('notification_subscription');
             if ($submissionsStorage instanceof Drupal\webform\WebformSubmissionStorage) {
 //                $result = '';
@@ -156,8 +158,8 @@ class DataAccessor
                             foreach ($possibilities as $loc) {
                                 $term = $this->entityTypeManager->getStorage('taxonomy_term')
                                     ->loadByProperties(['name' => ucwords($loc)]);
-                                if (isset($term) and $term instanceof Drupal\taxonomy\TermInterface) {
-                                    $submission->setElementData('property_location', $term->id());
+                                if (isset($term) and !empty($term)) {
+                                    $submission->setElementData('property_location', key($term));
                                     $submission->save();
                                     break;
                                 }
