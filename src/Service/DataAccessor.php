@@ -133,16 +133,6 @@ class DataAccessor
 //            $result = $storage->getQuery()->condition('webform_id', 'property_request_form')
 //                ->execute();
 
-
-//            $ll = 'kayonza';
-//            $term = $this->entityTypeManager->getStorage('taxonomy_term')
-//                ->loadByProperties(['name' => ucwords($ll)]);
-//
-//            if (isset($term) and $term instanceof Drupal\taxonomy\TermInterface)
-//
-//            Drupal::logger('rirrir')->info('term id: ' . json_encode($term));
-//
-//            return array();
             $webform = Drupal\webform\Entity\Webform::load('notification_subscription');
             if ($submissionsStorage instanceof Drupal\webform\WebformSubmissionStorage) {
 //                $result = '';
@@ -156,9 +146,10 @@ class DataAccessor
 
                             $possibilities = explode(' ', $location);
                             foreach ($possibilities as $loc) {
+                                if (strtolower($loc) === 'kigali') $loc = 'Kigali City';
                                 $term = $this->entityTypeManager->getStorage('taxonomy_term')
                                     ->loadByProperties(['name' => ucwords($loc)]);
-                                if (isset($term) and !empty($term)) {
+                                if (isset($term) and !empty($term) and empty($submission->getElementData('property_location'))) {
                                     $submission->setElementData('property_location', key($term));
                                     $submission->save();
                                     break;
