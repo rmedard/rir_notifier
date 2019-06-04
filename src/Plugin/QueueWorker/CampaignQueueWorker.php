@@ -80,10 +80,10 @@ class CampaignQueueWorker extends QueueWorkerBase
 
                 if (intval($result['result']) !== 1) {
                     $message = t('There was a problem sending campaign email to @email', ['@email' => $to]);
-                    Drupal::logger('rir_interface')->error($message);
+                    Drupal::logger('rir_notifier')->error($message);
                 } else {
                     $message = t('An campaign email has been sent to @email.', ['@email' => $to]);
-                    Drupal::logger('rir_interface')->info($message);
+                    Drupal::logger('rir_notifier')->info($message);
                 }
             }
         }
