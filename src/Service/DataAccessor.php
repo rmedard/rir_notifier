@@ -176,10 +176,12 @@ class DataAccessor
                         }
 
                         if (isset($location)) {
+                            $locations = array();
                             $term = Term::load(intval($location));
+                            array_push($locations, $term->id());
+
                             $termStorage = $this->entityTypeManager->getStorage('taxonomy_term');
                             if ($termStorage instanceof TermStorageInterface) {
-                                $locations = array();
                                 foreach ($termStorage->loadChildren($term->id()) as $locationTerm) {
                                     array_push($locations, $locationTerm->id());
                                 }
