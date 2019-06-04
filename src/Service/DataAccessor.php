@@ -134,7 +134,7 @@ class DataAccessor
     public function getComputeCampaigns() {
         try {
             $submissionsStorage = $this->entityTypeManager->getStorage('webform_submission');
-            $webform = Webform::load('notification_subscription');
+            $subscriptionWebform = Webform::load('notification_subscription');
             if ($submissionsStorage instanceof WebformSubmissionStorage) {
 
                 $start_time = strtotime('-1 days 00:00:00');
@@ -142,7 +142,7 @@ class DataAccessor
                 $nodeStorage = $this->entityTypeManager->getStorage('node');
 
                 $subscribers = array();
-                foreach ($submissionsStorage->loadByEntities($webform, null, null) as $sid => $submission) {
+                foreach ($submissionsStorage->loadByEntities($subscriptionWebform, null, null) as $sid => $submission) {
                     if ($submission instanceof WebformSubmissionInterface) {
 
                         $advertType = $submission->getElementData('notif_advert_type');
