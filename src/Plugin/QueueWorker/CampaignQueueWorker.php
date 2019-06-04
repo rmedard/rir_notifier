@@ -60,32 +60,37 @@ class CampaignQueueWorker extends QueueWorkerBase
     public function processItem($data)
     {
         $dataAccessor = Drupal::service('rir_notifier.data_accessor');
-        $subs = $dataAccessor->getNotificationSubscribers();
+        $campaigns = $dataAccessor->getComputeCampaigns();
 
-        $mailManager = Drupal::service('plugin.manager.mail');
-        $module = 'rir_interface';
-        $key = 'send_campaign_email';
-        $reply = Drupal::config('system.site')->get('mail');
+        if (!empty($campaigns)) {
+            $mailManager = Drupal::service('plugin.manager.mail');
+            $module = 'rir_interface';
+            $key = 'send_campaign_email';
+            $reply = Drupal::config('system.site')->get('mail');
 
-        foreach ($subs as $sid => $jobIds) {
-            $submission = WebformSubmission::load($sid);
-            $adverts = Node::loadMultiple($jobIds);
-            if ($submission instanceof WebformSubmissionInterface) {
-                $to = $submission->getElementData('notif_firstname') . '<' . $submission->getElementData('notif_email') . '>';
-                $params['message'] = Markup::create(getCampaignHtmlContent($sid, $submission->getElementData('notif_firstname'), $adverts));
+            foreach ($campaigns as $sid => $jobIds) {
+                $submission = WebformSubmission::load($sid);
+                $adverts = Node::loadMultiple($jobIds);
+                if ($submission instanceof WebformSubmissionInterface) {
+                    $to = $submission->getElementData('notif_firstname') . '<' . $submission->getElementData('notif_email') . '>';
+                    $params['message'] = Markup::create(getCampaignHtmlContent($sid, $submission->getElementData('notif_firstname'), $adverts));
 
-                $langcode = Drupal::currentUser()->getPreferredLangcode();
-                $send = TRUE;
-                $result = $mailManager->mail($module, $key, $to, $langcode, $params, $reply, $send);
+                    $langcode = Drupal::currentUser()->getPreferredLangcode();
+                    $send = TRUE;
+                    $result = $mailManager->mail($module, $key, $to, $langcode, $params, $reply, $send);
 
-                if (intval($result['result']) !== 1) {
-                    $message = t('There was a problem sending campaign email to @email', ['@email' => $to]);
-                    Drupal::logger('rir_notifier')->error($message);
-                } else {
-                    $message = t('An campaign email has been sent to @email.', ['@email' => $to]);
-                    Drupal::logger('rir_notifier')->info($message);
+                    if (intval($result['result']) !== 1) {
+                        $message = t('There was a problem sending campaign email to @email', ['@email' => $to]);
+                        Drupal::logger('rir_notifier')->error($message);
+                    } else {
+                        $message = t('An campaign email has been sent to @email.', ['@email' => $to]);
+                        Drupal::logger('rir_notifier')->info($message);
+                    }
                 }
             }
+        } else {
+            $message = t('No campaigns available to distribute.');
+            Drupal::logger('rir_notifier')->info($message);
         }
     }
 }

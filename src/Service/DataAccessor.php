@@ -131,7 +131,7 @@ class DataAccessor
         }
     }
 
-    public function getNotificationSubscribers() {
+    public function getComputeCampaigns() {
         try {
             $submissionsStorage = $this->entityTypeManager->getStorage('webform_submission');
             $webform = Webform::load('notification_subscription');
