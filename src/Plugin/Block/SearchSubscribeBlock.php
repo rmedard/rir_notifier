@@ -12,7 +12,7 @@ namespace Drupal\rir_notifier\Plugin\Block;
 use Drupal\Core\Block\BlockBase;
 
 /**
- * Class SearchSibscribeBlock
+ * Class SearchSubscribeBlock
  *
  * @package Drupal\rir_notifier\Plugin\Block
  * @Block(
