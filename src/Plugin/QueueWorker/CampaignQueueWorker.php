@@ -11,7 +11,10 @@ namespace Drupal\rir_notifier\Plugin\QueueWorker;
 
 use Drupal;
 use Drupal\Core\Queue\QueueWorkerBase;
+use Drupal\Core\Render\Markup;
 use Drupal\node\Entity\Node;
+use Drupal\webform\Entity\WebformSubmission;
+use Drupal\webform\WebformSubmissionInterface;
 use Mailchimp\Mailchimp;
 use Mailchimp\MailchimpAPIException;
 use Mailchimp\MailchimpCampaigns;
@@ -27,7 +30,8 @@ use Mailchimp\MailchimpLists;
  *  cron = {"time" = 90}
  * )
  */
-class CampaignQueueWorker extends QueueWorkerBase {
+class CampaignQueueWorker extends QueueWorkerBase
+{
 
     /**
      * Works on a single queue item.
@@ -57,14 +61,30 @@ class CampaignQueueWorker extends QueueWorkerBase {
      *
      * @see \Drupal\Core\Cron::processQueues()
      */
-    public function processItem($data) {
+    public function processItem($data)
+    {
+        $dataAccessor = Drupal::service('rir_notifier.data_accessor');
+        $subs = $dataAccessor->getNotificationSubscribers();
+
+        $mailManager = Drupal::service('plugin.manager.mail');
+        $module = 'rir_interface';
+        $key = 'send_campaign_email';
+        $reply = Drupal::config('system.site')->get('mail');
+
+        foreach ($subs as $sid => $jobIds) {
+            $submission = WebformSubmission::load($sid);
+            $adverts = Node::loadMultiple($jobIds);
+            if ($submission instanceof WebformSubmissionInterface) {
+                $to = $submission->getElementData('notif_email');
+                $params['subscriber_name'] = $submission->getElementData('notif_firstname');
+                $params['message'] = Markup::create(getCampaignHtmlContent($sid, $submission->getElementData('notif_firstname'), $adverts));
+            }
+        }
+
 
 //        $storage = $this->entityTypeManager->getStorage('node');
 //        $query = $storage->getQuery()
 //            ->condition('type', 'advert')
-
-
-
 
 
 //        Drupal::logger('rir_notifier')->notice('Sending notifications started');

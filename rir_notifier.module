@@ -5,7 +5,6 @@
  */
 
 use Drupal\Core\Render\Markup;
-use Drupal\webform\WebformSubmissionInterface;
 
 /**
  * Implements hook_page_attachments().
@@ -32,31 +31,6 @@ function rir_notifier_theme($existing, $type, $theme, $path)
     ];
 }
 
-/**
- * Implements hook_ENTITY_TYPE_insert().
- */
-function rir_notifier_webform_submission_insert(WebformSubmissionInterface $entity)
-{
-    if ($entity->getWebform()->id() == 'notification_subscription') {
-        $location = $entity->getElementData('notif_property_location');
-        $advertType = $entity->getElementData('notif_advert_type');
-        $propertyType = $entity->getElementData('notif_property_type');
-        $email = $entity->getElementData('notif_email');
-        $firstName = $entity->getElementData('notif_firstname');
-        $lastName = $entity->getElementData('notif_lastname');
-        $referenceNbr = getRequestCategoryReference($location, $advertType, $propertyType);
-
-        $alertsQueueWorker = Drupal::queue('alerts_processor');
-        $data = (object)[
-            'email' => $email,
-            'first_name' => $firstName,
-            'last_name' => $lastName,
-            'reference' => strtolower($referenceNbr),
-        ];
-        $alertsQueueWorker->createItem($data);
-    }
-}
-
 function getRequestCategoryReference($location, $advertType, $propertyType)
 {
     if (empty($location)) {
@@ -76,32 +50,18 @@ function getRequestCategoryReference($location, $advertType, $propertyType)
  */
 function rir_notifier_cron()
 {
-
-    $dataAccessor = Drupal::service('rir_notifier.data_accessor');
-    $subs = $dataAccessor->getNotificationSubscribers();
-
-    Drupal::logger('ririrrrr')->info('subs: ' . json_encode($subs));
-
     $request_time = Drupal::time()->getRequestTime();
     $day = date('dmY', $request_time);
     $hour = date('H', $request_time);
-//    $last_notifications_sent = Drupal::state()->get('notifications.last.sent');
-//    if (isset($last_notifications_sent)) {
-//        if (date('dmY', $last_notifications_sent) != $day) {
-//            $campaign_processor = Drupal::queue('campaigns_processor');
-//            $campaign_processor->createItem(new stdClass());
-//            Drupal::state()->set('notifications.last.sent', $request_time);
-//            Drupal::logger('rir_notifier')
-//                ->notice('Sending notifications scheduled!');
-//        }
-//    } else {
-//        if (intval($hour) < 6) {
-//            Drupal::queue('campaigns_processor')->createItem(new stdClass());
-//            Drupal::state()->set('notifications.last.sent', $request_time);
-//            Drupal::logger('rir_notifier')
-//                ->notice('First sending notifications scheduled!');
-//        }
-//    }
+    $last_notifications_sent = Drupal::state()->get('notifications.last.sent');
+    if ((isset($last_notifications_sent) and date('dmY', $last_notifications_sent) != $day) or
+        (!isset($last_notifications_sent) and intval($hour) < 6)) {
+
+        $campaign_processor = Drupal::queue('campaigns_processor');
+        $campaign_processor->createItem(new StdClass());
+        Drupal::state()->set('notifications.last.sent', $request_time);
+        Drupal::logger('rir_notifier')->notice('Sending notifications scheduled!');
+    }
 
     $last_expirations_sent = Drupal::state()->get('expirations.last.sent');
     if (!isset($last_expirations_sent)) {
@@ -140,13 +100,8 @@ function rir_notifier_cron()
     }
 }
 
-function getCampaignHtmlContent($reference)
+function getCampaignHtmlContent($sid, $name, $adverts)
 {
-    $dataAccessor = Drupal::service('rir_notifier.data_accessor');
-    $keys = explode('-', $reference);
-    $location = $keys[0];
-    $advertType = $keys[1];
-    $propertyType = $keys[2];
     $twig_service = Drupal::service('twig');
     $module_handler = Drupal::service('module_handler');
     $cdn_enabled = 0;
@@ -155,10 +110,12 @@ function getCampaignHtmlContent($reference)
     }
 
     $variables = [
-        'adverts' => $dataAccessor->getDailyAdverts($location, $advertType, $propertyType),
+        'sid' => $sid,
+        'recipient' => $name,
+        'adverts' => $adverts,
         'cdn_enabled' => $cdn_enabled
     ];
-    return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/rir-campaign.html.twig')
+    return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/hir-campaign-adverts.html.twig')
         ->render($variables);
 }
 
@@ -167,7 +124,7 @@ function getExpiringAdvertsEmailContent($expiring_adverts, $date)
     $counted_adverts = array();
     foreach ($expiring_adverts as $key => $expiring_advert) {
         $node_view_stats = Drupal::service('statistics.storage.node')->fetchView($expiring_advert->id());
-        if ($node_view_stats !== FALSE){
+        if ($node_view_stats !== FALSE) {
             $counted_adverts[$key . '_' . $node_view_stats->getTotalCount()] = $expiring_advert;
         } else {
             $counted_adverts[$key . '_' . 0] = $expiring_advert;

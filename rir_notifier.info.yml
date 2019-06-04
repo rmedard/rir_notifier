@@ -7,7 +7,6 @@ type: module
 core: 8.x
 
 dependencies:
-  - mailchimp:mailchimp
   - webform:webform
   - twig_tweak:twig_tweak
   - rir_interface:rir_interface
