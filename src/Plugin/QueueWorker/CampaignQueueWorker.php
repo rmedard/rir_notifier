@@ -11,10 +11,13 @@ namespace Drupal\rir_notifier\Plugin\QueueWorker;
 
 use Drupal;
 use Drupal\Core\Queue\QueueWorkerBase;
+use Drupal\Core\Queue\RequeueException;
+use Drupal\Core\Queue\SuspendQueueException;
 use Drupal\Core\Render\Markup;
 use Drupal\node\Entity\Node;
 use Drupal\webform\Entity\WebformSubmission;
 use Drupal\webform\WebformSubmissionInterface;
+use Exception;
 
 /**
  * Class CampaignQueueWorker
@@ -37,15 +40,15 @@ class CampaignQueueWorker extends QueueWorkerBase
      *   \Drupal\Core\Queue\QueueInterface::createItem() when the item was
      *   queued.
      *
-     * @throws \Drupal\Core\Queue\RequeueException
+     * @throws RequeueException
      *   Processing is not yet finished. This will allow another process to
      *   claim the item immediately.
-     * @throws \Exception
+     * @throws Exception
      *   A QueueWorker plugin may throw an exception to indicate there was a
      *   problem. The cron process will log the exception, and leave the item
      *   in
      *   the queue to be processed again later.
-     * @throws \Drupal\Core\Queue\SuspendQueueException
+     * @throws SuspendQueueException
      *   More specifically, a SuspendQueueException should be thrown when a
      *   QueueWorker plugin is aware that the problem will affect all
      *   subsequent
