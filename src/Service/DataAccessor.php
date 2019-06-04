@@ -150,15 +150,15 @@ class DataAccessor
                         $propertyType = $submission->getElementData('notif_property_type');
                         $location = $submission->getElementData('property_location');
 
-                        if (!isset($advertType) || strtolower($advertType) === 'all') {
+                        if (!isset($advertType) or strtolower($advertType) == 'all') {
                             $advertType = null;
                         }
 
-                        if (!isset($propertyType) || strtolower($propertyType) === 'all') {
+                        if (!isset($propertyType) or strtolower($propertyType) == 'all') {
                             $propertyType = null;
                         }
 
-                        if (!isset($location) || strtolower($location) === '0') {
+                        if (!isset($location) or strtolower($location) == '0') {
                             $location = null;
                         }
 
