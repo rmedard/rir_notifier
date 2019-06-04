@@ -188,7 +188,7 @@ class DataAccessor
                         }
 
                         $advertIds = $query->execute();
-
+                        Drupal::logger('ririrrrr')->info('Query: ' . $advertType . '|' . $propertyType . '|' . $location);
                         Drupal::logger('ririrrrr')->info('ads for : ' . $sid . ' are ' . json_encode($advertIds));
 
                         if (isset($advertIds) and !empty($advertIds)) {
