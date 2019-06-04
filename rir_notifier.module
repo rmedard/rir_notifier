@@ -78,7 +78,9 @@ function rir_notifier_cron()
 {
 
     $dataAccessor = Drupal::service('rir_notifier.data_accessor');
-    $dataAccessor->getNotificationSubscribers();
+    $subs = $dataAccessor->getNotificationSubscribers();
+
+    Drupal::logger('ririrrrr')->info('subs: ' . json_encode($subs));
 
     $request_time = Drupal::time()->getRequestTime();
     $day = date('dmY', $request_time);
