@@ -161,6 +161,7 @@ class DataAccessor
                             $location = null;
                         }
 
+                        // TODO Take this out of the loop, load entities and filter them
                         $query = $nodeStorage->getQuery()
                             ->condition('type', 'advert')
                             ->condition('status', Node::PUBLISHED)
