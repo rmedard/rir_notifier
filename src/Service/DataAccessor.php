@@ -146,6 +146,8 @@ class DataAccessor
 
                             $possibilities = explode(' ', $location);
                             foreach ($possibilities as $loc) {
+                                $loc = trim($loc);
+                                if (substr($loc, -1) === ',' or substr($loc, -1) === ';') $loc = substr($loc, 0, strlen($loc) - 1);
                                 if (strtolower($loc) === 'kigali') $loc = 'Kigali City';
                                 $term = $this->entityTypeManager->getStorage('taxonomy_term')
                                     ->loadByProperties(['name' => ucwords($loc)]);
