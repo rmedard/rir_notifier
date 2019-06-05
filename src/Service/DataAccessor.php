@@ -58,18 +58,16 @@ class DataAccessor
 
     function getDailyAdverts($location = NULL, $advert = NULL, $property = NULL)
     {
-        $adverts_ids = $this->getQuery($location, $advert, $property)->execute();
-        $storage = $this->entityTypeManager->getStorage('node');
-        return $storage->loadMultiple($adverts_ids);
-    }
-
-    /**
-     * Get Mailchimp API Key from Mailchimp module configuration
-     * @return array|mixed|null
-     */
-    function getMailchimpAPIKey()
-    {
-        return Drupal::config('mailchimp.settings')->get('api_key');
+        try {
+            $adverts_ids = $this->getQuery($location, $advert, $property)->execute();
+            $storage = $this->entityTypeManager->getStorage('node');
+            return $storage->loadMultiple($adverts_ids);
+        } catch (InvalidPluginDefinitionException $e) {
+            Drupal::logger('rir_notifier')->error("GetQuery failed: " . $e->getMessage());
+        } catch (PluginNotFoundException $e) {
+            Drupal::logger('rir_notifier')->error("GetQuery failed: " . $e->getMessage());
+        }
+        return array();
     }
 
     private function getQuery($location, $advert, $property)
@@ -99,14 +97,12 @@ class DataAccessor
             if (isset($property) and !empty($property) and $property !== 'pro') {
                 $query->condition('field_advert_property_type', $property);
             }
-            return $query;
         } catch (InvalidPluginDefinitionException $e) {
             Drupal::logger('rir_notifier')->error("GetQuery failed: " . $e->getMessage());
-            return $query;
         } catch (PluginNotFoundException $e) {
             Drupal::logger('rir_notifier')->error("GetQuery failed: " . $e->getMessage());
-            return $query;
         }
+        return $query;
     }
 
     public function getExpiringAdvertsByDate($date)
@@ -122,27 +118,31 @@ class DataAccessor
                 return $storage->loadMultiple($expiring_adverts_ids);
             } else {
                 Drupal::logger('rir_notifier')->debug('No expiring adverts on date: ' . $date);
-                return array();
             }
         } catch (InvalidPluginDefinitionException $e) {
             Drupal::logger('rir_notifier')
                 ->error('Runtime error code: ' . $e->getCode() . '. Error message: ' . $e->getMessage());
-            return array();
+        } catch (PluginNotFoundException $e) {
+            Drupal::logger('rir_notifier')
+                ->error('Plugin not found: ' . $e->getCode() . '. Error message: ' . $e->getMessage());
         }
+        return array();
     }
 
-    public function getComputeCampaigns() {
+    public function getComputeCampaigns()
+    {
         try {
             $submissionsStorage = $this->entityTypeManager->getStorage('webform_submission');
-            $subscriptionWebform = Webform::load('notification_subscription');
+//            $subscriptionWebform = Webform::load('notification_subscription');
             if ($submissionsStorage instanceof WebformSubmissionStorage) {
 
-                $start_time = strtotime('-1 days 00:00:00');
+                $start_time = strtotime('-400 days 00:00:00');
                 $end_time = strtotime('-1 days 23:59:59');
                 $nodeStorage = $this->entityTypeManager->getStorage('node');
 
                 $subscribers = array();
-                foreach ($submissionsStorage->loadByEntities($subscriptionWebform, null, null) as $sid => $submission) {
+                $submissions = $submissionsStorage->loadByProperties(array('webform_id' => 'notification_subscription', 'subscription_active' => 1));
+                foreach ($submissions as $sid => $submission) {
                     if ($submission instanceof WebformSubmissionInterface) {
 
                         $advertType = $submission->getElementData('notif_advert_type');
