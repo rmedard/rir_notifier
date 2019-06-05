@@ -54,6 +54,12 @@ class CampaignUnsubscriptionForm extends FormBase
             '#description' => $this->t('Enter the email address that has to be unsubscribed.'),
             '#required' => TRUE,
         ];
+        $form['actions']['#type'] = 'actions';
+        $form['actions']['submit'] = array(
+            '#type' => 'submit',
+            '#value' => $this->t('Unsubscribe'),
+            '#button_type' => 'primary',
+        );
         return $form;
     }
 
