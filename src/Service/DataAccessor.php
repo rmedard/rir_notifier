@@ -133,17 +133,16 @@ class DataAccessor
     {
         try {
             $submissionsStorage = $this->entityTypeManager->getStorage('webform_submission');
-//            $subscriptionWebform = Webform::load('notification_subscription');
+            $subscriptionWebform = Webform::load('notification_subscription');
             if ($submissionsStorage instanceof WebformSubmissionStorage) {
 
-                $start_time = strtotime('-400 days 00:00:00');
+                $start_time = strtotime('-1 days 00:00:00');
                 $end_time = strtotime('-1 days 23:59:59');
                 $nodeStorage = $this->entityTypeManager->getStorage('node');
 
                 $subscribers = array();
-                $submissions = $submissionsStorage->loadByProperties(array('webform_id' => 'notification_subscription',  'data' => array('subscription_active' => '1')));
-                foreach ($submissions as $sid => $submission) {
-                    if ($submission instanceof WebformSubmissionInterface) {
+                foreach ($submissionsStorage->loadByEntities($subscriptionWebform, null, null) as $sid => $submission) {
+                    if ($submission instanceof WebformSubmissionInterface and $submission->getElementData('subscription_active') == '1') {
 
                         $advertType = $submission->getElementData('notif_advert_type');
                         $propertyType = $submission->getElementData('notif_property_type');
