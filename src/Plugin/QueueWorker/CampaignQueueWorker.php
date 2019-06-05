@@ -78,7 +78,7 @@ class CampaignQueueWorker extends QueueWorkerBase
                     $to = $submission->getElementData('notif_firstname') . '<' . $submission->getElementData('notif_email') . '>';
                     $params['message'] = Markup::create(getCampaignHtmlContent($sid, $submission->getElementData('notif_firstname'), $adverts));
 
-                    $langcode = Drupal::currentUser()->getPreferredLangcode();
+                    $langcode = Drupal::languageManager()->getDefaultLanguage()->getId();
                     $send = TRUE;
                     $result = $mailManager->mail($module, $key, $to, $langcode, $params, $reply, $send);
 
@@ -87,7 +87,7 @@ class CampaignQueueWorker extends QueueWorkerBase
                         Drupal::logger('rir_notifier')->error($message);
                     } else {
                         $message = t('An campaign email has been sent to @email.', ['@email' => $to]);
-                        Drupal::logger('rir_notifier')->info($message. ' | ' . $params['message']);
+                        Drupal::logger('rir_notifier')->info($message);
                     }
                 }
             }
