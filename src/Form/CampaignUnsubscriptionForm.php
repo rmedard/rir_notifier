@@ -43,7 +43,7 @@ class CampaignUnsubscriptionForm extends FormBase
      * @return array
      *   The form structure.
      */
-    public function buildForm(array $form, FormStateInterface $form_state, WebformSubmissionInterface $sid = null)
+    public function buildForm(array $form, FormStateInterface $form_state, $sid = null)
     {
         $form['description'] = [
             '#type' => 'item',
@@ -61,7 +61,7 @@ class CampaignUnsubscriptionForm extends FormBase
             '#value' => $this->t('Unsubscribe'),
             '#button_type' => 'primary',
         );
-        Drupal::logger('ffff')->info('Captured: ' . $sid->id());
+        Drupal::logger('ffff')->info('Captured: ' . $sid);
         return $form;
     }
 
