@@ -73,7 +73,7 @@ class CampaignUnsubscriptionForm extends FormBase
      */
     public function submitForm(array &$form, FormStateInterface $form_state)
     {
-        parent::submitForm($form, $form_state);
+//        parent::submitForm($form, $form_state);
     }
 
     function validateForm(array &$form, FormStateInterface $form_state)
