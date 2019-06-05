@@ -8,7 +8,6 @@ use Drupal;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\webform\Entity\WebformSubmission;
-use Drupal\webform\WebformSubmissionInterface;
 
 /**
  * Class CampaignUnsubscriptionForm
@@ -16,6 +15,8 @@ use Drupal\webform\WebformSubmissionInterface;
  */
 class CampaignUnsubscriptionForm extends FormBase
 {
+
+    protected $submissionId;
 
     /**
      * Returns a unique string identifying the form.
@@ -61,7 +62,7 @@ class CampaignUnsubscriptionForm extends FormBase
             '#value' => $this->t('Unsubscribe'),
             '#button_type' => 'primary',
         );
-        Drupal::logger('ffff')->info('Captured: ' . $sid);
+        $this->submissionId = $sid;
         return $form;
     }
 
@@ -85,20 +86,14 @@ class CampaignUnsubscriptionForm extends FormBase
         $errorFound = false;
         $email = $form_state->getValue('email');
 
-        $queryString = Drupal::request()->getQueryString();
-        if (isset($queryString)) {
-            $params = explode('&', $queryString);
-            $sid = intval(explode('=', $params[0])[1]);
-            if ($sid != 0) {
-                $submission = WebformSubmission::load($sid);
-                if ($submission->getElementData('notif_email') == $email) {
-                    $submission->setElementData('subscription_active', '0');
-                    $submission->save();
-                    $form_state->setRedirect('<front>');
-                    $messenger->addMessage(t('Successfully unsubscribed!'), $messenger::TYPE_STATUS, FALSE);
-                } else {
-                    $errorFound = true;
-                }
+        $sid = intval($this->submissionId);
+        if ($sid != 0) {
+            $submission = WebformSubmission::load($sid);
+            if ($submission->getElementData('notif_email') == $email) {
+                $submission->setElementData('subscription_active', '0');
+                $submission->save();
+                $form_state->setRedirect('<front>');
+                $messenger->addMessage(t('Successfully unsubscribed!'), $messenger::TYPE_STATUS, FALSE);
             } else {
                 $errorFound = true;
             }
