@@ -87,7 +87,7 @@ class CampaignQueueWorker extends QueueWorkerBase
                         Drupal::logger('rir_notifier')->error($message);
                     } else {
                         $message = t('An campaign email has been sent to @email.', ['@email' => $to]);
-                        Drupal::logger('rir_notifier')->info($message);
+                        Drupal::logger('rir_notifier')->info($message. ' | ' . $params['message']);
                     }
                 }
             }
