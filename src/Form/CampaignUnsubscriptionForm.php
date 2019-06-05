@@ -8,6 +8,7 @@ use Drupal;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\webform\Entity\WebformSubmission;
+use Drupal\webform\WebformSubmissionInterface;
 
 /**
  * Class CampaignUnsubscriptionForm
@@ -42,7 +43,7 @@ class CampaignUnsubscriptionForm extends FormBase
      * @return array
      *   The form structure.
      */
-    public function buildForm(array $form, FormStateInterface $form_state)
+    public function buildForm(array $form, FormStateInterface $form_state, WebformSubmissionInterface $sid = null)
     {
         $form['description'] = [
             '#type' => 'item',
@@ -60,6 +61,7 @@ class CampaignUnsubscriptionForm extends FormBase
             '#value' => $this->t('Unsubscribe'),
             '#button_type' => 'primary',
         );
+        Drupal::logger('ffff')->info('Captured: ' . $sid->id());
         return $form;
     }
 
@@ -73,7 +75,6 @@ class CampaignUnsubscriptionForm extends FormBase
      */
     public function submitForm(array &$form, FormStateInterface $form_state)
     {
-//        parent::submitForm($form, $form_state);
     }
 
     function validateForm(array &$form, FormStateInterface $form_state)

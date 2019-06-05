@@ -7,9 +7,12 @@ rir_notifier.admin_settings:
     _permission: 'administer site configuration'
 
 rir_notifier.campaing_unsubscription:
-  path: '/unsubscribe'
+  path: '/unsubscribe/{sid}'
   defaults:
     _form: '\Drupal\rir_notifier\Form\CampaignUnsubscriptionForm'
-    _title: 'Campaign unsubscription'
+    _title: 'Unsubscription'
+  options:
+    parameters:
+      sid: entity:webform_submission
   requirements:
     _permission: 'access content'
