@@ -54,7 +54,7 @@ class CampaignUnsubscriptionForm extends FormBase
             '#description' => $this->t('Enter the email address that has to be unsubscribed.'),
             '#required' => TRUE,
         ];
-        return parent::buildForm($form, $form_state);
+        return $form;
     }
 
     /**
