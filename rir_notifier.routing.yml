@@ -11,8 +11,5 @@ rir_notifier.campaing_unsubscription:
   defaults:
     _form: '\Drupal\rir_notifier\Form\CampaignUnsubscriptionForm'
     _title: 'Unsubscription'
-  options:
-    parameters:
-      sid: entity:webform_submission
   requirements:
     _permission: 'access content'
