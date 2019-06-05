@@ -141,7 +141,7 @@ class DataAccessor
                 $nodeStorage = $this->entityTypeManager->getStorage('node');
 
                 $subscribers = array();
-                $submissions = $submissionsStorage->loadByProperties(array('webform_id' => 'notification_subscription', 'data.subscription_active' => '1'));
+                $submissions = $submissionsStorage->loadByProperties(array('webform_id' => 'notification_subscription',  'data' => array('subscription_active' => '1')));
                 foreach ($submissions as $sid => $submission) {
                     if ($submission instanceof WebformSubmissionInterface) {
 
