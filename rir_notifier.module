@@ -60,7 +60,7 @@ function rir_notifier_cron()
 
     $last_notifications_sent = Drupal::state()->get('notifications.last.sent');
     if (
-        (isset($last_notifications_sent) and date('dmY', $last_notifications_sent) == $day) or
+        (isset($last_notifications_sent) and date('dmY', $last_notifications_sent) != $day) or
         (!isset($last_notifications_sent) and intval($hour) < 6)
     ) {
         $campaign_processor = Drupal::queue('campaigns_processor');
