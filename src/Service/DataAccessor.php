@@ -129,6 +129,17 @@ class DataAccessor
         return array();
     }
 
+
+    public function activateAllSubscribers() {
+        $submissionsStorage = $this->entityTypeManager->getStorage('webform_submission');
+        $subscriptionWebform = Webform::load('notification_subscription');
+        foreach ($submissionsStorage->loadByEntities($subscriptionWebform, null, null) as $sid => $submission) {
+            if ($submission instanceof WebformSubmissionInterface and $submission->getElementData('subscription_active') != '1') {
+                $submission->setElementData('subscription_active', '1')->save();
+            }
+        }
+    }
+
     public function getComputeCampaigns()
     {
         try {
