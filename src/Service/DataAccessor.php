@@ -137,13 +137,13 @@ class DataAccessor
             if ($submissionsStorage instanceof WebformSubmissionStorage) {
 
                 $start_time = strtotime('-1 days 00:00:00');
-//                $end_time = strtotime('-1 days 23:59:59');
-                $end_time = strtotime('now');
+                $end_time = strtotime('-1 days 23:59:59');
                 $nodeStorage = $this->entityTypeManager->getStorage('node');
 
                 $subscribers = array();
                 foreach ($submissionsStorage->loadByEntities($subscriptionWebform, null, null) as $sid => $submission) {
-                    if ($submission instanceof WebformSubmissionInterface and $submission->getElementData('subscription_active') == '1' and $submission->getElementData('notif_email') == 'medard.rebero@gmail.com') {
+                    if ($submission instanceof WebformSubmissionInterface and
+                        $submission->getElementData('subscription_active') == '1') {
 
                         $advertType = $submission->getElementData('notif_advert_type');
                         $propertyType = $submission->getElementData('notif_property_type');
