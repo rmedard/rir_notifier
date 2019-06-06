@@ -71,9 +71,10 @@ class CampaignQueueWorker extends QueueWorkerBase
             $key = 'send_campaign_email';
             $reply = Drupal::config('system.site')->get('mail');
 
-            foreach ($campaigns as $sid => $jobIds) {
+            foreach ($campaigns as $sid => $advertIds) {
                 $submission = WebformSubmission::load($sid);
-                $adverts = Node::loadMultiple($jobIds);
+//                $adverts = Node::loadMultiple($jobIds);
+                $adverts = Drupal\Core\Entity\ContentEntityInterface::loadMultiple($advertIds);
                 if ($submission instanceof WebformSubmissionInterface) {
                     $to = $submission->getElementData('notif_firstname') . '<' . $submission->getElementData('notif_email') . '>';
                     $params['message'] = Markup::create(getCampaignHtmlContent($sid, $submission->getElementData('notif_firstname'), $adverts));
@@ -87,7 +88,7 @@ class CampaignQueueWorker extends QueueWorkerBase
                         Drupal::logger('rir_notifier')->error($message);
                     } else {
                         $message = t('An campaign email has been sent to @email with advertIds: @ids',
-                            ['@email' => $to, '@ids' => implode('|', $jobIds)]);
+                            ['@email' => $to, '@ids' => implode('|', $advertIds)]);
                         Drupal::logger('rir_notifier')->info($message);
                     }
                 }
