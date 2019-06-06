@@ -5,6 +5,7 @@ namespace Drupal\rir_notifier\Form;
 
 
 use Drupal;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\webform\Entity\WebformSubmission;
@@ -88,14 +89,19 @@ class CampaignUnsubscriptionForm extends FormBase
 
         $sid = intval($this->submissionId);
         if ($sid != 0) {
-            $submission = WebformSubmission::load($sid);
-            if ($submission->getElementData('notif_email') == $email) {
-                $submission->setElementData('subscription_active', '0');
-                $submission->save();
-                $form_state->setRedirect('<front>');
-                $messenger->addMessage(t('Successfully unsubscribed!'), $messenger::TYPE_STATUS, FALSE);
-            } else {
-                $errorFound = true;
+            try {
+                $submission = WebformSubmission::load($sid);
+                if ($submission->getElementData('notif_email') == $email) {
+                    $submission->setElementData('subscription_active', '0');
+                    $submission->save();
+                    $form_state->setRedirect('<front>');
+                    $messenger->addMessage(t('Successfully unsubscribed!'), $messenger::TYPE_STATUS, FALSE);
+                } else {
+                    $errorFound = true;
+                }
+            } catch (EntityStorageException $ex) {
+                Drupal::logger('rir_notifier')->error('Saving unsubscription failed for sid: ' . $sid);
+                $messenger->addMessage(t('Something wrong! Contact administrator.'), $messenger::TYPE_ERROR, FALSE);
             }
         } else {
             $errorFound = true;
@@ -103,7 +109,6 @@ class CampaignUnsubscriptionForm extends FormBase
 
         if ($errorFound) {
             $messenger->addMessage(t('Sorry, subscription not found!'), $messenger::TYPE_ERROR, FALSE);
-//        $form_state->setErrorByName('email', t('Sorry, subscription not found!'));
         }
     }
 }
