@@ -85,10 +85,6 @@
             </td>
         </tr>
         {% for advert in adverts %}
-            {% if advert.field_advert_type.value == 'buy' %}
-                {% set advert.field_advert_type.value = 'sale' %}
-            {% endif %}
-
             <tr>
                 <td class="tg-0pky">
                     {% if advert.field_advert_picture is not empty %}
@@ -107,7 +103,7 @@
                         {{ advert.field_advert_district.entity.name.value }}, {{ advert.field_advert_sector.value }}
                         <br/>
                         {{ advert.field_advert_property_type.value|capitalize }}
-                        for {{ advert.field_advert_type.value|capitalize }}
+                        for {% if advert.field_advert_type.value == 'buy' %} Sale {% else %} {{ advert.field_advert_type.value|capitalize }} {% endif %}
                     </p>
                 </td>
             </tr>
