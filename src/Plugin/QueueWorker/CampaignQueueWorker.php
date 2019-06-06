@@ -73,8 +73,7 @@ class CampaignQueueWorker extends QueueWorkerBase
 
             foreach ($campaigns as $sid => $advertIds) {
                 $submission = WebformSubmission::load($sid);
-//                $adverts = Node::loadMultiple($jobIds);
-                $adverts = Drupal\Core\Entity\ContentEntityInterface::loadMultiple($advertIds);
+                $adverts = Node::loadMultiple($advertIds);
                 if ($submission instanceof WebformSubmissionInterface) {
                     $to = $submission->getElementData('notif_firstname') . '<' . $submission->getElementData('notif_email') . '>';
                     $params['message'] = Markup::create(getCampaignHtmlContent($sid, $submission->getElementData('notif_firstname'), $adverts));
