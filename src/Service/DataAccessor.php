@@ -29,7 +29,7 @@ class DataAccessor
     /**
      * DataAccessor constructor.
      *
-     * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+     * @param EntityTypeManager $entityTypeManager
      */
     public function __construct(EntityTypeManager $entityTypeManager)
     {
@@ -136,7 +136,7 @@ class DataAccessor
             $subscriptionWebform = Webform::load('notification_subscription');
             if ($submissionsStorage instanceof WebformSubmissionStorage) {
 
-                $start_time = strtotime('-1 days 00:00:00');
+                $start_time = strtotime('-3 days 00:00:00');
                 $end_time = strtotime('-1 days 23:59:59');
                 $nodeStorage = $this->entityTypeManager->getStorage('node');
 
