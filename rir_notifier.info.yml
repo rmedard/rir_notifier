@@ -9,5 +9,6 @@ core: 8.x
 dependencies:
   - webform:webform
   - twig_tweak:twig_tweak
+  - twig_field_value:twig_field_value
   - publication_date:publication_date
   - rir_interface:rir_interface
