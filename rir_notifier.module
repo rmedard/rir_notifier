@@ -58,16 +58,16 @@ function rir_notifier_cron()
      * Send campaign emails
      */
 
-//    $last_notifications_sent = Drupal::state()->get('notifications.last.sent');
-//    if (
-//        (isset($last_notifications_sent) and date('dmY', $last_notifications_sent) != $day) or
-//        (!isset($last_notifications_sent) and intval($hour) < 6)
-//    ) {
+    $last_notifications_sent = Drupal::state()->get('notifications.last.sent');
+    if (
+        (isset($last_notifications_sent) and date('dmY', $last_notifications_sent) == $day) or
+        (!isset($last_notifications_sent) and intval($hour) < 6)
+    ) {
         $campaign_processor = Drupal::queue('campaigns_processor');
         $campaign_processor->createItem(new StdClass());
         Drupal::state()->set('notifications.last.sent', $request_time);
         Drupal::logger('rir_notifier')->notice('Sending notifications scheduled!');
-//    }
+    }
 
 
     /**
