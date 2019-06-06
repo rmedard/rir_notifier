@@ -164,7 +164,7 @@ class DataAccessor
                         $query = $nodeStorage->getQuery()
                             ->condition('type', 'advert')
                             ->condition('status', Node::PUBLISHED)
-                            ->condition('created', array($start_time, $end_time), 'BETWEEN');
+                            ->condition('published_at', array($start_time, $end_time), 'BETWEEN');
 
                         if (isset($advertType)) {
                             $query->condition('field_advert_type', $advertType);
