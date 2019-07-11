@@ -55,6 +55,14 @@ function rir_notifier_cron()
     $hour = date('H', $request_time);
 
     /**
+     * Flush all caches in the night
+     */
+    if ($hour == 5) {
+        drupal_flush_all_caches();
+        Drupal::logger('rir_notifier')->info('Cleared all caches via cron');
+    }
+
+    /**
      * Send campaign emails
      */
 
