@@ -105,11 +105,11 @@ function rir_notifier_cron()
 
                 if (intval($result['result']) !== 1) {
                     $message = t('There was a problem sending expired adverts email.');
-                    Drupal::logger('rir_interface')
+                    Drupal::logger('rir_notifier')
                         ->error($message . ' Whole Error: ' . json_encode($result, TRUE));
                 }
                 $message = t('An email of expiring adverts has been sent.');
-                Drupal::logger('rir_interface')->notice($message);
+                Drupal::logger('rir_notifier')->notice($message);
             } catch (Exception $ex) {
                 Drupal::logger('rir_notifier')->error('Error sending expired adverts: ' . $ex);
             }
