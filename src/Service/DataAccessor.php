@@ -13,6 +13,7 @@ use Drupal;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\TermStorageInterface;
@@ -56,21 +57,19 @@ class DataAccessor
         return $this->getQuery($location, $advertType, $propertyType)->count()->execute();
     }
 
-    function getDailyAdverts($location = NULL, $advert = NULL, $property = NULL)
+    function getDailyAdverts($location = NULL, $advert = NULL, $property = NULL): array
     {
         try {
             $adverts_ids = $this->getQuery($location, $advert, $property)->execute();
             $storage = $this->entityTypeManager->getStorage('node');
             return $storage->loadMultiple($adverts_ids);
-        } catch (InvalidPluginDefinitionException $e) {
-            Drupal::logger('rir_notifier')->error("GetQuery failed: " . $e->getMessage());
-        } catch (PluginNotFoundException $e) {
+        } catch (InvalidPluginDefinitionException | PluginNotFoundException $e) {
             Drupal::logger('rir_notifier')->error("GetQuery failed: " . $e->getMessage());
         }
         return array();
     }
 
-    private function getQuery($location, $advert, $property)
+    private function getQuery($location, $advert, $property): ?QueryInterface
     {
         $start_time = strtotime('-1 days 00:00:00');
         $end_time = strtotime('-1 days 23:59:59');
@@ -97,15 +96,13 @@ class DataAccessor
             if (isset($property) and !empty($property) and $property !== 'pro') {
                 $query->condition('field_advert_property_type', $property);
             }
-        } catch (InvalidPluginDefinitionException $e) {
-            Drupal::logger('rir_notifier')->error("GetQuery failed: " . $e->getMessage());
-        } catch (PluginNotFoundException $e) {
+        } catch (InvalidPluginDefinitionException | PluginNotFoundException $e) {
             Drupal::logger('rir_notifier')->error("GetQuery failed: " . $e->getMessage());
         }
         return $query;
     }
 
-    public function getExpiringAdvertsByDate($date)
+    public function getExpiringAdvertsByDate($date): array
     {
         try {
             $storage = $this->entityTypeManager->getStorage('node');
@@ -129,7 +126,7 @@ class DataAccessor
         return array();
     }
 
-    public function getComputeCampaigns()
+    public function getComputeCampaigns(): array
     {
         try {
             $submissionsStorage = $this->entityTypeManager->getStorage('webform_submission');

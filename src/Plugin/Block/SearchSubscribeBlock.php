@@ -9,6 +9,7 @@
 namespace Drupal\rir_notifier\Plugin\Block;
 
 
+use Drupal\Core\Block\Annotation\Block;
 use Drupal\Core\Block\BlockBase;
 
 /**
@@ -36,7 +37,8 @@ class SearchSubscribeBlock extends BlockBase {
    *
    * @see \Drupal\block\BlockViewBuilder
    */
-  public function build() {
+  public function build(): array
+  {
     return [
       '#theme' => 'rir_subscribe_search'
     ];

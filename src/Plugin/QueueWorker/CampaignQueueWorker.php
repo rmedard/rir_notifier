@@ -10,6 +10,7 @@ namespace Drupal\rir_notifier\Plugin\QueueWorker;
 
 
 use Drupal;
+use Drupal\Core\Annotation\QueueWorker;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\Core\Queue\RequeueException;
 use Drupal\Core\Queue\SuspendQueueException;

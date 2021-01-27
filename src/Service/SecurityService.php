@@ -12,7 +12,7 @@ use Exception;
  */
 class SecurityService
 {
-    function encrypt($value, $nonce)
+    function encrypt($value, $nonce): ?string
     {
         $encrypted = null;
         $config_factory = Drupal::configFactory();
