@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\webform\Entity\WebformSubmission;
+use Drupal\webform\WebformSubmissionInterface;
 
 /**
  * Class CampaignUnsubscriptionForm
@@ -29,7 +30,7 @@ class CampaignUnsubscriptionForm extends FormBase
      * @return string
      *   The unique string identifying the form.
      */
-    public function getFormId()
+    public function getFormId(): string
     {
         return 'campaign_unsubscription_form';
     }
@@ -45,7 +46,7 @@ class CampaignUnsubscriptionForm extends FormBase
      * @return array
      *   The form structure.
      */
-    public function buildForm(array $form, FormStateInterface $form_state, $sid = null)
+    public function buildForm(array $form, FormStateInterface $form_state, $sid = null): array
     {
         $form['description'] = [
             '#type' => 'item',
@@ -91,7 +92,7 @@ class CampaignUnsubscriptionForm extends FormBase
         if ($sid != 0) {
             try {
                 $submission = WebformSubmission::load($sid);
-                if ($submission->getElementData('notif_email') == $email) {
+                if ($submission instanceof WebformSubmissionInterface && $submission->getElementData('notif_email') == $email) {
                     $submission->setElementData('subscription_active', '0');
                     $submission->save();
                     $form_state->setRedirect('<front>');
