@@ -134,7 +134,7 @@ class DataAccessor
             $subscriptionWebform = Webform::load('notification_subscription');
             if ($submissionsStorage instanceof WebformSubmissionStorage && $subscriptionWebform instanceof WebformInterface) {
 
-                $start_time = strtotime('-1 days 00:00:00');
+                $start_time = strtotime('-7 days 00:00:00'); // Because emails are sent once a week.
                 $end_time = strtotime('-1 days 23:59:59');
                 $nodeStorage = $this->entityTypeManager->getStorage('node');
 
