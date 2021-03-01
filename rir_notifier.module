@@ -8,6 +8,7 @@ use Drupal\Core\Render\Markup;
 
 /**
  * Implements hook_page_attachments().
+ * @param array $attachments
  */
 function rir_notifier_page_attachments(array &$attachments)
 {
@@ -19,8 +20,13 @@ function rir_notifier_page_attachments(array &$attachments)
 
 /**
  * Implements hook_theme().
+ * @param $existing
+ * @param $type
+ * @param $theme
+ * @param $path
+ * @return array
  */
-function rir_notifier_theme($existing, $type, $theme, $path)
+function rir_notifier_theme($existing, $type, $theme, $path): array
 {
     return [
         'rir_subscribe_search' => [
@@ -31,7 +37,7 @@ function rir_notifier_theme($existing, $type, $theme, $path)
     ];
 }
 
-function getRequestCategoryReference($location, $advertType, $propertyType)
+function getRequestCategoryReference($location, $advertType, $propertyType): string
 {
     if (empty($location)) {
         $location = 'loc';
@@ -54,19 +60,28 @@ function rir_notifier_cron()
     $todayDate = date('dmY', $request_time);
     $dayOfWeek = date('N', $request_time);
     $hour = date('H', $request_time);
+    $last_notifications_sent = Drupal::state()->get('notifications.last.sent');
+
+    Drupal::logger('EMAILS_LOGGER')
+        ->info(t('RequestTime: @time | Today: @today | DayOfWeek: @week | Hour: @hour | Last notif: @last', [
+            '@time' => $request_time,
+            '@today' => $todayDate,
+            '@week' => $dayOfWeek,
+            '@hour' => $hour,
+            '@last' => $last_notifications_sent,
+        ]));
 
     /**
      * Send campaign emails
      */
     if (intval($dayOfWeek) == 7) {
-        $last_notifications_sent = Drupal::state()->get('notifications.last.sent');
         if (
             (isset($last_notifications_sent) and date('dmY', $last_notifications_sent) != $todayDate) or
             (!isset($last_notifications_sent) and intval($hour) < 6)
         ) {
-            $campaign_processor = Drupal::queue('campaigns_processor');
-            $campaign_processor->createItem(new StdClass());
-            Drupal::state()->set('notifications.last.sent', $request_time);
+//            $campaign_processor = Drupal::queue('campaigns_processor');
+//            $campaign_processor->createItem(new StdClass());
+//            Drupal::state()->set('notifications.last.sent', $request_time);
             Drupal::logger('rir_notifier')->notice('Sending notifications scheduled!');
         }
     }
