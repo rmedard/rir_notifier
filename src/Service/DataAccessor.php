@@ -18,6 +18,7 @@ use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\TermStorageInterface;
 use Drupal\webform\Entity\Webform;
+use Drupal\webform\Entity\WebformSubmission;
 use Drupal\webform\WebformInterface;
 use Drupal\webform\WebformSubmissionInterface;
 use Drupal\webform\WebformSubmissionStorage;
@@ -129,90 +130,95 @@ class DataAccessor
 
     public function getComputeCampaigns(): array
     {
+        $subscribers = [];
         try {
             $submissionsStorage = $this->entityTypeManager->getStorage('webform_submission');
             $subscriptionWebform = Webform::load('notification_subscription');
-            if ($submissionsStorage instanceof WebformSubmissionStorage && $subscriptionWebform instanceof WebformInterface) {
+            if ($submissionsStorage instanceof WebformSubmissionStorage
+                && $subscriptionWebform instanceof WebformInterface
+                && $subscriptionWebform->hasSubmissions()) {
 
-                $start_time = strtotime('-7 days 00:00:00'); // Because emails are sent once a week.
-                $end_time = strtotime('-1 days 23:59:59');
-                $nodeStorage = $this->entityTypeManager->getStorage('node');
+                $submissionIds = $submissionsStorage->getQuery()
+                    ->condition('subscription_active', true)
+                    ->execute();
+                if (isset($submissionIds) && !empty($submissionIds)) {
+                    $submissions = WebformSubmission::loadMultiple($submissionIds);
+                    $start_time = strtotime('-7 days 00:00:00'); // Because emails are sent once a week.
+                    $end_time = strtotime('-1 days 23:59:59');
+                    $nodeStorage = $this->entityTypeManager->getStorage('node');
+                    foreach ($submissions as $sid => $submission) {
+                        if ($submission instanceof WebformSubmissionInterface) {
 
-                $subscribers = [];
-                foreach ($submissionsStorage->loadByEntities($subscriptionWebform) as $sid => $submission) {
-                    if ($submission instanceof WebformSubmissionInterface &&
-                        $submission->getElementData('subscription_active') == '1') {
+                            $advertType = $submission->getElementData('notif_advert_type');
+                            $propertyType = $submission->getElementData('notif_property_type');
+                            $minBedrooms = $submission->getElementData('notif_minimum_bedrooms');
+                            $maxBedrooms = $submission->getElementData('notif_maximum_bedrooms');
+                            $currency = $submission->getElementData('notif_currency');
+                            $minBudget = $submission->getElementData('notif_budget_minimum');
+                            $maxBudget = $submission->getElementData('notif_budget_maximum');
+                            $payable = $submission->getElementData('notif_payable');
+                            $location = $submission->getElementData('property_location');
 
-                        $advertType = $submission->getElementData('notif_advert_type');
-                        $propertyType = $submission->getElementData('notif_property_type');
-                        $minBedrooms = $submission->getElementData('notif_minimum_bedrooms');
-                        $maxBedrooms = $submission->getElementData('notif_maximum_bedrooms');
-                        $currency = $submission->getElementData('notif_currency');
-                        $minBudget = $submission->getElementData('notif_budget_minimum');
-                        $maxBudget = $submission->getElementData('notif_budget_maximum');
-                        $payable = $submission->getElementData('notif_payable');
-                        $location = $submission->getElementData('property_location');
+                            $query = $nodeStorage->getQuery()
+                                ->condition('type', 'advert')
+                                ->condition('status', Node::PUBLISHED)
+                                ->condition('published_at', [$start_time, $end_time], 'BETWEEN');
 
-                        $query = $nodeStorage->getQuery()
-                            ->condition('type', 'advert')
-                            ->condition('status', Node::PUBLISHED)
-                            ->condition('published_at', [$start_time, $end_time], 'BETWEEN');
-
-                        if (isset($advertType) && !in_array(strtolower($advertType), ['', 'all'])) {
-                            $query->condition('field_advert_type', $advertType);
-                            if ($advertType === 'rent') {
-                                if (isset($payable) && $payable !== '') {
-                                    $query->condition('field_advert_payment', $payable);
+                            if (isset($advertType) && !in_array(strtolower($advertType), ['', 'all'])) {
+                                $query->condition('field_advert_type', $advertType);
+                                if ($advertType === 'rent') {
+                                    if (isset($payable) && $payable !== '') {
+                                        $query->condition('field_advert_payment', $payable);
+                                    }
                                 }
                             }
-                        }
 
-                        if (isset($propertyType) && !in_array(strtolower($propertyType), ['', 'all'])) {
-                            $query->condition('field_advert_property_type', $propertyType);
-                        }
+                            if (isset($propertyType) && !in_array(strtolower($propertyType), ['', 'all'])) {
+                                $query->condition('field_advert_property_type', $propertyType);
+                            }
 
-                        if (isset($minBedrooms) && $minBedrooms !== '') {
-                            $query->condition('field_advert_bedrooms', intval($minBedrooms), '>=');
-                        }
+                            if (isset($minBedrooms) && $minBedrooms !== '') {
+                                $query->condition('field_advert_bedrooms', intval($minBedrooms), '>=');
+                            }
 
-                        if (isset($maxBedrooms) && $maxBedrooms !== '') {
-                            $query->condition('field_advert_bedrooms', intval($maxBedrooms), '<=');
-                        }
+                            if (isset($maxBedrooms) && $maxBedrooms !== '') {
+                                $query->condition('field_advert_bedrooms', intval($maxBedrooms), '<=');
+                            }
 
-                        if (isset($currency) && $currency !== '') {
-                            $min = $minBudget;
-                            $max = $maxBudget;
-                            if ($currency === 'usd') {
-                                $rate = Drupal::service('rir_interface.currency_converter_service')->getUsdRwfRate();
-                                if (isset($rate)) {
-                                    $min = intval($minBudget) * $rate;
-                                    $max = intval($maxBudget) * $rate;
+                            if (isset($currency) && $currency !== '') {
+                                $min = $minBudget;
+                                $max = $maxBudget;
+                                if ($currency === 'usd') {
+                                    $rate = Drupal::service('rir_interface.currency_converter_service')->getUsdRwfRate();
+                                    if (isset($rate)) {
+                                        $min = intval($minBudget) * $rate;
+                                        $max = intval($maxBudget) * $rate;
+                                    }
+                                }
+                                $query->condition('field_advert_price', [$min, $max], 'BETWEEN');
+                            }
+
+                            if (isset($location) && $location !== '0') {
+                                $locations = array();
+                                $term = Term::load(intval($location));
+                                array_push($locations, $term->id());
+
+                                $termStorage = $this->entityTypeManager->getStorage('taxonomy_term');
+                                if ($termStorage instanceof TermStorageInterface) {
+                                    foreach ($termStorage->loadChildren($term->id()) as $locationTerm) {
+                                        array_push($locations, $locationTerm->id());
+                                    }
+                                    $query->condition('field_advert_district.target_id', $locations, 'IN');
                                 }
                             }
-                            $query->condition('field_advert_price', [$min, $max], 'BETWEEN');
-                        }
 
-                        if (isset($location) && $location !== '0') {
-                            $locations = array();
-                            $term = Term::load(intval($location));
-                            array_push($locations, $term->id());
-
-                            $termStorage = $this->entityTypeManager->getStorage('taxonomy_term');
-                            if ($termStorage instanceof TermStorageInterface) {
-                                foreach ($termStorage->loadChildren($term->id()) as $locationTerm) {
-                                    array_push($locations, $locationTerm->id());
-                                }
-                                $query->condition('field_advert_district.target_id', $locations, 'IN');
+                            $advertIds = $query->execute();
+                            if (isset($advertIds) && !empty($advertIds)) {
+                                $subscribers[$sid] = $advertIds;
                             }
-                        }
-
-                        $advertIds = $query->execute();
-                        if (isset($advertIds) && !empty($advertIds)) {
-                            $subscribers[$sid] = $advertIds;
                         }
                     }
                 }
-                return $subscribers;
             }
         } catch (InvalidPluginDefinitionException $e) {
             Drupal::logger('rir_notifier')
@@ -221,6 +227,6 @@ class DataAccessor
             Drupal::logger('rir_notifier')
                 ->error('Plugin not found: ' . $e->getCode() . '. Error message: ' . $e->getMessage());
         }
-        return array();
+        return $subscribers;
     }
 }
