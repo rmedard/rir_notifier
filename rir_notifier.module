@@ -62,29 +62,20 @@ function rir_notifier_cron()
     $hour = date('H', $request_time);
     $last_notifications_sent = Drupal::state()->get('notifications.last.sent');
 
-    Drupal::logger('EMAILS_LOGGER')
-        ->info(t('RequestTime: @time | Today: @today | DayOfWeek: @week | Hour: @hour | Last notif: @last', [
-            '@time' => $request_time,
-            '@today' => $todayDate,
-            '@week' => $dayOfWeek,
-            '@hour' => $hour,
-            '@last' => $last_notifications_sent,
-        ]));
-
     /**
      * Send campaign emails
      */
-    if (intval($dayOfWeek) == 7) {
+//    if (intval($dayOfWeek) == 7) {
         if (
             (isset($last_notifications_sent) and date('dmY', $last_notifications_sent) != $todayDate) or
-            (!isset($last_notifications_sent) and intval($hour) < 6)
+            (!isset($last_notifications_sent))
         ) {
-//            $campaign_processor = Drupal::queue('campaigns_processor');
-//            $campaign_processor->createItem(new StdClass());
-//            Drupal::state()->set('notifications.last.sent', $request_time);
+            $campaign_processor = Drupal::queue('campaigns_processor');
+            $campaign_processor->createItem(new StdClass());
+            Drupal::state()->set('notifications.last.sent', $request_time);
             Drupal::logger('rir_notifier')->notice('Sending notifications scheduled!');
         }
-    }
+//    }
 
 
     /**

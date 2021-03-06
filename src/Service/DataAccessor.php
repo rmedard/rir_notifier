@@ -22,12 +22,18 @@ use Drupal\webform\Entity\WebformSubmission;
 use Drupal\webform\WebformInterface;
 use Drupal\webform\WebformSubmissionInterface;
 use Drupal\webform\WebformSubmissionStorage;
+use PDO;
 use function strtotime;
 
 class DataAccessor
 {
 
-    protected EntityTypeManagerInterface $entityTypeManager;
+    /**
+     * Entity type manager.
+     *
+     * @var EntityTypeManagerInterface
+     */
+    protected $entityTypeManager;
 
     /**
      * DataAccessor constructor.
@@ -138,12 +144,18 @@ class DataAccessor
                 && $subscriptionWebform instanceof WebformInterface
                 && $subscriptionWebform->hasSubmissions()) {
 
-                $submissionIds = $submissionsStorage->getQuery()
-                    ->condition('subscription_active', true)
+                $select = Drupal::service('database')
+                    ->select('webform_submission_data', 'wsd')
+                    ->fields('wsd', array('sid'))
+                    ->orderBy('wsd.sid', 'DESC')
+                    ->condition('wsd.webform_id', 'notification_subscription', '=')
+                    ->condition('wsd.name', 'subscription_active', '=')
+                    ->condition('wsd.value', true, '=')
                     ->execute();
+                $submissionIds = $select->fetchAll(PDO::FETCH_COLUMN);
                 if (isset($submissionIds) && !empty($submissionIds)) {
                     $submissions = WebformSubmission::loadMultiple($submissionIds);
-                    $start_time = strtotime('-7 days 00:00:00'); // Because emails are sent once a week.
+                    $start_time = strtotime('-1 days 00:00:00'); // Because emails are sent once a day.
                     $end_time = strtotime('-1 days 23:59:59');
                     $nodeStorage = $this->entityTypeManager->getStorage('node');
                     foreach ($submissions as $sid => $submission) {
