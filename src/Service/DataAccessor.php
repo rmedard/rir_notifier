@@ -171,7 +171,7 @@ class DataAccessor
                             $payable = $submission->getElementData('notif_payable');
                             $location = $submission->getElementData('property_location');
 
-                            $query = $nodeStorage->getQuery()
+                            $query = $nodeStorage->getQuery()->range(0, 10)
                                 ->condition('type', 'advert')
                                 ->condition('status', Node::PUBLISHED)
                                 ->condition('published_at', [$start_time, $end_time], 'BETWEEN');
