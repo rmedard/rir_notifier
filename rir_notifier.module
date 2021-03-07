@@ -70,9 +70,9 @@ function rir_notifier_cron()
             (isset($last_notifications_sent) and date('dmY', $last_notifications_sent) != $todayDate) or
             (!isset($last_notifications_sent))
         ) {
-            $campaign_processor = Drupal::queue('campaigns_processor');
-            $campaign_processor->createItem(new StdClass());
-            Drupal::state()->set('notifications.last.sent', $request_time);
+//            $campaign_processor = Drupal::queue('campaigns_processor');
+//            $campaign_processor->createItem(new StdClass());
+//            Drupal::state()->set('notifications.last.sent', $request_time);
             Drupal::logger('rir_notifier')->notice('Sending notifications scheduled!');
         }
 //    }
