@@ -63,9 +63,7 @@ class CampaignQueueWorker extends QueueWorkerBase
      */
     public function processItem($data)
     {
-        $dataAccessor = Drupal::service('rir_notifier.data_accessor');
-        $campaigns = $dataAccessor->getComputeCampaigns();
-
+        $campaigns = $data->campaigns;
         if (!empty($campaigns)) {
             $mailManager = Drupal::service('plugin.manager.mail');
             $module = 'rir_interface';
