@@ -71,10 +71,13 @@ function rir_notifier_cron()
         ) {
             $dataAccessor = Drupal::service('rir_notifier.data_accessor');
             $campaigns = $dataAccessor->getComputeCampaigns();
-            $item = new StdClass();
-            $item->campaigns = $campaigns;
             $campaign_processor = Drupal::queue('campaigns_processor');
-            $campaign_processor->createItem($item);
+            foreach ($campaigns as $sid => $advertIds) {
+                $item = new StdClass();
+                $item->sid = $sid;
+                $item->advertIds = $advertIds;
+                $campaign_processor->createItem($item);
+            }
             Drupal::state()->set('notifications.last.sent', $request_time);
             Drupal::logger('rir_notifier')->notice(t('Sending notifications scheduled for @date', ['@date' => $todayDate]));
         }

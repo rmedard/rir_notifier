@@ -26,8 +26,7 @@ use Exception;
  * @package Drupal\rir_notifier\Plugin\QueueWorker
  * @QueueWorker(
  *  id = "campaigns_processor",
- *  title = "Campaigns Queue Worker",
- *  cron = {"time" = 90}
+ *  title = "Campaigns Queue Worker"
  * )
  */
 class CampaignQueueWorker extends QueueWorkerBase
@@ -63,32 +62,32 @@ class CampaignQueueWorker extends QueueWorkerBase
      */
     public function processItem($data)
     {
-        $campaigns = $data->campaigns;
-        if (!empty($campaigns)) {
+        if (isset($data)) {
             $mailManager = Drupal::service('plugin.manager.mail');
             $module = 'rir_interface';
             $key = 'send_campaign_email';
             $reply = Drupal::config('system.site')->get('mail');
 
-            foreach ($campaigns as $sid => $advertIds) {
-                $submission = WebformSubmission::load($sid);
-                $adverts = Node::loadMultiple($advertIds);
-                if ($submission instanceof WebformSubmissionInterface) {
-                    $to = $submission->getElementData('notif_firstname') . '<' . $submission->getElementData('notif_email') . '>';
-                    $params['message'] = Markup::create(getCampaignHtmlContent($sid, $submission->getElementData('notif_firstname'), $adverts));
+            $sid = $data->sid;
+            $advertIds = $data->advertIds;
 
-                    $langcode = Drupal::languageManager()->getDefaultLanguage()->getId();
-                    $send = TRUE;
-                    $result = $mailManager->mail($module, $key, $to, $langcode, $params, $reply, $send);
+            $submission = WebformSubmission::load($sid);
+            $adverts = Node::loadMultiple($advertIds);
+            if ($submission instanceof WebformSubmissionInterface) {
+                $to = $submission->getElementData('notif_firstname') . '<' . $submission->getElementData('notif_email') . '>';
+                $params['message'] = Markup::create(getCampaignHtmlContent($sid, $submission->getElementData('notif_firstname'), $adverts));
 
-                    if (intval($result['result']) !== 1) {
-                        $message = t('There was a problem sending campaign email to @email', ['@email' => $to]);
-                        Drupal::logger('rir_notifier')->error($message);
-                    } else {
-                        $message = t('An campaign email has been sent to @email with advertIds: @ids',
-                            ['@email' => $to, '@ids' => implode('|', $advertIds)]);
-                        Drupal::logger('rir_notifier')->info($message);
-                    }
+                $langcode = Drupal::languageManager()->getDefaultLanguage()->getId();
+                $send = TRUE;
+                $result = $mailManager->mail($module, $key, $to, $langcode, $params, $reply, $send);
+
+                if (intval($result['result']) !== 1) {
+                    $message = t('There was a problem sending campaign email to @email', ['@email' => $to]);
+                    Drupal::logger('rir_notifier')->error($message);
+                } else {
+                    $message = t('An campaign email has been sent to @email with advertIds: @ids',
+                        ['@email' => $to, '@ids' => implode('|', $advertIds)]);
+                    Drupal::logger('rir_notifier')->info($message);
                 }
             }
         } else {
