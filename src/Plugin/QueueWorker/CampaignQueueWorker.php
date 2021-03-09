@@ -26,7 +26,8 @@ use Exception;
  * @package Drupal\rir_notifier\Plugin\QueueWorker
  * @QueueWorker(
  *  id = "campaigns_processor",
- *  title = "Campaigns Queue Worker"
+ *  title = "Campaigns Queue Worker",
+ *  cron = {"time" = 15}
  * )
  */
 class CampaignQueueWorker extends QueueWorkerBase
