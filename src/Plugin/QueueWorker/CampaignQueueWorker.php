@@ -27,7 +27,7 @@ use Exception;
  * @QueueWorker(
  *  id = "campaigns_processor",
  *  title = "Campaigns Queue Worker",
- *  cron = {"time" = 90}
+ *  cron = {"time" = 600}
  * )
  */
 class CampaignQueueWorker extends QueueWorkerBase
