@@ -139,7 +139,7 @@ function getCampaignHtmlContent($sid, $name, $adverts)
         'adverts' => $adverts,
         'cdn_enabled' => $cdn_enabled
     ];
-    return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/hir-campaign-adverts.html.twig')
+    return $twig_service->loadTemplate(drupal_get_path('theme', 'rir') . '/emails/hir-campaign-adverts.html.twig')
         ->render($variables);
 }
 
@@ -161,6 +161,6 @@ function getExpiringAdvertsEmailContent($expiring_adverts, $date)
         'date' => $date
     ];
     $twig_service = Drupal::service('twig');
-    return $twig_service->loadTemplate(drupal_get_path('module', 'rir_notifier') . '/templates/hir-expiring-adverts.html.twig')
+    return $twig_service->loadTemplate(drupal_get_path('theme', 'rir') . '/emails/hir-expiring-adverts.html.twig')
         ->render($variables);
 }
