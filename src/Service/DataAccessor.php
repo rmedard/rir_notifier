@@ -15,6 +15,7 @@ use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\node\Entity\Node;
+use Drupal\node\NodeInterface;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\TermStorageInterface;
 use Drupal\webform\Entity\Webform;
@@ -33,7 +34,7 @@ class DataAccessor
      *
      * @var EntityTypeManagerInterface
      */
-    protected $entityTypeManager;
+    protected EntityTypeManagerInterface $entityTypeManager;
 
     /**
      * DataAccessor constructor.
@@ -47,11 +48,11 @@ class DataAccessor
 
 
     /**
-     * @param $reference string reference
+     * @param $reference string|null reference
      *
-     * @return mixed
+     * @return array|int
      */
-    function countAdvertsByReference($reference = NULL)
+    function countAdvertsByReference(string $reference = NULL)
     {
         $location = NULL;
         $advertType = NULL;
@@ -86,7 +87,7 @@ class DataAccessor
             $storage = $this->entityTypeManager->getStorage('node');
             $query = $storage->getQuery()
                 ->condition('type', 'advert')
-                ->condition('status', Node::PUBLISHED)
+                ->condition('status', NodeInterface::PUBLISHED)
                 ->condition('created', array($start_time, $end_time), 'BETWEEN');
 
             if (isset($location) and !empty($location) and $location !== 'loc') {
@@ -110,13 +111,21 @@ class DataAccessor
         return $query;
     }
 
+    public function getExpiredAdvertIds(): array {
+      $storage = $this->entityTypeManager->getStorage('node');
+      $query = $storage->getQuery()
+        ->condition('type', 'advert')
+        ->condition('status', NodeInterface::NOT_PUBLISHED);
+      return $query->execute();
+    }
+
     public function getExpiringAdvertsByDate($date): array
     {
         try {
             $storage = $this->entityTypeManager->getStorage('node');
             $query = $storage->getQuery()
                 ->condition('type', 'advert')
-                ->condition('status', Node::PUBLISHED)
+                ->condition('status', NodeInterface::PUBLISHED)
                 ->condition('field_advert_expirydate', $date, '=');
             $expiring_adverts_ids = $query->execute();
             if (isset($expiring_adverts_ids) and count($expiring_adverts_ids) > 0) {
