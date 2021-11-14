@@ -139,21 +139,21 @@ function rir_notifier_cron()
 //  }
 
   //Update adverts
-  $update_processor = Drupal::queue('update_adverts_processor');
-  $query = Drupal::entityTypeManager()
-    ->getStorage('node')->getQuery()
-    ->condition('type', 'advert')
-    ->condition('status', NodeInterface::PUBLISHED)
-    ->condition('field_advert_furnished', NULL, 'IS NULL');
-  $ids = $query->execute();
-  if (count($ids) > 0) {
-    Drupal::logger('Updator')->info('Found adverts: ' . count($ids));
-    foreach ($ids as $nid) {
-      $update_processor->createItem($nid);
-    }
-  } else {
-    Drupal::logger('Updator')->warning('No adverts to update');
-  }
+//  $update_processor = Drupal::queue('update_adverts_processor');
+//  $query = Drupal::entityTypeManager()
+//    ->getStorage('node')->getQuery()
+//    ->condition('type', 'advert')
+//    ->condition('status', NodeInterface::PUBLISHED)
+//    ->condition('field_advert_furnished', NULL, 'IS NULL');
+//  $ids = $query->execute();
+//  if (count($ids) > 0) {
+//    Drupal::logger('Updator')->info('Found adverts: ' . count($ids));
+//    foreach ($ids as $nid) {
+//      $update_processor->createItem($nid);
+//    }
+//  } else {
+//    Drupal::logger('Updator')->warning('No adverts to update');
+//  }
 
 
   //update websites
@@ -242,12 +242,12 @@ function rir_notifier_cron()
     '231'=>'www.homeland.rw/',
     '193'=>'www.houseinrwanda.com'
   ];
-  foreach ($values as $id => $value) {
-    $advert = Node::load(intval($id));
-    $url = Url::fromUri('https://' . $value)->toString();
-    $advert->set('field_agent_website', $url);
-    $advert->save();
-  }
+//  foreach ($values as $id => $value) {
+//    $advert = Node::load(intval($id));
+//    $url = Url::fromUri('https://' . $value)->toString();
+//    $advert->set('field_agent_website', $url);
+//    $advert->save();
+//  }
 }
 
 function getCampaignHtmlContent($sid, $name, $adverts)
