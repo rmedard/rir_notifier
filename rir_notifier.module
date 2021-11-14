@@ -242,12 +242,12 @@ function rir_notifier_cron()
     '231'=>'www.homeland.rw/',
     '193'=>'www.houseinrwanda.com'
   ];
-//  foreach ($values as $id => $value) {
-//    $advert = Node::load(intval($id));
-//    $url = Url::fromUri('https://' . $value)->toString();
-//    $advert->set('field_agent_website', $url);
-//    $advert->save();
-//  }
+  foreach ($values as $id => $value) {
+    $advert = Node::load(intval($id));
+    $url = Url::fromUri('https://' . $value)->toString();
+    $advert->set('field_agent_website', $url);
+    $advert->save();
+  }
 }
 
 function getCampaignHtmlContent($sid, $name, $adverts)
