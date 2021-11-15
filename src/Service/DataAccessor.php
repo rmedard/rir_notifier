@@ -182,7 +182,7 @@ class DataAccessor
 
                             $query = $nodeStorage->getQuery()->range(0, 10)
                                 ->condition('type', 'advert')
-                                ->condition('status', Node::PUBLISHED)
+                                ->condition('status', NodeInterface::PUBLISHED)
                                 ->condition('published_at', [$start_time, $end_time], 'BETWEEN');
 
                             if (isset($advertType) && !in_array(strtolower($advertType), ['', 'all'])) {
@@ -229,7 +229,7 @@ class DataAccessor
                                     foreach ($termStorage->loadChildren($term->id()) as $locationTerm) {
                                         array_push($locations, $locationTerm->id());
                                     }
-                                    $query->condition('field_advert_district.target_id', $locations, 'IN');
+                                    $query->condition('field_advert_locality.target_id', $locations, 'IN');
                                 }
                             }
 
