@@ -126,18 +126,6 @@ function rir_notifier_cron()
         Drupal::logger('rir_notifier')->notice('Sending expired adverts scheduled!');
     }
 
-
-    // Delete expired jobs
-//  Drupal::logger('rir_theme')->info('Deleting expired adverts');
-//  $dataAccessor = Drupal::service('rir_notifier.data_accessor');
-//  $expiredAdvertIds = $dataAccessor->getExpiredAdvertIds();
-//  if (!empty($expiredAdvertIds)) {
-//    $remover_processor = Drupal::queue('advert_remover_processor');
-//    foreach ($expiredAdvertIds as $advertId) {
-//      $remover_processor->createItem($advertId);
-//    }
-//  }
-
   //Update adverts
 //  $update_processor = Drupal::queue('update_adverts_processor');
 //  $query = Drupal::entityTypeManager()
@@ -154,100 +142,6 @@ function rir_notifier_cron()
 //  } else {
 //    Drupal::logger('Updator')->warning('No adverts to update');
 //  }
-
-
-  //update websites
-  $values = [
-    '17563'=>'www.premiumcontainers.co.ke',
-    '17001'=>'www.property.emall.rw',
-    '15640'=>'www.property.emall.rw',
-    '15360'=>'www.remyproperty.com',
-    '14112'=>'www.rainbowestates.rw',
-    '11954'=>'www.profemmes.org',
-    '11607'=>'www.isco.co.rw',
-    '11150'=>'www.empirerealestate.rw',
-    '10431'=>'www.ibarize.com',
-    '9082'=>'www.heavenrwanda.com',
-    '7321'=>'www.abahuza.com',
-    '5936'=>'www.homeland.rw',
-    '5101'=>'www.abbank.rw',
-    '5024'=>'www.kigalihouse.com',
-    '4415'=>'www.landedproperty.rw',
-    '4234'=>'www.mdgroup.rw',
-    '4034'=>'www.izubacity.com',
-    '4021'=>'www.kigalirealtors.com',
-    '4010'=>'www.kigalirealtors.com',
-    '3880'=>'www.kazirealestate.rw',
-    '3875'=>'www.de250.com/real-estate',
-    '3807'=>'www.bestbrokers.rw',
-    '3459'=>'www.rwandaproperties.com',
-    '2527'=>'www.fandurealestate.rw',
-    '2292'=>'www.gobeland.com',
-    '2205'=>'www.facebook.com/lakhtrem',
-    '2049'=>'www.centuryrwanda.com',
-    '1678'=>'kivu-properties.business.site',
-    '1677'=>'www.benitaconsult.com',
-    '1660'=>'www.remoteestates.com',
-    '1655'=>'supernaturalrwanda.wordpress.com',
-    '1645'=>'www.lightbright.co.rw',
-    '1643'=>'www.dominionrestate.com',
-    '1635'=>'www.houseinrwanda.com',
-    '1572'=>'www.beausejourhotel.rw',
-    '1570'=>'www.lapalmehotel.net',
-    '1568'=>'www.accordhotel.rw',
-    '1566'=>'www.golfhillsresidence.com',
-    '1564'=>'www.ubukihotel.com',
-    '1546'=>'www.legendhotel.co.rw',
-    '1545'=>'www.onomohotel.com/fr/hotel/9/onomo-hotel-kigali',
-    '1544'=>'www.fivetofivehotel.com',
-    '1534'=>'highlandsuiteshotel.com',
-    '1533'=>'www.stipphotelrwanda.com',
-    '1532'=>'www.ubumwegrandehotel.com',
-    '1531'=>'www.hotelvillaportofinokigali.com',
-    '1530'=>'www.olympichotelkigali.com',
-    '1520'=>'www.grandlegacy.rw',
-    '1519'=>'www.gloriahotelrwanda.com',
-    '1518'=>'classichotelkigali.com/',
-    '1509'=>'www.chezlando.com',
-    '1508'=>'www.themanorhotel.rw',
-    '1477'=>'www.kigalidiplomathotel.com',
-    '1476'=>'www.radissonblu.com/en/hotel-kigali',
-    '1475'=>'www.5swisshotel.com',
-    '1474'=>'www.gorillashotels.com',
-    '1465'=>'www.serenahotels.com',
-    '1464'=>'www.themirrorwanda.com',
-    '1463'=>'www.lemigohotel.com',
-    '1462'=>'parkinn.com/hotel-kigali',
-    '1414'=>'www.thecourtboutiquehotel.com',
-    '1412'=>'www.hilltophotelkigali.com',
-    '1396'=>'www.umubanohotel.rw',
-    '1377'=>'www.millecollines.rw',
-    '1159'=>'www.homes-africa.com',
-    '694'=>'www.dvapparthotel.com-rwanda.com',
-    '685'=>'www.kigalilife.co.rw',
-    '627'=>'www.udl.rw',
-    '620'=>'www.cocoonrwanda.com',
-    '617'=>'www.montanavistahotel.com',
-    '616'=>'www.saintjeanleopold.com',
-    '615'=>'www.graziaapartments.com',
-    '594'=>'www.rohiaparthotel.co.rw',
-    '467'=>'www.climaxrwanda.com',
-    '445'=>'savenextgeneration.wixsite.com/homebusinessnetwork',
-    '390'=>'www.plutproperties.com',
-    '387'=>'www.houseinrwanda.com',
-    '311'=>'www.proffessionalbrokers.com',
-    '289'=>'www.premierrealestate.co.rw',
-    '264'=>'www.kigalilist.com',
-    '249'=>'www.dnddevelopers.rw',
-    '231'=>'www.homeland.rw/',
-    '193'=>'www.houseinrwanda.com'
-  ];
-  foreach ($values as $id => $value) {
-    $advert = Node::load(intval($id));
-    $url = Url::fromUri('https://' . $value)->toString();
-    $advert->set('field_agent_website', $url);
-    $advert->save();
-  }
 }
 
 function getCampaignHtmlContent($sid, $name, $adverts)
