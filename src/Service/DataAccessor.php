@@ -14,7 +14,6 @@ use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
-use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\TermStorageInterface;
@@ -92,8 +91,9 @@ class DataAccessor
 
             if (isset($location) and !empty($location) and $location !== 'loc') {
                 $group = $query->orConditionGroup()
-                    ->condition('field_advert_locality.entity.name', $location)
-                    ->condition('field_advert_sector', $location)
+                    ->condition('field_advert_locality_sector', $location)
+                    ->condition('field_advert_locality_district', $location)
+                    ->condition('field_advert_locality_province', $location)
                     ->condition('field_advert_village', $location);
                 $query->condition($group);
             }
