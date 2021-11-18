@@ -92,7 +92,7 @@ class DataAccessor
 
             if (isset($location) and !empty($location) and $location !== 'loc') {
                 $group = $query->orConditionGroup()
-                    ->condition('field_advert_district.entity.name', $location)
+                    ->condition('field_advert_locality.entity.name', $location)
                     ->condition('field_advert_sector', $location)
                     ->condition('field_advert_village', $location);
                 $query->condition($group);

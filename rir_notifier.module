@@ -5,9 +5,6 @@
  */
 
 use Drupal\Core\Render\Markup;
-use Drupal\Core\Url;
-use Drupal\node\Entity\Node;
-use Drupal\node\NodeInterface;
 
 /**
  * Implements hook_page_attachments().
@@ -125,23 +122,6 @@ function rir_notifier_cron()
         Drupal::state()->set('expirations.last.sent', $request_time);
         Drupal::logger('rir_notifier')->notice('Sending expired adverts scheduled!');
     }
-
-  //Update adverts
-//  $update_processor = Drupal::queue('update_adverts_processor');
-//  $query = Drupal::entityTypeManager()
-//    ->getStorage('node')->getQuery()
-//    ->condition('type', 'advert')
-//    ->condition('status', NodeInterface::PUBLISHED)
-//    ->condition('field_advert_furnished', NULL, 'IS NULL');
-//  $ids = $query->execute();
-//  if (count($ids) > 0) {
-//    Drupal::logger('Updator')->info('Found adverts: ' . count($ids));
-//    foreach ($ids as $nid) {
-//      $update_processor->createItem($nid);
-//    }
-//  } else {
-//    Drupal::logger('Updator')->warning('No adverts to update');
-//  }
 }
 
 function getCampaignHtmlContent($sid, $name, $adverts)
@@ -159,7 +139,7 @@ function getCampaignHtmlContent($sid, $name, $adverts)
         'adverts' => $adverts,
         'cdn_enabled' => $cdn_enabled
     ];
-    return $twig_service->loadTemplate(drupal_get_path('theme', 'rir') . '/emails/hir-campaign-adverts.html.twig')
+    return $twig_service->loadTemplate(drupal_get_path('theme', 'houseinrwanda_theme') . '/emails/hir-campaign-adverts.html.twig')
         ->render($variables);
 }
 
@@ -181,6 +161,6 @@ function getExpiringAdvertsEmailContent($expiring_adverts, $date)
         'date' => $date
     ];
     $twig_service = Drupal::service('twig');
-    return $twig_service->loadTemplate(drupal_get_path('theme', 'rir') . '/emails/hir-expiring-adverts.html.twig')
+    return $twig_service->loadTemplate(drupal_get_path('theme', 'houseinrwanda_theme') . '/emails/hir-expiring-adverts.html.twig')
         ->render($variables);
 }
