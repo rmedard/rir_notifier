@@ -51,7 +51,7 @@ class DataAccessor
    *
    * @return array|int
    */
-  function countAdvertsByReference(string $reference = NULL)
+  function countAdvertsByReference(string $reference = NULL): array|int
   {
     $location = NULL;
     $advertType = NULL;

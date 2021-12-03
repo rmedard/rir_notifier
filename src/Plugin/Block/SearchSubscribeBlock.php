@@ -11,6 +11,7 @@ namespace Drupal\rir_notifier\Plugin\Block;
 
 use Drupal\Core\Block\Annotation\Block;
 use Drupal\Core\Block\BlockBase;
+use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * Class SearchSubscribeBlock
@@ -37,6 +38,7 @@ class SearchSubscribeBlock extends BlockBase {
    *
    * @see \Drupal\block\BlockViewBuilder
    */
+  #[ArrayShape(['#theme' => "string"])]
   public function build(): array
   {
     return [
