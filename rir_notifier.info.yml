@@ -4,13 +4,12 @@ package: RIR Custom Modules
 configure: rir_notifier.admin_settings
 
 type: module
-core: 8.x
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^9 || ^10
 
 dependencies:
   - webform:webform
   - twig_tweak:twig_tweak
   - publication_date:publication_date
   - rir_interface:rir_interface
-version: '8.x-1.0'
+version: '9.x-1.0'
 project: 'rir_notifier'
