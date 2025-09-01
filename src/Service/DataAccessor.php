@@ -12,7 +12,7 @@ namespace Drupal\rir_notifier\Service;
 use Drupal;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\Entity\Term;
@@ -31,16 +31,16 @@ class DataAccessor
   /**
    * Entity type manager.
    *
-   * @var EntityTypeManagerInterface
+   * @var EntityTypeManager
    */
-  protected EntityTypeManagerInterface $entityTypeManager;
+  protected EntityTypeManager $entityTypeManager;
 
   /**
    * DataAccessor constructor.
    *
-   * @param EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManager $entityTypeManager
    */
-  public function __construct(EntityTypeManagerInterface $entityTypeManager)
+  public function __construct(EntityTypeManager $entityTypeManager)
   {
     $this->entityTypeManager = $entityTypeManager;
   }
@@ -69,7 +69,7 @@ class DataAccessor
   {
     try {
       $adverts_ids = $this->getQuery($location, $advert, $property)->execute();
-      $storage = $this->entityTypeManager->getStorage('node');
+      $storage = $this->entityTypeManager->getStorage('node')->accessCheck(true);
       return $storage->loadMultiple($adverts_ids);
     } catch (InvalidPluginDefinitionException | PluginNotFoundException $e) {
       Drupal::logger('rir_notifier')->error("GetQuery failed: " . $e->getMessage());
@@ -83,7 +83,7 @@ class DataAccessor
     $end_time = strtotime('-1 days 23:59:59');
     $query = NULL;
     try {
-      $storage = $this->entityTypeManager->getStorage('node');
+      $storage = $this->entityTypeManager->getStorage('node')->accessCheck(true);
       $query = $storage->getQuery()
         ->condition('type', 'advert')
         ->condition('status', NodeInterface::PUBLISHED)
@@ -113,7 +113,7 @@ class DataAccessor
 
   public function getExpiredAdvertIds(): array
   {
-    $storage = $this->entityTypeManager->getStorage('node');
+    $storage = $this->entityTypeManager->getStorage('node')->accessCheck(true);
     $query = $storage->getQuery()
       ->condition('type', 'advert')
       ->condition('status', NodeInterface::NOT_PUBLISHED);
@@ -123,7 +123,7 @@ class DataAccessor
   public function getExpiringAdvertsByDate($date): array
   {
     try {
-      $storage = $this->entityTypeManager->getStorage('node');
+      $storage = $this->entityTypeManager->getStorage('node')->accessCheck(true);
       $query = $storage->getQuery()
         ->condition('type', 'advert')
         ->condition('status', NodeInterface::PUBLISHED)
@@ -148,7 +148,7 @@ class DataAccessor
   {
     $subscribers = [];
     try {
-      $submissionsStorage = $this->entityTypeManager->getStorage('webform_submission');
+      $submissionsStorage = $this->entityTypeManager->getStorage('webform_submission')->accessCheck(true);
       $subscriptionWebform = Webform::load('notification_subscription');
       if ($submissionsStorage instanceof WebformSubmissionStorage
         && $subscriptionWebform instanceof WebformInterface
@@ -167,7 +167,7 @@ class DataAccessor
           $submissions = WebformSubmission::loadMultiple($submissionIds);
           $start_time = strtotime('-1 days 00:00:00'); // Because emails are sent once a day.
           $end_time = strtotime('-1 days 23:59:59');
-          $nodeStorage = $this->entityTypeManager->getStorage('node');
+          $nodeStorage = $this->entityTypeManager->getStorage('node')->accessCheck(true);
           foreach ($submissions as $sid => $submission) {
             if ($submission instanceof WebformSubmissionInterface) {
 
