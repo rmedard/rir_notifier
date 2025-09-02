@@ -148,7 +148,7 @@ class DataAccessor
   {
     $subscribers = [];
     try {
-      $submissionsStorage = $this->entityTypeManager->getStorage('webform_submission')->accessCheck();
+      $submissionsStorage = $this->entityTypeManager->getStorage('webform_submission');
       $subscriptionWebform = Webform::load('notification_subscription');
       if ($submissionsStorage instanceof WebformSubmissionStorage
         && $subscriptionWebform instanceof WebformInterface
