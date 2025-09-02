@@ -140,7 +140,7 @@ function getCampaignHtmlContent($sid, $name, $adverts)
         'cdn_enabled' => $cdn_enabled
     ];
     $themePath = Drupal::service('extension.list.theme')->getPath('houseinrwanda_theme');
-    return $twig_service->loadTemplate($themePath . '/emails/hir-campaign-adverts.html.twig')->render($variables);
+    return $twig_service->load($themePath . '/emails/hir-campaign-adverts.html.twig')->render($variables);
 }
 
 function getExpiringAdvertsEmailContent($expiring_adverts, $date)
@@ -162,6 +162,6 @@ function getExpiringAdvertsEmailContent($expiring_adverts, $date)
     ];
     $themePath = Drupal::service('extension.list.theme')->getPath('houseinrwanda_theme');
     $twig_service = Drupal::service('twig');
-    return $twig_service->loadTemplate($themePath . '/emails/hir-expiring-adverts.html.twig')
+    return $twig_service->load($themePath . '/emails/hir-expiring-adverts.html.twig')
         ->render($variables);
 }
